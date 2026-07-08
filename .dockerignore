@@ -1,0 +1,14 @@
+node_modules
+dist
+server/dist
+uploads
+.env
+*.md
+!README.md
+.git
+.gitignore
+guidelines
+.pgdata-dev
+.pgdata-test
+uploads-test
+.github

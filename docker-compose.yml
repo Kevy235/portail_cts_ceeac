@@ -1,0 +1,42 @@
+# Déploiement autonome (alternative au mode Application + Database de Dokploy,
+# également utilisable en local avec Docker : `docker compose up --build`).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      DATABASE_URL: postgresql://portail_cts:${POSTGRES_PASSWORD:?definir POSTGRES_PASSWORD}@db:5432/portail_cts
+      JWT_SECRET: ${JWT_SECRET:?definir JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@ceeac-eccas.org}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?definir ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME:-Secrétariat APPS}
+      UPLOAD_DIR: /app/uploads
+      MAX_UPLOAD_MB: "50"
+    ports:
+      - "3001:3001"
+    volumes:
+      - uploads:/app/uploads
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portail_cts
+      POSTGRES_USER: portail_cts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definir POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portail_cts -d portail_cts"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  uploads:
+  pgdata:

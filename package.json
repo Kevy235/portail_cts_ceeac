@@ -1,0 +1,58 @@
+{
+  "name": "portail-web-document-cts",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Plateforme d'accès aux documents du CTS-APPS — CEEAC",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "vite",
+    "dev:api": "tsx watch server/src/index.ts",
+    "build": "npm run build:web && npm run build:api",
+    "build:web": "vite build",
+    "build:api": "tsc -p server/tsconfig.json",
+    "start": "node server/dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p server/tsconfig.json",
+    "dev:db": "node scripts/dev-db.mjs",
+    "test:smoke": "npm run build:api && node scripts/smoke-test.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "clsx": "2.1.1",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.5.2",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "0.487.0",
+    "multer": "^2.0.1",
+    "pg": "^8.16.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router": "7.18.1",
+    "sonner": "2.0.3",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.12",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.8.1",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.11.14",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "@vitejs/plugin-react": "4.7.0",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "4.1.12",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vite": "6.4.3"
+  }
+}
