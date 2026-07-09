@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import {
   BookOpen,
   Calendar,
+  CircleHelp,
   FileText,
   Info,
   LayoutDashboard,
@@ -43,7 +44,11 @@ const PARTICIPANT_NAV: NavItem[] = [
   { to: "/espace", icon: <BookOpen size={16} />, labelKey: "nav.library", settingsKey: "nav_library" },
   { to: "/espace/sessions", icon: <MessagesSquare size={16} />, labelKey: "nav.psessions", settingsKey: "nav_psessions" },
   { to: "/espace/profil", icon: <UserCircle size={16} />, labelKey: "nav.profile", settingsKey: "nav_profile" },
+  { to: "/espace/guide", icon: <CircleHelp size={16} />, labelKey: "nav.guide" },
 ];
+
+/** Pages accessibles aux invités (accès par codes de session). */
+const GUEST_PATHS = new Set(["/espace", "/espace/guide"]);
 
 export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
   const { user, logout } = useAuth();
@@ -58,7 +63,7 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
     variant === "admin"
       ? ADMIN_NAV
       : isGuest
-        ? PARTICIPANT_NAV.filter((item) => item.to === "/espace")
+        ? PARTICIPANT_NAV.filter((item) => GUEST_PATHS.has(item.to))
         : PARTICIPANT_NAV;
 
   // Retour en haut de page à chaque changement de route.

@@ -7,7 +7,7 @@ import { useI18n } from "@/i18n";
 import { api, ApiError } from "@/lib/api";
 import type { User } from "@/lib/types";
 import { COUNTRIES } from "@/lib/types";
-import { Field, FontSizeControl, inputClass, LangSelector } from "@/components/ui";
+import { Field, FontSizeControl, inputClass, LangSelector, PasswordInput } from "@/components/ui";
 import { CountryFlag } from "@/components/CountryFlag";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
@@ -233,27 +233,23 @@ export function RegisterPage() {
               </Field>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label={t("register.password")} required>
-                  <input
+                  <PasswordInput
                     required
-                    type="password"
                     minLength={8}
                     value={form.password}
                     onChange={(e) => set("password")(e.target.value)}
                     autoComplete="new-password"
                     placeholder="••••••••"
-                    className={inputClass}
                   />
                 </Field>
                 <Field label={t("register.confirmPassword")} required>
-                  <input
+                  <PasswordInput
                     required
-                    type="password"
                     minLength={8}
                     value={form.confirm}
                     onChange={(e) => set("confirm")(e.target.value)}
                     autoComplete="new-password"
                     placeholder="••••••••"
-                    className={inputClass}
                   />
                 </Field>
               </div>

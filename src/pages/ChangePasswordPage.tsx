@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useI18n } from "@/i18n";
-import { FontSizeControl, inputClass, LangSelector, LoadingBlock, PrimaryButton } from "@/components/ui";
+import { FontSizeControl, LangSelector, LoadingBlock, PasswordInput, PrimaryButton } from "@/components/ui";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 export function ChangePasswordPage() {
@@ -65,44 +65,38 @@ export function ChangePasswordPage() {
             <label htmlFor="current" className="block text-xs font-medium text-ink mb-1.5">
               {user.mustChangePassword ? t("pwd.currentTemp") : t("pwd.current")}
             </label>
-            <input
+            <PasswordInput
               id="current"
-              type="password"
               required
               autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className={inputClass}
             />
           </div>
           <div>
             <label htmlFor="new" className="block text-xs font-medium text-ink mb-1.5">
               {t("pwd.new")}
             </label>
-            <input
+            <PasswordInput
               id="new"
-              type="password"
               required
               minLength={8}
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className={inputClass}
             />
           </div>
           <div>
             <label htmlFor="confirm" className="block text-xs font-medium text-ink mb-1.5">
               {t("pwd.confirm")}
             </label>
-            <input
+            <PasswordInput
               id="confirm"
-              type="password"
               required
               minLength={8}
               autoComplete="new-password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className={inputClass}
             />
           </div>
 

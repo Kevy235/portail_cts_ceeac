@@ -9,6 +9,7 @@ import { AppLayout } from "@/components/Layout";
 import { LoadingBlock } from "@/components/ui";
 import { initFontSize } from "@/lib/fontsize";
 import { LoginPage } from "@/pages/LoginPage";
+import { GuideContent, GuidePage } from "@/pages/GuidePage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { ChangePasswordPage } from "@/pages/ChangePasswordPage";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
@@ -60,6 +61,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeRedirect />} />
         <Route path="/connexion" element={<LoginPage />} />
+        <Route path="/guide" element={<GuidePage />} />
         <Route path="/inscription" element={<RegisterPage />} />
         <Route path="/premiere-connexion" element={<ChangePasswordPage />} />
 
@@ -87,6 +89,7 @@ function App() {
           }
         >
           <Route index element={<ParticipantLibrary />} />
+          <Route path="guide" element={<GuideContent />} />
           <Route
             path="sessions"
             element={

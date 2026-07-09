@@ -407,6 +407,52 @@ export const en: Dict = {
   "set.groupLogin": "Login page",
   "set.groupFooter": "Contact & footer",
 
+  "common.showPwd": "Show password",
+  "common.hidePwd": "Hide password",
+
+  "login.guideLink": "User guide",
+  "nav.guide": "Guide",
+  "guide.title": "User guide",
+  "guide.subtitle": "The essentials for using the CTS-APPS platform",
+  "guide.intro":
+    "The CTS-APPS platform provides access to the official documents of the ECCAS Specialised Technical Committee on Political Affairs, Peace and Security. This guide summarises the essential procedures; the full guide is available from the DAPPS Secretariat.",
+  "guide.backToLogin": "Back to sign-in",
+  "guide.s1.title": "Access with the session codes (guest)",
+  "guide.s1.p":
+    "Have you received a session identifier (CTS-XXXXXX) and an access password? You can view the documents immediately, without creating an account.",
+  "guide.s1.1": "On the sign-in page, open the “Session codes” tab.",
+  "guide.s1.2": "Enter the session identifier and the access password you received.",
+  "guide.s1.3": "Click “Access the documents”: the library opens immediately.",
+  "guide.s1.note": "Guest access is valid for 24 hours; enter the codes again to renew it.",
+  "guide.s2.title": "Create your participant account (optional)",
+  "guide.s2.p":
+    "An account lets you take part in the discussion threads and receive reports by e-mail. The same session codes are used to register.",
+  "guide.s2.1": "Open the registration page via “Register here” or “Create my account”.",
+  "guide.s2.2": "Enter the session codes, then your details (name, institutional e-mail, country).",
+  "guide.s2.3": "Choose your personal password (at least 8 characters) and confirm.",
+  "guide.s2.note":
+    "From then on, always sign in with your e-mail address and personal password (“I have an account” tab).",
+  "guide.s3.title": "The document library",
+  "guide.s3.1": "Search a document by words from its title; filter by category or by session.",
+  "guide.s3.2":
+    "View a PDF online with the “eye” button, or download the desired version (FR, EN, PT, ES).",
+  "guide.s3.3":
+    "Documents bearing the “Coded document” badge require a reading key sent separately by the Secretariat.",
+  "guide.s4.title": "Sessions & discussions (account required)",
+  "guide.s4.1":
+    "The “Sessions & discussions” page presents the CTS calendar: dates, venue, status and related documents.",
+  "guide.s4.2":
+    "Open “Discussion” on a session to exchange with the other participants and the Secretariat (2,000 characters per message).",
+  "guide.s5.title": "Reading comfort",
+  "guide.s5.1": "The A / A+ / A++ button enlarges the text across the platform; your setting is remembered.",
+  "guide.s5.2": "The flag buttons switch the interface language instantly (FR, EN, PT, ES).",
+  "guide.s6.title": "Your profile",
+  "guide.s6.1":
+    "“My profile” summarises your accreditation details. For any correction or password change, please contact the DAPPS Secretariat.",
+  "guide.assistTitle": "Assistance",
+  "guide.assist":
+    "For any difficulty (access, password, accreditation), the DAPPS Secretariat remains at your disposal:",
+
   "login.tabAccount": "I have an account",
   "login.tabCodes": "Session codes",
   "login.codesHint":

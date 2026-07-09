@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { AlertTriangle, Check, Copy, Lock, RefreshCw, X, ZoomIn } from "lucide-react";
+import { AlertTriangle, Check, Copy, Eye, EyeOff, Lock, RefreshCw, X, ZoomIn } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -322,6 +322,41 @@ export const inputClass =
   "placeholder:text-slate2/45 hover:border-brand/50 " +
   "focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/15 " +
   "disabled:bg-mist disabled:text-slate2 disabled:cursor-not-allowed disabled:shadow-none";
+
+// ─── Champ mot de passe avec œil afficher/masquer ──────────────────────────────
+export function PasswordInput({
+  withIcon,
+  className,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  /** Affiche un cadenas à gauche (style des pages de connexion). */
+  withIcon?: boolean;
+}) {
+  const { t } = useI18n();
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      {withIcon && (
+        <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand/60" aria-hidden />
+      )}
+      <input
+        {...props}
+        type={visible ? "text" : "password"}
+        className={clsx(inputClass, "pr-10", withIcon && "pl-9", className)}
+      />
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? t("common.hidePwd") : t("common.showPwd")}
+        title={visible ? t("common.hidePwd") : t("common.showPwd")}
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-slate2/60 hover:text-brand hover:bg-brand-soft transition-colors"
+      >
+        {visible ? <EyeOff size={15} aria-hidden /> : <Eye size={15} aria-hidden />}
+      </button>
+    </div>
+  );
+}
 
 // ─── Modale accessible ─────────────────────────────────────────────────────────
 const FOCUSABLE =

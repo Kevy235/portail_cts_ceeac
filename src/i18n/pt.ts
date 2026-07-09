@@ -408,6 +408,52 @@ export const pt: Dict = {
   "set.groupLogin": "Página de início de sessão",
   "set.groupFooter": "Contacto e rodapé",
 
+  "common.showPwd": "Mostrar a palavra-passe",
+  "common.hidePwd": "Ocultar a palavra-passe",
+
+  "login.guideLink": "Guia do utilizador",
+  "nav.guide": "Guia",
+  "guide.title": "Guia do utilizador",
+  "guide.subtitle": "O essencial para utilizar a plataforma CTS-APPS",
+  "guide.intro":
+    "A plataforma CTS-APPS dá acesso aos documentos oficiais do Comité Técnico Especializado dos Assuntos Políticos, Paz e Segurança da CEEAC. Este guia resume os procedimentos essenciais; o guia completo pode ser obtido junto do Secretariado DAPPS.",
+  "guide.backToLogin": "Voltar ao início de sessão",
+  "guide.s1.title": "Aceder com os códigos de sessão (convidado)",
+  "guide.s1.p":
+    "Recebeu um identificador de sessão (CTS-XXXXXX) e uma palavra-passe de acesso? Pode consultar os documentos imediatamente, sem criar conta.",
+  "guide.s1.1": "Na página de início de sessão, abra o separador « Códigos de sessão ».",
+  "guide.s1.2": "Introduza o identificador de sessão e a palavra-passe de acesso recebidos.",
+  "guide.s1.3": "Clique em « Aceder aos documentos »: a biblioteca abre imediatamente.",
+  "guide.s1.note": "O acesso de convidado é válido por 24 horas; introduza novamente os códigos para o renovar.",
+  "guide.s2.title": "Criar a sua conta de participante (facultativo)",
+  "guide.s2.p":
+    "A conta permite participar nos fios de discussão e receber os relatórios por e-mail. Os mesmos códigos de sessão servem para a inscrição.",
+  "guide.s2.1": "Abra a página de inscrição através de « Inscreva-se aqui » ou « Criar a minha conta ».",
+  "guide.s2.2": "Introduza os códigos de sessão e depois os seus dados (nome, e-mail institucional, país).",
+  "guide.s2.3": "Escolha a sua palavra-passe pessoal (mínimo de 8 caracteres) e confirme.",
+  "guide.s2.note":
+    "A partir daí, inicie sempre sessão com o seu e-mail e a sua palavra-passe pessoal (separador « Tenho uma conta »).",
+  "guide.s3.title": "A biblioteca documental",
+  "guide.s3.1": "Pesquise um documento pelas palavras do título; filtre por categoria ou por sessão.",
+  "guide.s3.2":
+    "Consulte um PDF em linha com o botão « olho », ou descarregue a versão pretendida (FR, EN, PT, ES).",
+  "guide.s3.3":
+    "Os documentos com o distintivo « Documento codificado » requerem uma chave de leitura transmitida separadamente pelo Secretariado.",
+  "guide.s4.title": "Sessões e discussões (conta necessária)",
+  "guide.s4.1":
+    "A página « Sessões e discussões » apresenta o calendário do CTS: datas, local, estado e documentos associados.",
+  "guide.s4.2":
+    "Abra « Discussão » numa sessão para trocar impressões com os outros participantes e o Secretariado (2 000 caracteres por mensagem).",
+  "guide.s5.title": "Conforto de leitura",
+  "guide.s5.1": "O botão A / A+ / A++ amplia o texto de toda a plataforma; a sua preferência é guardada.",
+  "guide.s5.2": "Os botões com bandeiras mudam imediatamente a língua da interface (FR, EN, PT, ES).",
+  "guide.s6.title": "O seu perfil",
+  "guide.s6.1":
+    "« O meu perfil » resume os dados da sua acreditação. Para qualquer correção ou mudança de palavra-passe, contacte o Secretariado DAPPS.",
+  "guide.assistTitle": "Assistência",
+  "guide.assist":
+    "Para qualquer dificuldade (acesso, palavra-passe, acreditação), o Secretariado DAPPS permanece à sua disposição:",
+
   "login.tabAccount": "Tenho uma conta",
   "login.tabCodes": "Códigos de sessão",
   "login.codesHint":

@@ -423,6 +423,55 @@ export const fr = {
   "set.groupLogin": "Page de connexion",
   "set.groupFooter": "Contact & pied de page",
 
+  // ─── Mot de passe : afficher / masquer ────────────────────────────────
+  "common.showPwd": "Afficher le mot de passe",
+  "common.hidePwd": "Masquer le mot de passe",
+
+  // ─── Guide utilisateur intégré ────────────────────────────────────────
+  "login.guideLink": "Guide utilisateur",
+  "nav.guide": "Guide",
+  "guide.title": "Guide utilisateur",
+  "guide.subtitle": "L'essentiel pour bien utiliser la plateforme CTS-APPS",
+  "guide.intro":
+    "La plateforme CTS-APPS donne accès aux documents officiels du Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès du Secrétariat DAPPS.",
+  "guide.backToLogin": "Retour à la connexion",
+  "guide.s1.title": "Accéder avec les codes de session (invité)",
+  "guide.s1.p":
+    "Vous avez reçu un identifiant de session (CTS-XXXXXX) et un mot de passe d'accès ? Vous pouvez consulter les documents immédiatement, sans créer de compte.",
+  "guide.s1.1": "Sur la page de connexion, ouvrez l'onglet « Codes de session ».",
+  "guide.s1.2": "Saisissez l'identifiant de session et le mot de passe d'accès reçus.",
+  "guide.s1.3": "Cliquez sur « Accéder aux documents » : la bibliothèque s'ouvre immédiatement.",
+  "guide.s1.note":
+    "L'accès invité est valable 24 heures ; saisissez à nouveau les codes pour le renouveler.",
+  "guide.s2.title": "Créer votre compte participant (facultatif)",
+  "guide.s2.p":
+    "Le compte permet de participer aux fils de discussion et de recevoir les rapports par e-mail. Les mêmes codes de session servent à l'inscription.",
+  "guide.s2.1": "Ouvrez la page d'inscription via « Inscrivez-vous ici » ou « Créer mon compte ».",
+  "guide.s2.2": "Saisissez les codes de session, puis vos informations (nom, e-mail institutionnel, pays).",
+  "guide.s2.3": "Choisissez votre mot de passe personnel (8 caractères minimum) et validez.",
+  "guide.s2.note":
+    "Par la suite, connectez-vous toujours avec votre adresse e-mail et votre mot de passe personnel (onglet « J'ai un compte »).",
+  "guide.s3.title": "La bibliothèque documentaire",
+  "guide.s3.1": "Recherchez un document par les mots de son titre ; filtrez par catégorie ou par session.",
+  "guide.s3.2":
+    "Consultez un PDF en ligne avec le bouton « œil », ou téléchargez la version souhaitée (FR, EN, PT, ES).",
+  "guide.s3.3":
+    "Les documents portant le badge « Document codé » nécessitent une clé de lecture transmise séparément par le Secrétariat.",
+  "guide.s4.title": "Sessions & discussions (compte requis)",
+  "guide.s4.1":
+    "La page « Sessions & échanges » présente le calendrier des sessions du CTS : dates, lieu, statut et documents rattachés.",
+  "guide.s4.2":
+    "Ouvrez « Discussion » sur une session pour échanger avec les autres participants et le Secrétariat (2 000 caractères par message).",
+  "guide.s5.title": "Confort de lecture",
+  "guide.s5.1": "Le bouton A / A+ / A++ agrandit le texte de toute la plateforme ; votre réglage est conservé.",
+  "guide.s5.2": "Les boutons drapeaux changent immédiatement la langue de l'interface (FR, EN, PT, ES).",
+  "guide.s6.title": "Votre profil",
+  "guide.s6.1":
+    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous au Secrétariat DAPPS.",
+  "guide.assistTitle": "Assistance",
+  "guide.assist":
+    "Pour toute difficulté (accès, mot de passe, accréditation), le Secrétariat DAPPS demeure à votre disposition :",
+
   // ─── Accès invité par codes de session ────────────────────────────────
   "login.tabAccount": "J'ai un compte",
   "login.tabCodes": "Codes de session",

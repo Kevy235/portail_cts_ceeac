@@ -16,6 +16,7 @@ import {
   inputClass,
   LoadingBlock,
   PageHeader,
+  PasswordInput,
   PrimaryButton,
 } from "@/components/ui";
 
@@ -356,36 +357,30 @@ export function AdminSettings() {
             </div>
             <form onSubmit={handleChangePassword} className="space-y-4">
               <Field label={t("pwd.current")} required>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   autoComplete="current-password"
                   value={pwdCurrent}
                   onChange={(e) => setPwdCurrent(e.target.value)}
-                  className={inputClass}
                 />
               </Field>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label={t("pwd.new")} required>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     minLength={8}
                     autoComplete="new-password"
                     value={pwdNew}
                     onChange={(e) => setPwdNew(e.target.value)}
-                    className={inputClass}
                   />
                 </Field>
                 <Field label={t("pwd.confirm")} required>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     minLength={8}
                     autoComplete="new-password"
                     value={pwdConfirm}
                     onChange={(e) => setPwdConfirm(e.target.value)}
-                    className={inputClass}
                   />
                 </Field>
               </div>

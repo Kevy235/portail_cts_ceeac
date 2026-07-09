@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
-import { AlertCircle, ChevronRight, Globe, KeyRound, Lock, Mail } from "lucide-react";
+import { AlertCircle, ChevronRight, CircleHelp, Globe, KeyRound, Lock, Mail } from "lucide-react";
 import { clsx } from "clsx";
 import { useAuth } from "@/context/AuthContext";
 import { useSettings } from "@/context/SettingsContext";
 import { useI18n } from "@/i18n";
 import { ApiError } from "@/lib/api";
-import { FontSizeControl, inputClass, LangSelector } from "@/components/ui";
+import { FontSizeControl, inputClass, LangSelector, PasswordInput } from "@/components/ui";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 /**
@@ -206,22 +206,18 @@ export function LoginPage() {
                       <label htmlFor="password" className="block text-ink text-sm font-medium mb-1.5">
                         {t("login.password")}
                       </label>
-                      <div className="relative">
-                        <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand/60" aria-hidden />
-                        <input
-                          id="password"
-                          type="password"
-                          required
-                          autoComplete="current-password"
-                          value={password}
-                          onChange={(e) => {
-                            setPassword(e.target.value);
-                            setError("");
-                          }}
-                          placeholder="••••••••"
-                          className={`${inputClass} pl-9`}
-                        />
-                      </div>
+                      <PasswordInput
+                        id="password"
+                        withIcon
+                        required
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setError("");
+                        }}
+                        placeholder="••••••••"
+                      />
                     </div>
 
                     {errorBlock}
@@ -314,6 +310,17 @@ export function LoginPage() {
                   </p>
                 </>
               )}
+
+              {/* Aide : guide utilisateur accessible sans connexion */}
+              <p className="text-center mt-5">
+                <Link
+                  to="/guide"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline"
+                >
+                  <CircleHelp size={14} aria-hidden />
+                  {t("login.guideLink")}
+                </Link>
+              </p>
             </div>
           </div>
         </div>
