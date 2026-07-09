@@ -28,7 +28,7 @@ export function SessionCard({
   const { t } = useI18n();
 
   return (
-    <div className="bg-white rounded-xl border border-line-soft p-5 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl border border-line-soft p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       <div className="flex items-start gap-4 flex-wrap">
         <div
           className={clsx(

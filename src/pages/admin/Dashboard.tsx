@@ -108,7 +108,7 @@ export function AdminDashboard() {
         {cards.map(({ label, value, sub, color, icon }) => (
           <div
             key={label}
-            className={`bg-white rounded-xl p-4 border border-line-soft border-l-4 ${color} shadow-sm flex items-center gap-3 md:block`}
+            className={`bg-white rounded-xl p-4 border border-line-soft border-l-4 ${color} shadow-sm flex items-center gap-3 md:block transition-all duration-200 hover:shadow-md hover:-translate-y-0.5`}
           >
             <div className="w-9 h-9 rounded-lg bg-mist flex items-center justify-center flex-shrink-0 md:mb-3">
               {icon}

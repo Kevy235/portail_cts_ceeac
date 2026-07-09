@@ -51,13 +51,13 @@ git push -u origin main
    - **User** : `portail_cts`
    - **Password** : générez un mot de passe fort (bouton dés ou `openssl rand -base64 24`)
 4. Cliquez sur **Create** puis **Deploy**.
-5. Notez le **nom d'hôte interne** affiché dans l'onglet *Connection* (généralement le nom du service, ex. `portail-cts-db`). **N'exposez pas le port 5432 sur Internet** (laissez "External Port" vide).
-
-L'URL de connexion interne sera :
+5. Ouvrez l'onglet **Connections** (ou *Internal Credentials*) du service et **copiez l'URL de connexion interne** affichée par Dokploy. **Attention** : le nom d'hôte interne réel n'est **pas** le nom que vous avez saisi — Dokploy génère un identifiant technique (ex. `portail-cts-portailctsdb-x3k9f2`). Utilisez toujours l'URL copiée depuis cet onglet :
 
 ```
-postgresql://portail_cts:MOT_DE_PASSE@portail-cts-db:5432/portail_cts
+postgresql://portail_cts:MOT_DE_PASSE@NOM_INTERNE_GENERE:5432/portail_cts
 ```
+
+6. **N'exposez pas le port 5432 sur Internet** (laissez "External Port" vide).
 
 ## Étape 3 — Créer l'application
 
@@ -72,7 +72,7 @@ Onglet **Environment** de l'application, ajoutez :
 ```env
 NODE_ENV=production
 PORT=3001
-DATABASE_URL=postgresql://portail_cts:MOT_DE_PASSE@portail-cts-db:5432/portail_cts
+DATABASE_URL=postgresql://portail_cts:MOT_DE_PASSE@NOM_INTERNE_GENERE:5432/portail_cts
 JWT_SECRET=CHAINE_ALEATOIRE_LONGUE
 ADMIN_EMAIL=admin@ceeac-eccas.org
 ADMIN_PASSWORD=MOT_DE_PASSE_ADMIN_FORT
@@ -157,7 +157,8 @@ restic backup /var/lib/docker/volumes/portail-cts-uploads/_data
 | Symptôme | Cause probable | Solution |
 |---|---|---|
 | `Variables d'environnement manquantes en production` dans les logs | `DATABASE_URL` ou `JWT_SECRET` absent | Complétez l'onglet Environment et redéployez |
-| `ECONNREFUSED` vers PostgreSQL | Mauvais hôte dans `DATABASE_URL` | Utilisez le nom interne du service (pas `localhost`) et vérifiez que la base est déployée |
+| `getaddrinfo ENOTFOUND …` au démarrage | Le nom d'hôte dans `DATABASE_URL` n'existe pas sur le réseau Docker | Copiez l'URL interne exacte depuis l'onglet *Connections* de la base (le nom généré par Dokploy diffère du nom saisi) ; l'app et la base doivent être dans le même projet |
+| `ECONNREFUSED` vers PostgreSQL | Base arrêtée ou mauvais hôte dans `DATABASE_URL` | Utilisez le nom interne du service (pas `localhost`) et vérifiez que la base est déployée |
 | Erreur 502 sur le domaine | Mauvais port dans Domains | Le Container Port doit être `3001` |
 | Les fichiers disparaissent après redéploiement | Volume non monté | Vérifiez le montage `/app/uploads` (Étape 5) |
 | Upload refusé (« trop volumineux ») | Limite applicative ou Traefik | Augmentez `MAX_UPLOAD_MB` ; Traefik n'impose pas de limite par défaut |

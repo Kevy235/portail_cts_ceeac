@@ -137,7 +137,8 @@ export function PrimaryButton({
       {...props}
       className={clsx(
         "flex items-center justify-center gap-2 bg-brand text-white px-4 py-2.5 rounded-lg text-sm font-medium",
-        "hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+        "hover:bg-brand-dark hover:shadow-md hover:shadow-brand/25 active:scale-[0.98] transition-all duration-150",
+        "disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none",
         className
       )}
     >
@@ -156,7 +157,8 @@ export function SecondaryButton({
       {...props}
       className={clsx(
         "flex items-center justify-center gap-2 border border-line text-slate2 px-4 py-2.5 rounded-lg text-sm",
-        "hover:bg-mist transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+        "hover:bg-mist hover:border-brand/30 active:scale-[0.98] transition-all duration-150",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
         className
       )}
     >
@@ -306,7 +308,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-overlay-in"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -317,7 +319,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         className={clsx(
-          "bg-white rounded-2xl shadow-2xl w-full max-h-[92vh] overflow-y-auto",
+          "bg-white rounded-2xl shadow-2xl w-full max-h-[92vh] overflow-y-auto animate-modal-in",
           wide ? "max-w-2xl" : "max-w-lg"
         )}
       >

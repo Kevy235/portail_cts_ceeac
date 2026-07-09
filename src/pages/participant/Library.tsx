@@ -114,7 +114,7 @@ export function ParticipantLibrary() {
           return (
             <div
               key={doc.id}
-              className="bg-white rounded-xl border border-line-soft p-4 hover:shadow-md hover:border-brand/20 transition-all"
+              className="bg-white rounded-xl border border-line-soft p-4 hover:shadow-md hover:border-brand/20 hover:-translate-y-0.5 transition-all duration-200"
             >
               <div className="flex items-start gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
                 <div className="w-10 h-10 rounded-xl bg-brand/10 hidden sm:flex items-center justify-center flex-shrink-0">
