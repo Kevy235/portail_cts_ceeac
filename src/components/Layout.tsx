@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router";
 import {
   BookOpen,
@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessagesSquare,
   Settings,
   UserCircle,
   Users,
@@ -16,31 +17,36 @@ import { clsx } from "clsx";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useSettings } from "@/context/SettingsContext";
+import { useI18n } from "@/i18n";
+import type { Dict } from "@/i18n/fr";
 import { initials } from "@/lib/format";
+import { FontSizeControl, LangSelector } from "@/components/ui";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 interface NavItem {
   to: string;
-  icon: ReactNode;
-  label: string;
+  icon: React.ReactNode;
+  labelKey: keyof Dict;
 }
 
 const ADMIN_NAV: NavItem[] = [
-  { to: "/admin", icon: <LayoutDashboard size={17} />, label: "Tableau de bord" },
-  { to: "/admin/participants", icon: <Users size={17} />, label: "Participants" },
-  { to: "/admin/documents", icon: <FileText size={17} />, label: "Documents" },
-  { to: "/admin/sessions", icon: <Calendar size={17} />, label: "Sessions CTS" },
-  { to: "/admin/parametres", icon: <Settings size={17} />, label: "Contenus du portail" },
+  { to: "/admin", icon: <LayoutDashboard size={17} />, labelKey: "nav.dashboard" },
+  { to: "/admin/participants", icon: <Users size={17} />, labelKey: "nav.participants" },
+  { to: "/admin/documents", icon: <FileText size={17} />, labelKey: "nav.documents" },
+  { to: "/admin/sessions", icon: <Calendar size={17} />, labelKey: "nav.sessions" },
+  { to: "/admin/parametres", icon: <Settings size={17} />, labelKey: "nav.settings" },
 ];
 
 const PARTICIPANT_NAV: NavItem[] = [
-  { to: "/espace", icon: <BookOpen size={17} />, label: "Bibliothèque documentaire" },
-  { to: "/espace/profil", icon: <UserCircle size={17} />, label: "Mon profil" },
+  { to: "/espace", icon: <BookOpen size={17} />, labelKey: "nav.library" },
+  { to: "/espace/sessions", icon: <MessagesSquare size={17} />, labelKey: "nav.psessions" },
+  { to: "/espace/profil", icon: <UserCircle size={17} />, labelKey: "nav.profile" },
 ];
 
 export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
   const { user, logout } = useAuth();
   const { settings } = useSettings();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -51,7 +57,7 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
       await logout();
       navigate("/connexion");
     } catch {
-      toast.error("Échec de la déconnexion");
+      toast.error(t("header.logoutFailed"));
     }
   };
 
@@ -62,7 +68,7 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Ouvrir le menu"
+            aria-label={t("header.openMenu")}
             className="lg:hidden text-white/70 hover:text-white transition-colors p-1"
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -82,7 +88,11 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:flex items-center gap-2">
+            <FontSizeControl dark />
+            <LangSelector dark />
+          </div>
           <div className="flex items-center gap-2 border-l border-white/20 pl-3 sm:pl-4">
             <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white text-xs font-bold">
               {initials(user?.name ?? "?")}
@@ -91,7 +101,7 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
               <p className="text-white text-xs font-medium leading-tight">{user?.name}</p>
               <p className="text-white/40 text-[10px] leading-tight">
                 {variant === "admin"
-                  ? "Administrateur"
+                  ? t("header.admin")
                   : [user?.functionTitle, user?.country].filter(Boolean).join(" — ")}
               </p>
             </div>
@@ -99,8 +109,8 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
           <button
             onClick={handleLogout}
             className="text-white/60 hover:text-white transition-colors p-1.5 hover:bg-white/10 rounded"
-            title="Déconnexion"
-            aria-label="Déconnexion"
+            title={t("header.logout")}
+            aria-label={t("header.logout")}
           >
             <LogOut size={16} />
           </button>
@@ -117,11 +127,11 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
         >
           <div className="px-4 pt-6 pb-3">
             <p className="text-white/30 text-[10px] uppercase tracking-widest font-medium px-2">
-              {variant === "admin" ? "Administration" : "Menu"}
+              {variant === "admin" ? t("nav.section.admin") : t("nav.section.menu")}
             </p>
           </div>
           <nav className="flex-1 px-3 space-y-0.5">
-            {nav.map(({ to, icon, label }) => (
+            {nav.map(({ to, icon, labelKey }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -137,14 +147,18 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
                 }
               >
                 <span className="opacity-80">{icon}</span>
-                <span className="flex-1 text-left">{label}</span>
+                <span className="flex-1 text-left">{t(labelKey)}</span>
               </NavLink>
             ))}
           </nav>
-          <div className="p-3 m-3 rounded bg-white/5 border border-white/10">
+          <div className="px-3 pb-2 md:hidden flex items-center gap-2">
+            <FontSizeControl dark />
+            <LangSelector dark />
+          </div>
+          <div className="p-3 m-3 mt-0 rounded bg-white/5 border border-white/10">
             <p className="text-white/40 text-[11px] text-center">{settings.platform_subtitle}</p>
             <p className="text-accent text-[11px] text-center font-medium mt-0.5">
-              Accès sécurisé
+              {t("header.secureAccess")}
             </p>
           </div>
         </aside>
@@ -156,8 +170,13 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
           />
         )}
 
-        <main className="flex-1 overflow-y-auto p-5 lg:p-7 scrollbar-hide">
-          <div className={clsx("mx-auto", variant === "admin" ? "max-w-5xl" : "max-w-4xl")}>
+        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-10 lg:py-7 scrollbar-hide">
+          <div
+            className={clsx(
+              "mx-auto w-full",
+              variant === "admin" ? "max-w-[1440px]" : "max-w-5xl"
+            )}
+          >
             <Outlet />
           </div>
         </main>

@@ -4,9 +4,12 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { I18nProvider, useI18n } from "@/i18n";
 import { AppLayout } from "@/components/Layout";
 import { LoadingBlock } from "@/components/ui";
+import { initFontSize } from "@/lib/fontsize";
 import { LoginPage } from "@/pages/LoginPage";
+import { RegisterPage } from "@/pages/RegisterPage";
 import { ChangePasswordPage } from "@/pages/ChangePasswordPage";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { AdminParticipants } from "@/pages/admin/Participants";
@@ -14,6 +17,7 @@ import { AdminDocuments } from "@/pages/admin/Documents";
 import { AdminSessions } from "@/pages/admin/Sessions";
 import { AdminSettings } from "@/pages/admin/Settings";
 import { ParticipantLibrary } from "@/pages/participant/Library";
+import { ParticipantSessions } from "@/pages/participant/Sessions";
 import { ParticipantProfile } from "@/pages/participant/Profile";
 import "@/styles/index.css";
 
@@ -25,7 +29,8 @@ function Guard({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
-  if (loading) return <LoadingBlock label="Vérification de la session…" />;
+  const { t } = useI18n();
+  if (loading) return <LoadingBlock label={t("common.sessionCheck")} />;
   if (!user) return <Navigate to="/connexion" replace />;
   if (user.mustChangePassword) return <Navigate to="/premiere-connexion" replace />;
   if (role && user.role !== role) {
@@ -36,7 +41,7 @@ function Guard({
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
-  if (loading) return <LoadingBlock label="Chargement…" />;
+  if (loading) return <LoadingBlock />;
   if (!user) return <Navigate to="/connexion" replace />;
   if (user.mustChangePassword) return <Navigate to="/premiere-connexion" replace />;
   return <Navigate to={user.role === "admin" ? "/admin" : "/espace"} replace />;
@@ -48,6 +53,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeRedirect />} />
         <Route path="/connexion" element={<LoginPage />} />
+        <Route path="/inscription" element={<RegisterPage />} />
         <Route path="/premiere-connexion" element={<ChangePasswordPage />} />
 
         <Route
@@ -74,6 +80,7 @@ function App() {
           }
         >
           <Route index element={<ParticipantLibrary />} />
+          <Route path="sessions" element={<ParticipantSessions />} />
           <Route path="profil" element={<ParticipantProfile />} />
         </Route>
 
@@ -83,13 +90,18 @@ function App() {
   );
 }
 
+// Applique la taille de texte choisie avant le premier rendu.
+initFontSize();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <SettingsProvider>
-      <AuthProvider>
-        <App />
-        <Toaster position="top-right" richColors closeButton />
-      </AuthProvider>
-    </SettingsProvider>
+    <I18nProvider>
+      <SettingsProvider>
+        <AuthProvider>
+          <App />
+          <Toaster position="top-right" richColors closeButton />
+        </AuthProvider>
+      </SettingsProvider>
+    </I18nProvider>
   </StrictMode>
 );

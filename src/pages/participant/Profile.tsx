@@ -1,62 +1,106 @@
-import { useState } from "react";
-import { KeyRound, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
+import { KeyRound, Languages, Shield } from "lucide-react";
+import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useSettings } from "@/context/SettingsContext";
-import { COUNTRY_FLAGS } from "@/lib/types";
+import { COUNTRY_FLAGS, type User } from "@/lib/types";
 import { formatDate, initials } from "@/lib/format";
-import {
-  Field,
-  inputClass,
-  PrimaryButton,
-  StatusBadge,
-} from "@/components/ui";
+import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
+import { Field, inputClass, PrimaryButton, StatusBadge } from "@/components/ui";
 
 export function ParticipantProfile() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { settings } = useSettings();
+  const { t, setLang } = useI18n();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const [uiLang, setUiLang] = useState<Lang>(user?.uiLang ?? "fr");
+  const [docLangs, setDocLangs] = useState<Lang[]>(user?.docLangs ?? [...LANGS]);
+  const [prefsBusy, setPrefsBusy] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setUiLang(user.uiLang);
+      setDocLangs(user.docLangs);
+    }
+  }, [user]);
+
   if (!user) return null;
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (busy) return;
     if (newPassword !== confirm) {
-      toast.error("Les deux mots de passe ne correspondent pas");
+      toast.error(t("pwd.mismatch"));
       return;
     }
     setBusy(true);
     try {
       await api.post("/auth/change-password", { currentPassword, newPassword });
-      toast.success("Mot de passe mis à jour");
+      toast.success(t("pwd.updated"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirm("");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Échec de la mise à jour");
+      toast.error(err instanceof Error ? err.message : t("pwd.updateFailed"));
     } finally {
       setBusy(false);
     }
   };
 
+  const toggleDocLang = (lang: Lang) => {
+    setDocLangs((prev) =>
+      prev.includes(lang)
+        ? prev.length > 1
+          ? prev.filter((l) => l !== lang)
+          : prev
+        : [...prev, lang]
+    );
+  };
+
+  const handleSavePrefs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (prefsBusy) return;
+    setPrefsBusy(true);
+    try {
+      const { user: updated } = await api.put<{ user: User }>("/auth/preferences", {
+        uiLang,
+        docLangs,
+      });
+      setUser(updated);
+      setLang(uiLang);
+      toast.success(t("prof.prefsSaved"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("prof.prefsFailed"));
+    } finally {
+      setPrefsBusy(false);
+    }
+  };
+
   const infos = [
-    { label: "Adresse e-mail", value: user.email },
-    { label: "Institution", value: user.institution || "—" },
-    { label: "Pays représenté", value: user.country || "—" },
-    { label: "Fonction", value: user.functionTitle || "—" },
-    { label: "Date d'accréditation", value: formatDate(user.createdAt) },
+    { label: t("prof.email"), value: user.email },
+    { label: t("prof.institution"), value: user.institution || "—" },
+    { label: t("prof.country"), value: user.country || "—" },
+    { label: t("prof.function"), value: user.functionTitle || "—" },
+    { label: t("prof.accreditedOn"), value: formatDate(user.createdAt) },
+    ...(user.originSessionTitle
+      ? [{ label: t("prof.originSession"), value: user.originSessionTitle }]
+      : []),
   ];
 
+  const [accredBefore, accredAfter] = t("prof.accredText", { email: "\u0000" }).split("\u0000");
+
   return (
-    <div className="space-y-5 max-w-2xl">
+    <div className="space-y-5">
       <div>
-        <h2 className="text-ink text-xl font-bold font-title">Mon profil</h2>
-        <p className="text-slate2 text-sm mt-0.5">Informations de votre accréditation CTS-APPS</p>
+        <h2 className="text-ink text-2xl font-bold font-title">{t("prof.title")}</h2>
+        <p className="text-slate2 text-sm mt-0.5">{t("prof.subtitle")}</p>
       </div>
 
       <div className="bg-white rounded-xl border border-line-soft overflow-hidden">
@@ -80,7 +124,7 @@ export function ParticipantProfile() {
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {infos.map(({ label, value }) => (
               <div key={label} className="bg-mist rounded-lg px-4 py-3">
                 <p className="text-slate2/70 text-[11px] uppercase tracking-wide mb-1">{label}</p>
@@ -89,7 +133,7 @@ export function ParticipantProfile() {
             ))}
             <div className="bg-mist rounded-lg px-4 py-3">
               <p className="text-slate2/70 text-[11px] uppercase tracking-wide mb-1">
-                Statut d'accréditation
+                {t("prof.status")}
               </p>
               <StatusBadge status={user.status} />
             </div>
@@ -97,14 +141,65 @@ export function ParticipantProfile() {
         </div>
       </div>
 
+      {/* ─── Préférences de langue ─────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-line-soft p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Languages size={15} className="text-brand" />
+          <h3 className="text-sm font-semibold text-ink">{t("prof.prefs")}</h3>
+        </div>
+        <form onSubmit={handleSavePrefs} className="space-y-4">
+          <Field label={t("prof.uiLang")}>
+            <select
+              value={uiLang}
+              onChange={(e) => setUiLang(e.target.value as Lang)}
+              className={`${inputClass} max-w-xs`}
+            >
+              {LANGS.map((l) => (
+                <option key={l} value={l}>
+                  {LANG_LABELS[l]}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <div>
+            <p className="block text-xs font-medium text-ink mb-1.5">{t("prof.docLangs")}</p>
+            <p className="text-[11px] text-slate2/70 mb-2">{t("prof.docLangsNote")}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              {LANGS.map((l) => {
+                const active = docLangs.includes(l);
+                return (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => toggleDocLang(l)}
+                    className={clsx(
+                      "px-3 py-2 rounded-lg text-xs font-medium border transition-colors",
+                      active
+                        ? "bg-brand text-white border-brand"
+                        : "bg-white border-line text-slate2 hover:bg-mist"
+                    )}
+                  >
+                    <span className="uppercase font-bold mr-1.5">{l}</span>
+                    {LANG_LABELS[l]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <PrimaryButton type="submit" disabled={prefsBusy}>
+            {prefsBusy ? t("common.saving") : t("common.save")}
+          </PrimaryButton>
+        </form>
+      </div>
+
       {/* ─── Changement de mot de passe ────────────────────────────── */}
       <div className="bg-white rounded-xl border border-line-soft p-6">
         <div className="flex items-center gap-2 mb-4">
           <KeyRound size={15} className="text-brand" />
-          <h3 className="text-sm font-semibold text-ink">Changer mon mot de passe</h3>
+          <h3 className="text-sm font-semibold text-ink">{t("prof.changePwd")}</h3>
         </div>
         <form onSubmit={handleChangePassword} className="grid sm:grid-cols-3 gap-4">
-          <Field label="Mot de passe actuel" required>
+          <Field label={t("pwd.current")} required>
             <input
               type="password"
               required
@@ -114,7 +209,7 @@ export function ParticipantProfile() {
               className={inputClass}
             />
           </Field>
-          <Field label="Nouveau mot de passe" required>
+          <Field label={t("pwd.new")} required>
             <input
               type="password"
               required
@@ -125,7 +220,7 @@ export function ParticipantProfile() {
               className={inputClass}
             />
           </Field>
-          <Field label="Confirmation" required>
+          <Field label={t("pwd.confirm")} required>
             <input
               type="password"
               required
@@ -138,7 +233,7 @@ export function ParticipantProfile() {
           </Field>
           <div className="sm:col-span-3">
             <PrimaryButton type="submit" disabled={busy}>
-              {busy ? "Enregistrement…" : "Mettre à jour"}
+              {busy ? t("common.saving") : t("prof.update")}
             </PrimaryButton>
           </div>
         </form>
@@ -147,14 +242,13 @@ export function ParticipantProfile() {
       <div className="bg-accent-soft border border-accent/25 rounded-xl p-4 flex items-start gap-3">
         <Shield size={16} className="text-accent-dark flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-ink text-sm font-medium">Accréditation CTS-APPS</p>
+          <p className="text-ink text-sm font-medium">{t("prof.accredTitle")}</p>
           <p className="text-slate2 text-xs mt-0.5">
-            Votre accès à cette plateforme a été accordé par le Secrétariat du DAPPS-CEEAC. Pour
-            toute modification de vos informations, veuillez contacter{" "}
+            {accredBefore}
             <a href={`mailto:${settings.contact_email}`} className="text-brand hover:underline">
               {settings.contact_email}
             </a>
-            .
+            {accredAfter}
           </p>
         </div>
       </div>

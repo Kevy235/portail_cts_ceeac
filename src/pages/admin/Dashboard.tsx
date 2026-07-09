@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
   Calendar,
@@ -12,14 +11,17 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
-import { toast } from "sonner";
-import { api } from "@/lib/api";
 import type { Stats } from "@/lib/types";
-import { formatDate, timeAgo } from "@/lib/format";
-import { LoadingBlock } from "@/components/ui";
+import { useApiResource } from "@/lib/useApiResource";
+import { formatDate, timeAgoParts } from "@/lib/format";
+import { useI18n } from "@/i18n";
+import type { Dict } from "@/i18n/fr";
+import { ErrorBlock, LoadingBlock, PageHeader } from "@/components/ui";
 
 const ACTIVITY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
   participant_created: { icon: <UserPlus size={14} className="text-accent-dark" />, bg: "bg-accent-soft" },
+  participant_registered: { icon: <UserPlus size={14} className="text-violet-600" />, bg: "bg-violet-50" },
+  broadcast_sent: { icon: <Mail size={14} className="text-brand" />, bg: "bg-brand-soft" },
   participant_updated: { icon: <Users size={14} className="text-brand" />, bg: "bg-brand-soft" },
   participant_deleted: { icon: <Trash2 size={14} className="text-danger" />, bg: "bg-danger-soft" },
   document_published: { icon: <Upload size={14} className="text-brand" />, bg: "bg-brand-soft" },
@@ -33,46 +35,66 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
   login: { icon: <Users size={14} className="text-slate-400" />, bg: "bg-slate-100" },
 };
 
+const ACTIVITY_KEYS: Record<string, keyof Dict> = {
+  participant_created: "activity.participant_created",
+  participant_registered: "activity.participant_registered",
+  broadcast_sent: "activity.broadcast_sent",
+  participant_updated: "activity.participant_updated",
+  participant_deleted: "activity.participant_deleted",
+  document_published: "activity.document_published",
+  document_updated: "activity.document_updated",
+  document_deleted: "activity.document_deleted",
+  document_downloaded: "activity.document_downloaded",
+  session_created: "activity.session_created",
+  session_updated: "activity.session_updated",
+  session_deleted: "activity.session_deleted",
+  settings_updated: "activity.settings_updated",
+  login: "activity.login",
+};
+
 export function AdminDashboard() {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const { t } = useI18n();
+  const resource = useApiResource<Stats>("/stats");
+  const stats = resource.data;
 
-  useEffect(() => {
-    api
-      .get<Stats>("/stats")
-      .then(setStats)
-      .catch((err) => toast.error(err.message));
-  }, []);
+  if (resource.error && !stats)
+    return <ErrorBlock message={resource.error} onRetry={resource.reload} />;
+  if (!stats) return <LoadingBlock />;
 
-  if (!stats) return <LoadingBlock label="Chargement du tableau de bord…" />;
+  const timeAgo = (iso: string) => {
+    const parts = timeAgoParts(iso);
+    if (parts.key === "date") return parts.text;
+    return t(parts.key, "n" in parts ? { n: parts.n } : undefined);
+  };
 
   const cards = [
     {
-      label: "Participants actifs",
+      label: t("dash.activeParticipants"),
       value: stats.participants.actifs,
-      sub: `${stats.participants.total} compte(s) au total`,
+      sub: t("dash.totalAccounts", { n: stats.participants.total }),
       color: "border-l-brand",
       icon: <Users size={18} className="text-brand" />,
     },
     {
-      label: "Documents publiés",
+      label: t("dash.publishedDocs"),
       value: stats.documents.publies,
-      sub: `${stats.documents.brouillons} brouillon(s) en attente`,
+      sub: t("dash.pendingDrafts", { n: stats.documents.brouillons }),
       color: "border-l-accent",
       icon: <FileText size={18} className="text-accent-dark" />,
     },
     {
-      label: "Sessions planifiées",
+      label: t("dash.plannedSessions"),
       value: stats.sessions.planifiees,
       sub: stats.sessions.prochaine
-        ? `prochaine : ${formatDate(stats.sessions.prochaine.startDate)}`
-        : "aucune session à venir",
+        ? t("dash.nextOn", { date: formatDate(stats.sessions.prochaine.startDate) })
+        : t("dash.noUpcoming"),
       color: "border-l-violet-500",
       icon: <Calendar size={18} className="text-violet-500" />,
     },
     {
-      label: "Téléchargements",
+      label: t("dash.downloads"),
       value: stats.downloads.moisCourant,
-      sub: `${stats.downloads.total} au total`,
+      sub: t("dash.totalDownloads", { n: stats.downloads.total }),
       color: "border-l-amber-500",
       icon: <Download size={18} className="text-amber-500" />,
     },
@@ -80,43 +102,41 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-ink text-xl font-bold font-title">Tableau de bord</h2>
-        <p className="text-slate2 text-sm mt-0.5">
-          Vue d'ensemble — données en temps réel de la plateforme
-        </p>
-      </div>
+      <PageHeader title={t("dash.title")} subtitle={t("dash.subtitle")} />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
         {cards.map(({ label, value, sub, color, icon }) => (
           <div
             key={label}
-            className={`bg-white rounded-xl p-4 border border-line-soft border-l-4 ${color} shadow-sm`}
+            className={`bg-white rounded-xl p-4 border border-line-soft border-l-4 ${color} shadow-sm flex items-center gap-3 md:block`}
           >
-            <div className="w-9 h-9 rounded-lg bg-mist flex items-center justify-center mb-3">
+            <div className="w-9 h-9 rounded-lg bg-mist flex items-center justify-center flex-shrink-0 md:mb-3">
               {icon}
             </div>
-            <p className="text-2xl font-bold text-ink">{value}</p>
-            <p className="text-xs font-medium text-ink mt-0.5">{label}</p>
-            <p className="text-[11px] text-slate2/70 mt-0.5">{sub}</p>
+            <div className="min-w-0">
+              <p className="text-2xl font-bold text-ink leading-tight">{value}</p>
+              <p className="text-xs font-medium text-ink mt-0.5">{label}</p>
+              <p className="text-[11px] text-slate2/70 mt-0.5">{sub}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
         {/* Activité récente */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-line-soft overflow-hidden">
           <div className="px-5 py-4 border-b border-line-soft flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-ink">Activité récente</h3>
+            <h3 className="text-sm font-semibold text-ink">{t("dash.recentActivity")}</h3>
           </div>
           {stats.activity.length === 0 ? (
             <p className="px-5 py-10 text-center text-sm text-slate2/70">
-              Aucune activité enregistrée pour le moment
+              {t("dash.noActivity")}
             </p>
           ) : (
             <div className="divide-y divide-line-soft">
               {stats.activity.map((item) => {
                 const meta = ACTIVITY_ICONS[item.type] ?? ACTIVITY_ICONS.login;
+                const labelKey = ACTIVITY_KEYS[item.type];
                 return (
                   <div
                     key={item.id}
@@ -128,7 +148,9 @@ export function AdminDashboard() {
                       {meta.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-ink">{item.message}</p>
+                      <p className="text-xs font-medium text-ink">
+                        {labelKey ? t(labelKey) : item.message}
+                      </p>
                       <p className="text-[11px] text-slate2/70 truncate">{item.detail}</p>
                     </div>
                     <span className="text-[11px] text-slate2/70 flex-shrink-0">
@@ -147,49 +169,53 @@ export function AdminDashboard() {
             <div className="bg-brand-deep rounded-xl p-5 text-white">
               <div className="flex items-center gap-2 mb-3">
                 <Calendar size={14} className="text-accent" />
-                <p className="text-white/60 text-xs uppercase tracking-wide">Prochaine session</p>
+                <p className="text-white/60 text-xs uppercase tracking-wide">
+                  {t("dash.nextSession")}
+                </p>
               </div>
               <p className="font-bold text-sm leading-snug mb-1 font-title">
                 {stats.sessions.prochaine.title}
               </p>
               <p className="text-white/60 text-xs mb-3">
                 {formatDate(stats.sessions.prochaine.startDate)} ·{" "}
-                {stats.sessions.prochaine.location || "Lieu à confirmer"}
+                {stats.sessions.prochaine.location || t("dash.locationTbd")}
               </p>
               <div className="flex items-center gap-3 text-xs">
                 <span className="flex items-center gap-1 text-white/60">
-                  <Users size={11} /> {stats.sessions.prochaine.participants} participants
+                  <Users size={11} />{" "}
+                  {t("dash.nParticipants", { n: stats.sessions.prochaine.participants })}
                 </span>
                 <span className="flex items-center gap-1 text-white/60">
-                  <FileText size={11} /> {stats.sessions.prochaine.documents} documents
+                  <FileText size={11} />{" "}
+                  {t("dash.nDocuments", { n: stats.sessions.prochaine.documents })}
                 </span>
               </div>
               <Link
                 to="/admin/sessions"
                 className="mt-4 block text-center w-full bg-accent text-white text-xs font-medium py-2 rounded-lg hover:bg-accent-dark transition-colors"
               >
-                Gérer les sessions
+                {t("dash.manageSessions")}
               </Link>
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-line-soft p-5 text-center">
               <Calendar size={22} className="mx-auto text-slate2/40 mb-2" />
-              <p className="text-sm text-slate2">Aucune session planifiée</p>
+              <p className="text-sm text-slate2">{t("dash.noSessionPlanned")}</p>
               <Link to="/admin/sessions" className="text-brand text-xs hover:underline">
-                Créer une session
+                {t("dash.createSession")}
               </Link>
             </div>
           )}
 
           {/* Actions rapides */}
           <div className="bg-white rounded-xl border border-line-soft p-4">
-            <p className="text-xs font-semibold text-ink mb-3">Actions rapides</p>
+            <p className="text-xs font-semibold text-ink mb-3">{t("dash.quickActions")}</p>
             <div className="space-y-2">
               {[
-                { label: "Ajouter un participant", to: "/admin/participants", icon: <UserPlus size={13} /> },
-                { label: "Publier un document", to: "/admin/documents", icon: <Upload size={13} /> },
-                { label: "Créer une session", to: "/admin/sessions", icon: <Calendar size={13} /> },
-                { label: "Modifier les contenus", to: "/admin/parametres", icon: <Settings size={13} /> },
+                { label: t("dash.addParticipant"), to: "/admin/participants", icon: <UserPlus size={13} /> },
+                { label: t("dash.publishDocument"), to: "/admin/documents", icon: <Upload size={13} /> },
+                { label: t("dash.createSession"), to: "/admin/sessions", icon: <Calendar size={13} /> },
+                { label: t("dash.editContents"), to: "/admin/parametres", icon: <Settings size={13} /> },
               ].map(({ label, to, icon }) => (
                 <Link
                   key={label}
@@ -205,10 +231,7 @@ export function AdminDashboard() {
 
           <div className="bg-white rounded-xl border border-line-soft p-4 flex items-start gap-2">
             <Mail size={14} className="text-brand flex-shrink-0 mt-0.5" />
-            <p className="text-[11px] text-slate2 leading-relaxed">
-              Les mots de passe provisoires générés à la création d'un compte sont affichés une
-              seule fois — transmettez-les au participant par un canal sûr.
-            </p>
+            <p className="text-[11px] text-slate2 leading-relaxed">{t("dash.tempPwdNote")}</p>
           </div>
         </div>
       </div>

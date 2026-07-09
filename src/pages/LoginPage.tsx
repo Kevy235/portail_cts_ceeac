@@ -1,27 +1,29 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import {
-  AlertCircle,
-  ChevronRight,
-  FileCheck,
-  Globe,
-  Lock,
-  Mail,
-} from "lucide-react";
+import { Link, Navigate, useNavigate } from "react-router";
+import { AlertCircle, ChevronRight, Globe, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSettings } from "@/context/SettingsContext";
-import { inputClass } from "@/components/ui";
+import { useI18n } from "@/i18n";
+import { ApiError } from "@/lib/api";
+import { FontSizeControl, inputClass, LangSelector } from "@/components/ui";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { user, loading, login } = useAuth();
   const { settings } = useSettings();
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Un utilisateur déjà connecté est renvoyé vers son espace.
+  if (!loading && user && !busy) {
+    if (user.mustChangePassword) return <Navigate to="/premiere-connexion" replace />;
+    return <Navigate to={user.role === "admin" ? "/admin" : "/espace"} replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,11 +34,21 @@ export function LoginPage() {
       if (user.mustChangePassword) navigate("/premiere-connexion");
       else navigate(user.role === "admin" ? "/admin" : "/espace");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Connexion impossible");
+      if (err instanceof ApiError && err.code === "invalid_credentials") {
+        setError(t("login.invalidCredentials"));
+      } else if (err instanceof ApiError && err.code === "account_disabled") {
+        setError(t("login.accountDisabled"));
+      } else {
+        setError(err instanceof Error ? err.message : t("login.failed"));
+      }
     } finally {
       setBusy(false);
     }
   };
+
+  const [noAccountBefore, noAccountAfter] = t("login.noAccount", {
+    email: "\u0000",
+  }).split("\u0000");
 
   return (
     <div className="min-h-screen bg-brand-deep flex flex-col">
@@ -47,6 +59,10 @@ export function LoginPage() {
             <span className="text-white/40 text-xs">
               ceeac-eccas.org · {settings.platform_subtitle}
             </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FontSizeControl dark />
+            <LangSelector dark />
           </div>
         </div>
       </div>
@@ -69,21 +85,6 @@ export function LoginPage() {
               </p>
             </div>
 
-            <div className="space-y-3">
-              {[
-                { icon: <Lock size={14} />, text: "Accès sécurisé par invitation" },
-                { icon: <FileCheck size={14} />, text: "Documents officiels CEEAC" },
-                { icon: <Globe size={14} />, text: "11 États membres de la CEEAC" },
-              ].map(({ icon, text }) => (
-                <div key={text} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
-                    {icon}
-                  </div>
-                  <span className="text-white/50 text-xs">{text}</span>
-                </div>
-              ))}
-            </div>
-
             <div className="border-t border-white/10 pt-4">
               <p className="text-white/25 text-[11px]">{settings.footer_text}</p>
             </div>
@@ -92,15 +93,13 @@ export function LoginPage() {
           {/* Formulaire */}
           <div className="lg:col-span-3 bg-white p-8 lg:p-10">
             <div className="max-w-sm mx-auto">
-              <h2 className="text-ink text-xl font-bold mb-1 font-title">
-                Connexion à la plateforme
-              </h2>
+              <h2 className="text-ink text-xl font-bold mb-1 font-title">{t("login.title")}</h2>
               <p className="text-slate2 text-sm mb-8">{settings.login_notice}</p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label htmlFor="email" className="block text-ink text-sm font-medium mb-1.5">
-                    Adresse e-mail
+                    {t("login.email")}
                   </label>
                   <div className="relative">
                     <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate2/50" />
@@ -114,7 +113,7 @@ export function LoginPage() {
                         setEmail(e.target.value);
                         setError("");
                       }}
-                      placeholder="votre.nom@institution.pays"
+                      placeholder={t("login.emailPlaceholder")}
                       className={`${inputClass} pl-9`}
                     />
                   </div>
@@ -122,7 +121,7 @@ export function LoginPage() {
 
                 <div>
                   <label htmlFor="password" className="block text-ink text-sm font-medium mb-1.5">
-                    Mot de passe
+                    {t("login.password")}
                   </label>
                   <div className="relative">
                     <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate2/50" />
@@ -154,18 +153,26 @@ export function LoginPage() {
                   disabled={busy}
                   className="w-full bg-brand text-white py-2.5 rounded-lg font-medium text-sm hover:bg-brand-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                 >
-                  {busy ? "Connexion…" : "Se connecter"}
+                  {busy ? t("login.submitting") : t("login.submit")}
                   {!busy && <ChevronRight size={16} />}
                 </button>
               </form>
 
-              <p className="text-center text-slate2/70 text-xs mt-8">
-                Vous n'avez pas de compte ? Contactez le Secrétariat DAPPS (
-                <a href={`mailto:${settings.contact_email}`} className="text-brand hover:underline">
-                  {settings.contact_email}
-                </a>
-                ) pour une accréditation.
-              </p>
+              <div className="mt-8 pt-5 border-t border-line-soft">
+                <p className="text-center text-slate2 text-sm">
+                  {t("login.registerPrompt")}{" "}
+                  <Link to="/inscription" className="text-brand hover:underline font-medium">
+                    {t("login.registerLink")}
+                  </Link>
+                </p>
+                <p className="text-center text-slate2/80 text-xs mt-3">
+                  {noAccountBefore}
+                  <a href={`mailto:${settings.contact_email}`} className="text-brand hover:underline">
+                    {settings.contact_email}
+                  </a>
+                  {noAccountAfter}
+                </p>
+              </div>
             </div>
           </div>
         </div>

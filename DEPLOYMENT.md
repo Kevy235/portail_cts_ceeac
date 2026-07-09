@@ -77,12 +77,24 @@ JWT_SECRET=CHAINE_ALEATOIRE_LONGUE
 ADMIN_EMAIL=admin@ceeac-eccas.org
 ADMIN_PASSWORD=MOT_DE_PASSE_ADMIN_FORT
 ADMIN_NAME=Secrétariat APPS
+APP_URL=https://documents.votre-domaine.org
 UPLOAD_DIR=/app/uploads
 MAX_UPLOAD_MB=50
+
+# Diffusion des rapports par e-mail (optionnel — la fonction est
+# désactivée proprement si SMTP_HOST est absent)
+SMTP_HOST=smtp.votre-fournisseur.org
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=no-reply@votre-domaine.org
+SMTP_PASS=MOT_DE_PASSE_SMTP
+SMTP_FROM="Plateforme CTS-APPS <no-reply@votre-domaine.org>"
 ```
 
-- `JWT_SECRET` : générez-le avec `openssl rand -base64 48` (obligatoire en production, le démarrage échoue sinon).
-- `ADMIN_EMAIL` / `ADMIN_PASSWORD` : identifiants du compte administrateur créé **au premier démarrage uniquement** (s'il n'existe aucun admin). Changez ensuite le mot de passe depuis l'application si besoin.
+- `JWT_SECRET` : générez-le avec `openssl rand -base64 48` (**obligatoire en production**, le démarrage échoue sinon).
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` : identifiants du compte administrateur créé **au premier démarrage uniquement** (s'il n'existe aucun admin). `ADMIN_PASSWORD` est **obligatoire en production**. Changez ensuite le mot de passe depuis l'application si besoin.
+- `APP_URL` : URL publique de la plateforme, utilisée pour construire les liens dans les e-mails de diffusion.
+- `SMTP_*` : paramètres du serveur d'envoi pour la fonction « Diffuser par e-mail » (rapports de réunion envoyés aux participants). `SMTP_SECURE=true` pour le port 465 (TLS implicite), `false` pour le port 587 (STARTTLS).
 
 ## Étape 5 — Volume persistant pour les fichiers
 
@@ -163,11 +175,14 @@ Le dépôt inclut une CI GitHub Actions (`.github/workflows/ci.yml`) qui, à cha
 ## Checklist de mise en production
 
 - [ ] `JWT_SECRET` généré aléatoirement (48+ caractères), jamais réutilisé d'un autre projet
-- [ ] `ADMIN_PASSWORD` fort et stocké dans un gestionnaire de mots de passe
+- [ ] `ADMIN_PASSWORD` fort et stocké dans un gestionnaire de mots de passe (obligatoire : le démarrage échoue sinon)
+- [ ] `APP_URL` renseigné (liens corrects dans les e-mails)
 - [ ] Port PostgreSQL **non exposé** sur Internet (pas d'External Port dans Dokploy)
+- [ ] Port 3001 de l'application **non publié** directement (uniquement via Traefik) — sinon le rate-limit de connexion peut être contourné
 - [ ] Volume `/app/uploads` monté (Étape 5)
 - [ ] Domaine en HTTPS avec certificat Let's Encrypt actif
 - [ ] `https://…/api/health` répond `{"status":"ok"}`
+- [ ] Variables `SMTP_*` configurées si la diffusion des rapports par e-mail est souhaitée (testez avec le bouton « Diffuser » d'une session)
 - [ ] Sauvegarde planifiée de la base configurée (Étape 9)
 - [ ] Connexion admin testée + contenus du portail personnalisés
-- [ ] Compte participant de test créé puis supprimé (vérifie le parcours complet)
+- [ ] Parcours d'auto-inscription testé : créer une session, copier l'invitation, créer un compte via `/inscription`, puis supprimer le compte de test

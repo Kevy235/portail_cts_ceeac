@@ -1,3 +1,5 @@
+import type { Lang } from "@/i18n";
+
 export type Role = "admin" | "participant";
 export type UserStatus = "actif" | "en-attente" | "inactif";
 export type DocStatus = "publié" | "brouillon";
@@ -15,6 +17,11 @@ export interface User {
   mustChangePassword: boolean;
   createdAt: string;
   lastLoginAt?: string | null;
+  uiLang: Lang;
+  docLangs: Lang[];
+  /** Session CTS via laquelle le participant s'est auto-inscrit (le cas échéant). */
+  originSessionId?: string | null;
+  originSessionTitle?: string | null;
 }
 
 export interface CtsSession {
@@ -28,7 +35,12 @@ export interface CtsSession {
   description: string;
   expectedParticipants: number;
   documentCount: number;
+  /** Participants auto-inscrits via les accès de cette session. */
+  registeredCount: number;
   createdAt: string;
+  /** Identifiants d'accès — présents uniquement pour l'administrateur. */
+  accessCode?: string;
+  accessPassword?: string;
 }
 
 export interface Category {
@@ -37,13 +49,19 @@ export interface Category {
   position: number;
 }
 
+export interface DocFile {
+  lang: Lang;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+}
+
 export interface Doc {
   id: string;
   title: string;
   status: DocStatus;
-  fileName: string;
-  fileSize: number;
-  mimeType: string;
+  /** Document chiffré/codé par l'administrateur avant téléversement. */
+  isCoded: boolean;
   createdAt: string;
   updatedAt: string;
   categoryId: string | null;
@@ -51,7 +69,18 @@ export interface Doc {
   sessionId: string | null;
   sessionTitle: string | null;
   sessionReference: string | null;
+  files: DocFile[];
   downloads: number;
+}
+
+export interface ChatMessage {
+  id: number;
+  body: string;
+  createdAt: string;
+  authorId: string | null;
+  authorName: string;
+  authorCountry: string;
+  authorRole: string;
 }
 
 export interface ActivityItem {

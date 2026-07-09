@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Copy,
   Edit3,
@@ -12,14 +12,19 @@ import {
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { COUNTRIES, COUNTRY_FLAGS, type User, type UserStatus } from "@/lib/types";
+import { useApiResource } from "@/lib/useApiResource";
 import { formatDate, initials } from "@/lib/format";
+import { useI18n } from "@/i18n";
 import {
   ConfirmDialog,
+  copyToClipboard,
   EmptyState,
+  ErrorBlock,
   Field,
   inputClass,
   LoadingBlock,
   Modal,
+  PageHeader,
   PrimaryButton,
   SecondaryButton,
   StatusBadge,
@@ -44,24 +49,19 @@ const EMPTY_FORM: FormState = {
 };
 
 export function AdminParticipants() {
-  const [participants, setParticipants] = useState<User[] | null>(null);
+  const { t } = useI18n();
+  const resource = useApiResource<{ participants: User[] }>("/participants");
+  const participants = resource.data?.participants ?? null;
+  const load = resource.reload;
+
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editing, setEditing] = useState<User | null>(null);
   const [deleting, setDeleting] = useState<User | null>(null);
+  const [resetting, setResetting] = useState<User | null>(null);
   const [busy, setBusy] = useState(false);
   const [tempPassword, setTempPassword] = useState<{ email: string; password: string } | null>(null);
-
-  const load = () =>
-    api
-      .get<{ participants: User[] }>("/participants")
-      .then((r) => setParticipants(r.participants))
-      .catch((err) => toast.error(err.message));
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const filtered = useMemo(() => {
     if (!participants) return [];
@@ -95,6 +95,7 @@ export function AdminParticipants() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (busy) return;
     setBusy(true);
     try {
       if (modal === "create") {
@@ -103,70 +104,86 @@ export function AdminParticipants() {
           temporaryPassword: string;
         }>("/participants", form);
         setTempPassword({ email: form.email, password: temporaryPassword });
-        toast.success("Compte participant créé");
+        toast.success(t("part.created"));
       } else if (editing) {
         await api.put(`/participants/${editing.id}`, form);
-        toast.success("Participant mis à jour");
+        toast.success(t("part.updated"));
       }
       setModal(null);
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Opération impossible");
+      toast.error(err instanceof Error ? err.message : t("part.opFailed"));
     } finally {
       setBusy(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!deleting) return;
+    if (!deleting || busy) return;
     setBusy(true);
     try {
       await api.delete(`/participants/${deleting.id}`);
-      toast.success(`${deleting.name} supprimé`);
+      toast.success(t("part.deleted", { name: deleting.name }));
       setDeleting(null);
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Suppression impossible");
+      toast.error(err instanceof Error ? err.message : t("part.opFailed"));
     } finally {
       setBusy(false);
     }
   };
 
-  const handleResetPassword = async (p: User) => {
+  // Réinitialisation : action destructive → confirmation + verrou anti double-clic.
+  const handleResetPassword = async () => {
+    if (!resetting || busy) return;
+    setBusy(true);
     try {
       const { temporaryPassword } = await api.post<{ temporaryPassword: string }>(
-        `/participants/${p.id}/reset-password`
+        `/participants/${resetting.id}/reset-password`
       );
-      setTempPassword({ email: p.email, password: temporaryPassword });
-      toast.success("Mot de passe réinitialisé");
+      setTempPassword({ email: resetting.email, password: temporaryPassword });
+      setResetting(null);
+      toast.success(t("part.pwdReset"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Réinitialisation impossible");
+      toast.error(err instanceof Error ? err.message : t("part.opFailed"));
+    } finally {
+      setBusy(false);
     }
   };
 
-  if (!participants) return <LoadingBlock label="Chargement des participants…" />;
+  if (resource.error && !participants)
+    return <ErrorBlock message={resource.error} onRetry={load} />;
+  if (!participants) return <LoadingBlock />;
+
+  const columns = [
+    t("part.colExpert"),
+    t("part.colCountry"),
+    t("part.colFunction"),
+    t("part.colStatus"),
+    t("part.colCreated"),
+    t("part.colActions"),
+  ];
 
   return (
     <div className="space-y-5">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-ink text-xl font-bold font-title">Gestion des participants</h2>
-          <p className="text-slate2 text-sm mt-0.5">
-            Experts accrédités au Comité Technique Spécialisé
-          </p>
-        </div>
-        <PrimaryButton onClick={openCreate}>
-          <UserPlus size={15} />
-          Créer un compte
-        </PrimaryButton>
-      </div>
+      <PageHeader
+        title={t("part.title")}
+        subtitle={t("part.subtitle")}
+        action={
+          <PrimaryButton onClick={openCreate}>
+            <UserPlus size={15} />
+            {t("part.create")}
+          </PrimaryButton>
+        }
+      />
 
       <div className="relative max-w-md">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate2/50" />
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate2/50" aria-hidden />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher par nom, pays ou e-mail…"
+          placeholder={t("part.searchPh")}
+          aria-label={t("part.searchPh")}
           className={`${inputClass} pl-9 py-2`}
         />
       </div>
@@ -176,9 +193,10 @@ export function AdminParticipants() {
           <table className="w-full">
             <thead className="bg-mist border-b border-line-soft">
               <tr>
-                {["Expert", "Pays", "Fonction", "Statut", "Créé le", "Actions"].map((h) => (
+                {columns.map((h) => (
                   <th
                     key={h}
+                    scope="col"
                     className="px-4 py-3 text-left text-xs font-semibold text-slate2 uppercase tracking-wide whitespace-nowrap"
                   >
                     {h}
@@ -196,7 +214,12 @@ export function AdminParticipants() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-ink">{p.name}</p>
-                        <p className="text-[11px] text-slate2/70">{p.email}</p>
+                        <p className="text-xs text-slate2/80">{p.email}</p>
+                        {p.originSessionTitle && (
+                          <p className="text-[11px] text-accent-dark mt-0.5">
+                            {t("part.viaSession", { title: p.originSessionTitle })}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -216,26 +239,26 @@ export function AdminParticipants() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleResetPassword(p)}
+                        onClick={() => setResetting(p)}
                         className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
-                        title="Réinitialiser le mot de passe"
-                        aria-label="Réinitialiser le mot de passe"
+                        title={t("part.resetPwd")}
+                        aria-label={t("part.resetPwd")}
                       >
                         <KeyRound size={14} />
                       </button>
                       <button
                         onClick={() => openEdit(p)}
                         className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
-                        title="Modifier"
-                        aria-label="Modifier"
+                        title={t("common.edit")}
+                        aria-label={t("common.edit")}
                       >
                         <Edit3 size={14} />
                       </button>
                       <button
                         onClick={() => setDeleting(p)}
                         className="p-1.5 rounded hover:bg-danger-soft text-slate2/60 hover:text-danger transition-colors"
-                        title="Supprimer"
-                        aria-label="Supprimer"
+                        title={t("common.delete")}
+                        aria-label={t("common.delete")}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -248,59 +271,51 @@ export function AdminParticipants() {
           {filtered.length === 0 && (
             <EmptyState
               icon={<Users size={32} />}
-              message={
-                search
-                  ? "Aucun participant ne correspond à la recherche"
-                  : "Aucun participant — créez le premier compte"
-              }
+              message={search ? t("part.emptySearch") : t("part.empty")}
             />
           )}
         </div>
         <div className="px-4 py-3 border-t border-line-soft">
-          <p className="text-xs text-slate2/70">{filtered.length} participant(s) affiché(s)</p>
+          <p className="text-xs text-slate2/70">{t("part.shown", { n: filtered.length })}</p>
         </div>
       </div>
 
       {/* ─── Modale création / édition ────────────────────────────── */}
       {modal && (
         <Modal
-          title={modal === "create" ? "Créer un compte participant" : "Modifier le participant"}
-          subtitle={
-            modal === "create"
-              ? "Un mot de passe provisoire sera généré et affiché une seule fois"
-              : editing?.email
-          }
+          title={modal === "create" ? t("part.createTitle") : t("part.editTitle")}
+          subtitle={modal === "create" ? t("part.createSubtitle") : editing?.email}
           onClose={() => setModal(null)}
         >
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <Field label="Nom complet" required>
+            <Field label={t("part.fullName")} required>
               <input
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Dr. Prénom Nom"
+                placeholder={t("part.fullNamePh")}
                 className={inputClass}
               />
             </Field>
-            <Field label="Adresse e-mail institutionnelle" required>
+            <Field label={t("part.email")} required>
               <input
                 required
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="prenom.nom@institution.pays"
+                placeholder={t("part.emailPh")}
                 className={inputClass}
               />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Pays" required>
+              <Field label={t("part.country")} required>
                 <select
                   required
                   value={form.country}
                   onChange={(e) => setForm({ ...form, country: e.target.value })}
                   className={inputClass}
                 >
-                  <option value="">Sélectionner…</option>
+                  <option value="">{t("common.select")}</option>
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -308,49 +323,49 @@ export function AdminParticipants() {
                   ))}
                 </select>
               </Field>
-              <Field label="Fonction" required>
+              <Field label={t("part.function")} required>
                 <input
                   required
                   value={form.functionTitle}
                   onChange={(e) => setForm({ ...form, functionTitle: e.target.value })}
-                  placeholder="Expert Principal"
+                  placeholder={t("part.functionPh")}
                   className={inputClass}
                 />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Institution">
+              <Field label={t("part.institution")}>
                 <input
                   value={form.institution}
                   onChange={(e) => setForm({ ...form, institution: e.target.value })}
-                  placeholder="Ministère des Affaires Étrangères"
+                  placeholder={t("part.institutionPh")}
                   className={inputClass}
                 />
               </Field>
-              <Field label="Statut">
+              <Field label={t("part.status")}>
                 <select
                   value={form.status}
                   onChange={(e) => setForm({ ...form, status: e.target.value as UserStatus })}
                   className={inputClass}
                 >
-                  <option value="en-attente">En attente</option>
-                  <option value="actif">Actif</option>
-                  <option value="inactif">Inactif</option>
+                  <option value="en-attente">{t("status.en-attente")}</option>
+                  <option value="actif">{t("status.actif")}</option>
+                  <option value="inactif">{t("status.inactif")}</option>
                 </select>
               </Field>
             </div>
 
             <div className="flex gap-3 pt-1">
               <SecondaryButton type="button" className="flex-1" onClick={() => setModal(null)}>
-                Annuler
+                {t("common.cancel")}
               </SecondaryButton>
               <PrimaryButton type="submit" className="flex-1" disabled={busy}>
                 <Mail size={14} />
                 {busy
-                  ? "Enregistrement…"
+                  ? t("common.saving")
                   : modal === "create"
-                    ? "Créer le compte"
-                    : "Enregistrer"}
+                    ? t("part.createBtn")
+                    : t("common.save")}
               </PrimaryButton>
             </div>
           </form>
@@ -360,35 +375,37 @@ export function AdminParticipants() {
       {/* ─── Mot de passe provisoire ───────────────────────────────── */}
       {tempPassword && (
         <Modal
-          title="Identifiants provisoires"
-          subtitle="Affichés une seule fois — transmettez-les par un canal sûr"
+          title={t("part.tempTitle")}
+          subtitle={t("part.tempSubtitle")}
           onClose={() => setTempPassword(null)}
         >
           <div className="p-6 space-y-4">
             <div className="bg-mist rounded-lg p-4 space-y-2">
               <p className="text-xs text-slate2">
-                E-mail : <span className="font-mono text-ink">{tempPassword.email}</span>
+                {t("part.tempEmail")}{" "}
+                <span className="font-mono text-ink">{tempPassword.email}</span>
               </p>
               <p className="text-xs text-slate2">
-                Mot de passe provisoire :{" "}
+                {t("part.tempPassword")}{" "}
                 <span className="font-mono text-ink font-bold">{tempPassword.password}</span>
               </p>
             </div>
-            <p className="text-xs text-slate2">
-              Le participant devra définir un nouveau mot de passe lors de sa première connexion.
-            </p>
+            <p className="text-xs text-slate2">{t("part.tempNote")}</p>
             <PrimaryButton
               className="w-full"
-              onClick={() => {
-                navigator.clipboard
-                  .writeText(
-                    `Plateforme CTS-APPS — identifiants provisoires\nE-mail : ${tempPassword.email}\nMot de passe : ${tempPassword.password}`
-                  )
-                  .then(() => toast.success("Identifiants copiés"));
+              onClick={async () => {
+                const ok = await copyToClipboard(
+                  t("part.copyText", {
+                    email: tempPassword.email,
+                    password: tempPassword.password,
+                  })
+                );
+                if (ok) toast.success(t("part.copied"));
+                else toast.error(t("common.copyFailed"));
               }}
             >
               <Copy size={14} />
-              Copier les identifiants
+              {t("part.copyBtn")}
             </PrimaryButton>
           </div>
         </Modal>
@@ -396,10 +413,21 @@ export function AdminParticipants() {
 
       {deleting && (
         <ConfirmDialog
-          title="Supprimer le participant"
-          message={`Le compte de ${deleting.name} (${deleting.email}) sera définitivement supprimé. Cette action est irréversible.`}
+          title={t("part.deleteTitle")}
+          message={t("part.deleteMsg", { name: deleting.name, email: deleting.email })}
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}
+          busy={busy}
+        />
+      )}
+
+      {resetting && (
+        <ConfirmDialog
+          title={t("part.resetTitle")}
+          message={t("part.resetMsg", { name: resetting.name })}
+          confirmLabel={t("part.resetConfirm")}
+          onConfirm={handleResetPassword}
+          onCancel={() => setResetting(null)}
           busy={busy}
         />
       )}

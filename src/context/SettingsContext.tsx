@@ -9,6 +9,7 @@ import {
 } from "react";
 import { api } from "@/lib/api";
 import type { Settings } from "@/lib/types";
+import { useI18n } from "@/i18n";
 
 const DEFAULTS: Settings = {
   platform_name: "CEEAC · DAPPS",
@@ -34,16 +35,19 @@ const SettingsContext = createContext<SettingsContextValue>({
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
+  const { lang } = useI18n();
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
 
   const refresh = useCallback(async () => {
     try {
-      const { settings } = await api.get<{ settings: Settings }>("/settings");
-      setSettings((prev) => ({ ...prev, ...settings }));
+      const { settings } = await api.get<{ settings: Settings }>(
+        `/settings?lang=${lang}`
+      );
+      setSettings({ ...DEFAULTS, ...settings });
     } catch {
       /* les valeurs par défaut restent affichées */
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     refresh();

@@ -15,10 +15,21 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@ceeac-eccas.org}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?definir ADMIN_PASSWORD}
       ADMIN_NAME: ${ADMIN_NAME:-Secrétariat APPS}
+      APP_URL: ${APP_URL:-}
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_MB: "50"
+      # Diffusion des rapports par e-mail (optionnel)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     ports:
-      - "3001:3001"
+      # Lié à l'hôte local uniquement : l'accès public passe par le reverse
+      # proxy (Traefik), sinon le rate-limit de connexion serait contournable
+      # via un X-Forwarded-For forgé.
+      - "127.0.0.1:3001:3001"
     volumes:
       - uploads:/app/uploads
 

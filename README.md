@@ -13,9 +13,14 @@ Portail sécurisé permettant au Secrétariat du DAPPS-CEEAC de gérer les parti
 
 ## Fonctionnalités
 
-- **Authentification** : connexion e-mail/mot de passe, rôles admin/participant, mot de passe provisoire à la création d'un compte avec changement obligatoire à la première connexion.
-- **Espace administrateur** : tableau de bord (statistiques réelles, journal d'activité), gestion des participants (création, édition, réinitialisation de mot de passe, suppression), gestion documentaire (téléversement PDF/Office, publication/brouillon, catégories), sessions CTS (création, édition, statuts), édition de tous les contenus du portail (textes de la page de connexion, en-tête, pied de page, catégories).
-- **Espace participant** : bibliothèque documentaire (recherche, filtres par catégorie, téléchargement comptabilisé), profil et changement de mot de passe.
+- **Multilingue (4 langues CEEAC)** : interface intégralement traduite en français, anglais, portugais et espagnol ; sélecteur de langue sur la page de connexion et dans l'en-tête ; contenus du portail éditables par langue par l'administrateur.
+- **Authentification** : connexion e-mail/mot de passe, rôles admin/participant, mot de passe provisoire à la création d'un compte avec changement obligatoire à la première connexion ; révocation immédiate des sessions (compte désactivé, mot de passe réinitialisé).
+- **Auto-inscription par session** : chaque session CTS reçoit à sa création un **identifiant** (`CTS-XXXXXX`) et un **mot de passe d'accès** générés automatiquement. L'administrateur les transmet aux États membres (bouton « Copier l'invitation ») ; chaque expert crée ensuite lui-même son compte sur la page `/inscription` avec ses propres informations, puis accède aux documents. Les accès sont régénérables à tout moment.
+- **Espace administrateur** : tableau de bord (statistiques réelles, journal d'activité), gestion des participants (création manuelle, suivi des auto-inscrits par session, réinitialisation de mot de passe avec confirmation, suppression), gestion documentaire multilingue (un document = jusqu'à 4 versions linguistiques PDF/Office, publication/brouillon, catégories, marquage **document codé** pour les fichiers chiffrés avant téléversement), sessions CTS (création, édition, statuts, accès d'inscription, fil de discussion), édition des contenus du portail dans les 4 langues.
+- **Diffusion des rapports par e-mail** : envoi en un clic d'un rapport de réunion à tous les participants actifs (ou aux seuls inscrits d'une session), avec liens de téléchargement par langue — nécessite la configuration SMTP (voir `.env.example`).
+- **Espace participant** : bibliothèque documentaire (recherche, filtres par catégorie, badge « codé », téléchargement par langue, filtrage selon les langues choisies), sessions & fils de discussion, profil avec préférences de langue (interface + documents) et changement de mot de passe.
+- **Discussions par session** : fil d'échanges lié à chaque session CTS, ouvert aux participants et aux administrateurs (rafraîchissement automatique avec prise en compte des suppressions, suspension en arrière-plan, suppression par l'auteur ou l'admin).
+- **Accessibilité** : taille de texte réglable (A / A+ / A++, mémorisée), anneaux de focus visibles au clavier, dialogues modaux accessibles (focus piégé, Échap, `aria-modal`), libellés traduits pour les lecteurs d'écran.
 
 ## Développement local
 
@@ -53,8 +58,9 @@ Le compte administrateur initial est créé au premier démarrage à partir de `
 │   └── routes/          auth, participants, documents, sessions, stats, paramètres
 ├── src/                 Frontend React
 │   ├── pages/           connexion, admin/*, participant/*
-│   ├── components/      layout, composants UI partagés
+│   ├── components/      layout, discussion, composants UI partagés
 │   ├── context/         AuthContext, SettingsContext
+│   ├── i18n/            dictionnaires fr/en/pt/es + contexte de langue
 │   └── lib/             client API, types, formatage
 ├── Dockerfile           image de production (multi-étapes)
 └── DEPLOYMENT.md        guide de déploiement Dokploy (VPS Hostinger)

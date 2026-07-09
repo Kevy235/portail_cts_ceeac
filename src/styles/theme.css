@@ -35,11 +35,27 @@
     font-size: 16px;
   }
 
+  /* Tailles de texte réglables (accessibilité basse vision) : tout le rendu
+     est en rem, changer la racine agrandit l'interface entière. */
+  html.fontsize-lg {
+    font-size: 18px;
+  }
+  html.fontsize-xl {
+    font-size: 20px;
+  }
+
   body {
     background-color: var(--color-mist);
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Anneau de focus visible au clavier, sur tous les éléments interactifs. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 

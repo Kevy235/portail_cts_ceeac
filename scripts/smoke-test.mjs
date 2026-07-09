@@ -173,7 +173,24 @@ async function main() {
       },
     });
     check("création session", r.status === 201);
+    check(
+      "accès d'inscription générés (identifiant + mot de passe)",
+      /^CTS-[A-Z0-9]{6}$/.test(r.data.session.accessCode) &&
+        typeof r.data.session.accessPassword === "string" &&
+        r.data.session.accessPassword.length >= 8
+    );
     const sessionId = r.data.session.id;
+    const accessCode = r.data.session.accessCode;
+    const accessPassword = r.data.session.accessPassword;
+
+    r = await admin("POST", "/sessions", {
+      json: {
+        title: "Session avec dates inversées",
+        startDate: "2026-09-25",
+        endDate: "2026-09-20",
+      },
+    });
+    check("date de fin antérieure au début refusée (400)", r.status === 400);
 
     // ─── Documents ──────────────────────────────────────────────────
     r = await admin("GET", "/categories");
@@ -182,17 +199,39 @@ async function main() {
 
     const pdfBytes = new TextEncoder().encode("%PDF-1.4\n%contenu de test\n%%EOF");
     const form = new FormData();
-    form.append("file", new Blob([pdfBytes], { type: "application/pdf" }), "rapport-test.pdf");
+    form.append("file_fr", new Blob([pdfBytes], { type: "application/pdf" }), "rapport-test-fr.pdf");
+    form.append("file_en", new Blob([pdfBytes], { type: "application/pdf" }), "test-report-en.pdf");
     form.append("title", "Rapport de test T1 2026");
     form.append("categoryId", categoryId);
     form.append("sessionId", sessionId);
     form.append("status", "publié");
+    form.append("isCoded", "true");
     r = await admin("POST", "/documents", { form });
-    check("téléversement + publication d'un document", r.status === 201);
+    check(
+      "publication d'un document en 2 langues (fr + en)",
+      r.status === 201 && r.data.document.files.length === 2
+    );
+    check("le document est marqué « codé »", r.data.document.isCoded === true);
     const docId = r.data.document.id;
 
+    const ptForm = new FormData();
+    ptForm.append("file", new Blob([pdfBytes], { type: "application/pdf" }), "relatorio-pt.pdf");
+    r = await admin("POST", `/documents/${docId}/files/pt`, { form: ptForm });
+    check(
+      "ajout d'une version portugaise au document",
+      r.status === 200 && r.data.document.files.length === 3
+    );
+
+    r = await admin("DELETE", `/documents/${docId}/files/pt`);
+    check("suppression d'une version linguistique", r.status === 200);
+
+    const noFileForm = new FormData();
+    noFileForm.append("title", "Document sans fichier");
+    r = await admin("POST", "/documents", { form: noFileForm });
+    check("document sans aucun fichier refusé (400)", r.status === 400);
+
     const badForm = new FormData();
-    badForm.append("file", new Blob([new Uint8Array(10)], { type: "application/x-msdownload" }), "virus.exe");
+    badForm.append("file_fr", new Blob([new Uint8Array(10)], { type: "application/x-msdownload" }), "virus.exe");
     badForm.append("title", "Fichier interdit");
     r = await admin("POST", "/documents", { form: badForm });
     check("type de fichier interdit refusé (400)", r.status === 400);
@@ -218,11 +257,60 @@ async function main() {
       r.status === 200 && r.data.documents.length === 1
     );
 
-    r = await participant("GET", `/documents/${docId}/download`);
+    r = await participant("GET", `/documents/${docId}/download/en`);
     check(
-      "téléchargement du document",
+      "téléchargement de la version anglaise du document",
       r.status === 200 && r.headers.get("content-type") === "application/pdf"
     );
+
+    r = await participant("GET", `/documents/${docId}/download/es`);
+    check("version espagnole inexistante (404)", r.status === 404);
+
+    // ─── Préférences de langue ──────────────────────────────────────
+    r = await participant("PUT", "/auth/preferences", {
+      json: { uiLang: "en", docLangs: ["en", "pt"] },
+    });
+    check(
+      "enregistrement des préférences de langue",
+      r.status === 200 &&
+        r.data.user.uiLang === "en" &&
+        r.data.user.docLangs.length === 2
+    );
+
+    r = await participant("PUT", "/auth/preferences", { json: { docLangs: [] } });
+    check("liste de langues vide refusée (400)", r.status === 400);
+
+    // ─── Fil de discussion de session ───────────────────────────────
+    r = await participant("POST", `/sessions/${sessionId}/messages`, {
+      json: { body: "Bonjour à tous, à quelle heure commence la session ?" },
+    });
+    check("le participant publie un message", r.status === 201);
+
+    r = await admin("POST", `/sessions/${sessionId}/messages`, {
+      json: { body: "La session commence à 9h00 précises." },
+    });
+    check("l'admin répond dans le fil", r.status === 201);
+    const adminMsgId = r.data.message.id;
+
+    r = await participant("GET", `/sessions/${sessionId}/messages`);
+    check(
+      "lecture du fil de discussion (2 messages, auteurs renseignés)",
+      r.status === 200 &&
+        r.data.messages.length === 2 &&
+        r.data.messages.every((m) => m.authorName)
+    );
+
+    r = await participant("GET", `/sessions/${sessionId}/messages?after=${r.data.messages[0].id}`);
+    check("récupération incrémentale (after)", r.status === 200 && r.data.messages.length === 1);
+
+    r = await participant("DELETE", `/sessions/${sessionId}/messages/${adminMsgId}`);
+    check(
+      "un participant ne peut pas supprimer le message d'autrui (404)",
+      r.status === 404
+    );
+
+    r = await admin("DELETE", `/sessions/${sessionId}/messages/${adminMsgId}`);
+    check("l'admin supprime son message", r.status === 200);
 
     r = await participant("GET", "/stats");
     check("les statistiques sont réservées à l'admin (403)", r.status === 403);
@@ -244,11 +332,16 @@ async function main() {
     );
 
     r = await admin("PUT", "/settings/admin", {
-      json: { settings: { platform_name: "CEEAC · Portail modifié" } },
+      json: {
+        settings: {
+          fr: { platform_name: "CEEAC · Portail modifié" },
+          en: { platform_name: "ECCAS · Updated portal" },
+        },
+      },
     });
     check(
-      "l'admin modifie les contenus du portail",
-      r.status === 200 && r.data.settings.platform_name === "CEEAC · Portail modifié"
+      "l'admin modifie les contenus du portail (fr + en)",
+      r.status === 200 && r.data.settings.fr.platform_name === "CEEAC · Portail modifié"
     );
 
     r = await anon("GET", "/settings");
@@ -257,11 +350,179 @@ async function main() {
       r.data.settings.platform_name === "CEEAC · Portail modifié"
     );
 
+    r = await anon("GET", "/settings?lang=en");
+    check(
+      "les contenus anglais sont servis pour lang=en",
+      r.data.settings.platform_name === "ECCAS · Updated portal"
+    );
+
+    r = await anon("GET", "/settings?lang=pt");
+    check(
+      "les contenus portugais par défaut sont présents (lang=pt)",
+      typeof r.data.settings.org_full_name === "string" &&
+        r.data.settings.org_full_name.includes("Comité Técnico")
+    );
+
+    // ─── Robustesse : paramètres invalides ne tuent pas le serveur ──
+    r = await admin("GET", "/sessions/pas-un-uuid/messages");
+    check("UUID invalide → 404 propre (pas de crash)", r.status === 404);
+    r = await admin("GET", "/documents/pas-un-uuid/download/fr");
+    check("téléchargement avec id invalide → 404", r.status === 404);
+    r = await admin("GET", "/health");
+    check("le serveur répond toujours après les requêtes invalides", r.status === 200);
+
+    // ─── Accès de session non visibles par les participants ─────────
+    r = await participant("GET", "/sessions");
+    check(
+      "les accès de session sont masqués aux participants",
+      r.status === 200 && r.data.sessions[0].accessCode === undefined
+    );
+    check(
+      "le compteur d'inscrits est exposé",
+      typeof r.data.sessions[0].registeredCount === "number"
+    );
+
+    // ─── Auto-inscription avec les accès de session ──────────────────
+    const registrant = makeClient();
+    r = await registrant("POST", "/auth/register", {
+      json: {
+        accessCode,
+        accessPassword: "MAUVAIS-MDP",
+        name: "Mme Intruse",
+        email: "intruse@test.td",
+        country: "Tchad",
+        functionTitle: "X",
+        password: "MotDePasse#1",
+      },
+    });
+    check("mot de passe de session erroné refusé (401)", r.status === 401);
+
+    r = await registrant("POST", "/auth/register", {
+      json: {
+        accessCode,
+        accessPassword,
+        name: "Dr. Auto Inscrit",
+        email: "auto.inscrit@test.td",
+        country: "Tchad",
+        functionTitle: "Conseiller Politique",
+        institution: "Ministère de la Défense",
+        password: "MotDePasse#1",
+      },
+    });
+    check(
+      "auto-inscription réussie (compte actif, sans changement forcé)",
+      r.status === 201 &&
+        r.data.user.status === "actif" &&
+        r.data.user.mustChangePassword === false
+    );
+    const registrantId = r.data.user.id;
+
+    r = await registrant("POST", "/auth/register", {
+      json: {
+        accessCode,
+        accessPassword,
+        name: "Doublon",
+        email: "auto.inscrit@test.td",
+        country: "Tchad",
+        functionTitle: "X",
+        password: "MotDePasse#2",
+      },
+    });
+    check("e-mail déjà inscrit refusé (409)", r.status === 409);
+
+    r = await registrant("GET", `/documents/${docId}/download/fr`);
+    check(
+      "l'auto-inscrit télécharge les documents de la session",
+      r.status === 200
+    );
+    r = await registrant("GET", "/documents");
+    check(
+      "le flag « codé » est visible par les participants",
+      r.status === 200 && r.data.documents[0].isCoded === true
+    );
+
+    r = await admin("GET", "/sessions");
+    check(
+      "le compteur d'inscrits de la session est incrémenté",
+      r.data.sessions.find((s) => s.id === sessionId)?.registeredCount === 1
+    );
+
+    // ─── Régénération des accès ──────────────────────────────────────
+    r = await admin("POST", `/sessions/${sessionId}/regenerate-access`);
+    check(
+      "régénération des accès de session",
+      r.status === 200 && r.data.session.accessCode !== accessCode
+    );
+    r = await registrant("POST", "/auth/register", {
+      json: {
+        accessCode,
+        accessPassword,
+        name: "Retardataire",
+        email: "retard@test.td",
+        country: "Tchad",
+        functionTitle: "X",
+        password: "MotDePasse#3",
+      },
+    });
+    check("les anciens accès ne fonctionnent plus (401)", r.status === 401);
+
+    // ─── Référence auto-générée ──────────────────────────────────────
+    r = await admin("POST", "/sessions", {
+      json: { title: "Session sans référence explicite", startDate: "2026-11-10" },
+    });
+    check(
+      "référence auto-générée au format CTS-APPS/AAAA/NN",
+      r.status === 201 && /^CTS-APPS\/2026\/\d{2}$/.test(r.data.session.reference)
+    );
+    await admin("DELETE", `/sessions/${r.data.session.id}`);
+
+    // ─── Diffusion par e-mail (SMTP non configuré → 503 explicite) ──
+    r = await admin("POST", `/sessions/${sessionId}/broadcast`, {
+      json: {
+        subject: "Rapport final",
+        message: "Veuillez trouver le rapport de la session.",
+        documentIds: [docId],
+        scope: "all",
+      },
+    });
+    check(
+      "diffusion sans SMTP → 503 avec code explicite",
+      r.status === 503 && r.data.code === "smtp_not_configured"
+    );
+
+    // ─── Révocation des jetons ───────────────────────────────────────
+    r = await admin("POST", `/participants/${registrantId}/reset-password`);
+    check("réinitialisation du mot de passe de l'auto-inscrit", r.status === 200);
+    r = await registrant("GET", "/auth/me");
+    check(
+      "les sessions ouvertes sont révoquées après réinitialisation (401)",
+      r.status === 401
+    );
+
+    r = await admin("PUT", `/participants/${participantId}`, {
+      json: {
+        name: "Dr. Test Expert",
+        email: "expert@test.cd",
+        country: "RDC",
+        functionTitle: "Expert Senior",
+        institution: "MAE",
+        status: "inactif",
+      },
+    });
+    check("désactivation du participant", r.status === 200);
+    r = await participant("GET", "/documents");
+    check(
+      "un compte désactivé perd l'accès immédiatement (401)",
+      r.status === 401
+    );
+
     // ─── Suppression ────────────────────────────────────────────────
     r = await admin("DELETE", `/documents/${docId}`);
     check("suppression document (fichier inclus)", r.status === 200);
     r = await admin("DELETE", `/participants/${participantId}`);
     check("suppression participant", r.status === 200);
+    r = await admin("DELETE", `/participants/${registrantId}`);
+    check("suppression de l'auto-inscrit", r.status === 200);
 
     console.log(`\nRésultat : ${passed} vérifications réussies, 0 échec.`);
   } finally {

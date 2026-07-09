@@ -1,17 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Edit3, FileText, Trash2, Upload } from "lucide-react";
+import { Edit3, FileText, Trash2, Upload, X } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { Category, CtsSession, Doc, DocStatus } from "@/lib/types";
 import { formatDate, formatSize } from "@/lib/format";
+import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import {
+  CodedBadge,
   ConfirmDialog,
   EmptyState,
+  ErrorBlock,
   Field,
   inputClass,
+  LangChip,
   LoadingBlock,
   Modal,
+  PageHeader,
   PrimaryButton,
   SecondaryButton,
   StatusBadge,
@@ -22,6 +27,7 @@ interface FormState {
   categoryId: string;
   sessionId: string;
   status: DocStatus;
+  isCoded: boolean;
 }
 
 const EMPTY_FORM: FormState = {
@@ -29,24 +35,29 @@ const EMPTY_FORM: FormState = {
   categoryId: "",
   sessionId: "",
   status: "publié",
+  isCoded: false,
 };
 
+type FileMap = Partial<Record<Lang, File>>;
+
 export function AdminDocuments() {
+  const { t } = useI18n();
   const [documents, setDocuments] = useState<Doc[] | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [sessions, setSessions] = useState<CtsSession[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"tous" | DocStatus>("tous");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<FileMap>({});
   const [editing, setEditing] = useState<Doc | null>(null);
   const [deleting, setDeleting] = useState<Doc | null>(null);
   const [busy, setBusy] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-  const fileInput = useRef<HTMLInputElement>(null);
+  const fileInputs = useRef<Partial<Record<Lang, HTMLInputElement | null>>>({});
 
-  const load = () =>
-    Promise.all([
+  const load = () => {
+    setLoadError(null);
+    return Promise.all([
       api.get<{ documents: Doc[] }>("/documents"),
       api.get<{ categories: Category[] }>("/categories"),
       api.get<{ sessions: CtsSession[] }>("/sessions"),
@@ -56,10 +67,16 @@ export function AdminDocuments() {
         setCategories(c.categories);
         setSessions(s.sessions);
       })
-      .catch((err) => toast.error(err.message));
+      .catch((err) => {
+        // État d'erreur persistant (avec bouton réessayer) si rien n'est affiché.
+        if (documents) toast.error(err.message);
+        else setLoadError(err instanceof Error ? err.message : String(err));
+      });
+  };
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = useMemo(() => {
@@ -69,7 +86,7 @@ export function AdminDocuments() {
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
-    setFile(null);
+    setFiles({});
     setEditing(null);
     setModal("create");
   };
@@ -80,40 +97,93 @@ export function AdminDocuments() {
       categoryId: doc.categoryId ?? "",
       sessionId: doc.sessionId ?? "",
       status: doc.status,
+      isCoded: doc.isCoded,
     });
+    setFiles({});
     setEditing(doc);
     setModal("edit");
   };
 
+  const acceptFile = (lang: Lang, f: File | undefined) => {
+    if (!f) return;
+    setFiles((prev) => ({ ...prev, [lang]: f }));
+    if (!form.title) {
+      setForm((prev) => ({ ...prev, title: f.name.replace(/\.[^.]+$/, "") }));
+    }
+  };
+
   const submit = async (status: DocStatus) => {
+    if (busy) return;
     setBusy(true);
     try {
       if (modal === "create") {
-        if (!file) {
-          toast.error("Sélectionnez un fichier à publier");
+        const provided = LANGS.filter((l) => files[l]);
+        if (provided.length === 0) {
+          toast.error(t("docs.needFile"));
           return;
         }
         const fd = new FormData();
-        fd.append("file", file);
         fd.append("title", form.title);
-        fd.append("categoryId", form.categoryId);
-        fd.append("sessionId", form.sessionId);
+        // Même convention que l'édition : champ omis = null côté serveur.
+        if (form.categoryId) fd.append("categoryId", form.categoryId);
+        if (form.sessionId) fd.append("sessionId", form.sessionId);
         fd.append("status", status);
+        fd.append("isCoded", String(form.isCoded));
+        for (const lang of provided) fd.append(`file_${lang}`, files[lang]!);
         await api.postForm("/documents", fd);
-        toast.success(status === "publié" ? "Document publié" : "Brouillon enregistré");
+        toast.success(status === "publié" ? t("docs.published") : t("docs.draftSaved"));
       } else if (editing) {
         await api.put(`/documents/${editing.id}`, {
           title: form.title,
           categoryId: form.categoryId || null,
           sessionId: form.sessionId || null,
           status,
+          isCoded: form.isCoded,
         });
-        toast.success("Document mis à jour");
+        toast.success(t("docs.updated"));
       }
       setModal(null);
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Opération impossible");
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Ajout/remplacement immédiat d'une version linguistique en mode édition
+  const uploadVersion = async (lang: Lang, f: File | undefined) => {
+    if (!f || !editing) return;
+    setBusy(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", f);
+      const { document } = await api.postForm<{ document: Doc }>(
+        `/documents/${editing.id}/files/${lang}`,
+        fd
+      );
+      setEditing(document);
+      toast.success(t("docs.fileAdded", { lang: LANG_LABELS[lang] }));
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteVersion = async (lang: Lang) => {
+    if (!editing) return;
+    setBusy(true);
+    try {
+      const { document } = await api.delete<{ document: Doc }>(
+        `/documents/${editing.id}/files/${lang}`
+      );
+      setEditing(document);
+      toast.success(t("docs.fileDeleted"));
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
     } finally {
       setBusy(false);
     }
@@ -124,47 +194,49 @@ export function AdminDocuments() {
     setBusy(true);
     try {
       await api.delete(`/documents/${deleting.id}`);
-      toast.success("Document supprimé");
+      toast.success(t("docs.deleted"));
       setDeleting(null);
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Suppression impossible");
+      toast.error(err instanceof Error ? err.message : t("common.error"));
     } finally {
       setBusy(false);
     }
   };
 
-  const acceptFile = (f: File | undefined) => {
-    if (!f) return;
-    setFile(f);
-    if (!form.title) {
-      setForm((prev) => ({ ...prev, title: f.name.replace(/\.[^.]+$/, "") }));
-    }
-  };
+  if (loadError && !documents) return <ErrorBlock message={loadError} onRetry={load} />;
+  if (!documents) return <LoadingBlock />;
 
-  if (!documents) return <LoadingBlock label="Chargement des documents…" />;
+  const columns = [
+    t("docs.colDocument"),
+    t("docs.colCategory"),
+    t("docs.colSession"),
+    t("docs.colDate"),
+    t("docs.colLangs"),
+    t("docs.colDl"),
+    t("docs.colStatus"),
+    t("docs.colActions"),
+  ];
 
   return (
     <div className="space-y-5">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-ink text-xl font-bold font-title">Gestion documentaire</h2>
-          <p className="text-slate2 text-sm mt-0.5">
-            Documents officiels publiés et brouillons en attente
-          </p>
-        </div>
-        <PrimaryButton onClick={openCreate}>
-          <Upload size={15} />
-          Publier un document
-        </PrimaryButton>
-      </div>
+      <PageHeader
+        title={t("docs.title")}
+        subtitle={t("docs.subtitle")}
+        action={
+          <PrimaryButton onClick={openCreate}>
+            <Upload size={15} />
+            {t("docs.publish")}
+          </PrimaryButton>
+        }
+      />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {(
           [
-            { key: "tous", label: "Tous les documents" },
-            { key: "publié", label: "Publiés" },
-            { key: "brouillon", label: "Brouillons" },
+            { key: "tous", label: t("docs.filterAll") },
+            { key: "publié", label: t("docs.filterPublished") },
+            { key: "brouillon", label: t("docs.filterDrafts") },
           ] as const
         ).map(({ key, label }) => (
           <button
@@ -187,16 +259,15 @@ export function AdminDocuments() {
           <table className="w-full">
             <thead className="bg-mist border-b border-line-soft">
               <tr>
-                {["Document", "Catégorie", "Session", "Date", "Taille", "Tél.", "Statut", "Actions"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold text-slate2 uppercase tracking-wide whitespace-nowrap"
-                    >
-                      {h}
-                    </th>
-                  )
-                )}
+                {columns.map((h) => (
+                  <th
+                    key={h}
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate2 uppercase tracking-wide whitespace-nowrap"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-line-soft">
@@ -208,8 +279,17 @@ export function AdminDocuments() {
                         <FileText size={15} className="text-brand" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm text-ink leading-snug line-clamp-2">{doc.title}</p>
-                        <p className="text-[11px] text-slate2/60 truncate">{doc.fileName}</p>
+                        <p className="text-sm text-ink leading-snug line-clamp-2">
+                          {doc.title}
+                          {doc.isCoded && (
+                            <span className="ml-2 align-middle">
+                              <CodedBadge compact />
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-slate2/70 truncate">
+                          {doc.files[0]?.fileName}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -228,8 +308,19 @@ export function AdminDocuments() {
                   <td className="px-4 py-3 text-xs text-slate2/70 whitespace-nowrap">
                     {formatDate(doc.createdAt)}
                   </td>
-                  <td className="px-4 py-3 text-xs text-slate2/70 whitespace-nowrap">
-                    {formatSize(doc.fileSize)}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      {doc.files.map((f) => (
+                        <a
+                          key={f.lang}
+                          href={`/api/documents/${doc.id}/download/${f.lang}`}
+                          title={`${t("docs.download")} — ${LANG_LABELS[f.lang]} (${formatSize(f.fileSize)})`}
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <LangChip lang={f.lang} />
+                        </a>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-xs font-mono text-slate2">{doc.downloads}</td>
                   <td className="px-4 py-3">
@@ -237,27 +328,19 @@ export function AdminDocuments() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <a
-                        href={`/api/documents/${doc.id}/download`}
-                        className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
-                        title="Télécharger"
-                        aria-label="Télécharger"
-                      >
-                        <Download size={13} />
-                      </a>
                       <button
                         onClick={() => openEdit(doc)}
                         className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
-                        title="Modifier"
-                        aria-label="Modifier"
+                        title={t("common.edit")}
+                        aria-label={t("common.edit")}
                       >
                         <Edit3 size={13} />
                       </button>
                       <button
                         onClick={() => setDeleting(doc)}
                         className="p-1.5 rounded hover:bg-danger-soft text-slate2/60 hover:text-danger transition-colors"
-                        title="Supprimer"
-                        aria-label="Supprimer"
+                        title={t("common.delete")}
+                        aria-label={t("common.delete")}
                       >
                         <Trash2 size={13} />
                       </button>
@@ -268,7 +351,7 @@ export function AdminDocuments() {
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <EmptyState icon={<FileText size={32} />} message="Aucun document dans cette vue" />
+            <EmptyState icon={<FileText size={32} />} message={t("docs.empty")} />
           )}
         </div>
       </div>
@@ -276,13 +359,10 @@ export function AdminDocuments() {
       {/* ─── Modale publication / édition ──────────────────────────── */}
       {modal && (
         <Modal
-          title={modal === "create" ? "Publier un document" : "Modifier le document"}
-          subtitle={
-            modal === "create"
-              ? "Le document publié sera accessible à tous les participants accrédités"
-              : editing?.fileName
-          }
+          title={modal === "create" ? t("docs.publishTitle") : t("docs.editTitle")}
+          subtitle={modal === "create" ? t("docs.publishSubtitle") : editing?.title}
           onClose={() => setModal(null)}
+          wide
         >
           <form
             className="p-6 space-y-4"
@@ -291,23 +371,23 @@ export function AdminDocuments() {
               submit(form.status);
             }}
           >
-            <Field label="Titre du document" required>
+            <Field label={t("docs.docTitle")} required>
               <input
                 required
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Titre officiel du document"
+                placeholder={t("docs.docTitlePh")}
                 className={inputClass}
               />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Catégorie">
+              <Field label={t("docs.category")}>
                 <select
                   value={form.categoryId}
                   onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
                   className={inputClass}
                 >
-                  <option value="">Aucune</option>
+                  <option value="">{t("common.none")}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -315,13 +395,13 @@ export function AdminDocuments() {
                   ))}
                 </select>
               </Field>
-              <Field label="Session liée">
+              <Field label={t("docs.linkedSession")}>
                 <select
                   value={form.sessionId}
                   onChange={(e) => setForm({ ...form, sessionId: e.target.value })}
                   className={inputClass}
                 >
-                  <option value="">Aucune</option>
+                  <option value="">{t("common.none")}</option>
                   {sessions.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.title.length > 40 ? `${s.title.slice(0, 40)}…` : s.title}
@@ -331,51 +411,115 @@ export function AdminDocuments() {
               </Field>
             </div>
 
-            {modal === "create" && (
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                  acceptFile(e.dataTransfer.files[0]);
-                }}
-                onClick={() => fileInput.current?.click()}
-                className={clsx(
-                  "border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer",
-                  dragOver
-                    ? "border-brand bg-brand-soft"
-                    : "border-line hover:border-brand/40 hover:bg-mist/50"
-                )}
-              >
-                <input
-                  ref={fileInput}
-                  type="file"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                  className="hidden"
-                  onChange={(e) => acceptFile(e.target.files?.[0])}
-                />
-                <Upload size={20} className="text-slate2/60 mx-auto mb-2" />
-                {file ? (
-                  <>
-                    <p className="text-sm text-ink font-medium">{file.name}</p>
-                    <p className="text-xs text-slate2/70 mt-1">{formatSize(file.size)}</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-sm text-slate2 font-medium">
-                      Glisser-déposer le fichier ici ou cliquer pour parcourir
-                    </p>
-                    <p className="text-xs text-slate2/70 mt-1">
-                      PDF, Word, Excel, PowerPoint — max. 50 Mo
-                    </p>
-                  </>
-                )}
+            <label className="flex items-start gap-3 px-3 py-3 rounded-lg border border-line-soft hover:bg-mist cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.isCoded}
+                onChange={(e) => setForm({ ...form, isCoded: e.target.checked })}
+                className="w-4 h-4 mt-0.5 accent-brand"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">{t("docs.codedLabel")}</span>
+                <span className="block text-xs text-slate2/80 mt-0.5">{t("docs.codedHelp")}</span>
+              </span>
+            </label>
+
+            {/* ─── Versions linguistiques ─────────────────────────── */}
+            <div>
+              <p className="text-xs font-medium text-ink mb-1.5">{t("docs.filesByLang")}</p>
+              <p className="text-[11px] text-slate2/70 mb-3">
+                {t("docs.filesNote", { n: 50 })}
+              </p>
+              <div className="space-y-2">
+                {LANGS.map((lang) => {
+                  const existing = editing?.files.find((f) => f.lang === lang);
+                  const pending = files[lang];
+                  return (
+                    <div
+                      key={lang}
+                      className="flex items-center gap-3 border border-line-soft rounded-lg px-3 py-2.5"
+                    >
+                      <LangChip lang={lang} muted={!existing && !pending} />
+                      <span className="text-xs text-slate2 w-20 flex-shrink-0 hidden sm:inline">
+                        {LANG_LABELS[lang]}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        {modal === "create" ? (
+                          pending ? (
+                            <p className="text-xs text-ink truncate">
+                              {pending.name}{" "}
+                              <span className="text-slate2/60">({formatSize(pending.size)})</span>
+                            </p>
+                          ) : (
+                            <p className="text-xs text-slate2/50">{t("docs.noFile")}</p>
+                          )
+                        ) : existing ? (
+                          <p className="text-xs text-ink truncate">
+                            {existing.fileName}{" "}
+                            <span className="text-slate2/60">
+                              ({formatSize(existing.fileSize)})
+                            </span>
+                          </p>
+                        ) : (
+                          <p className="text-xs text-slate2/50">{t("docs.noFile")}</p>
+                        )}
+                      </div>
+                      <input
+                        ref={(el) => {
+                          fileInputs.current[lang] = el;
+                        }}
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          e.target.value = "";
+                          if (modal === "create") acceptFile(lang, f);
+                          else uploadVersion(lang, f);
+                        }}
+                      />
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => fileInputs.current[lang]?.click()}
+                          className="text-xs text-brand hover:underline px-2 py-1 disabled:opacity-50"
+                        >
+                          {existing || pending ? t("docs.replaceFile") : t("docs.chooseFile")}
+                        </button>
+                        {modal === "create" && pending && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFiles((prev) => {
+                                const next = { ...prev };
+                                delete next[lang];
+                                return next;
+                              })
+                            }
+                            className="p-1 text-slate2/50 hover:text-danger transition-colors"
+                            title={t("docs.deleteFile")}
+                          >
+                            <X size={13} />
+                          </button>
+                        )}
+                        {modal === "edit" && existing && (editing?.files.length ?? 0) > 1 && (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => deleteVersion(lang)}
+                            className="p-1 text-slate2/50 hover:text-danger transition-colors disabled:opacity-50"
+                            title={t("docs.deleteFile")}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
             <div className="flex items-center gap-3 pt-1">
               <SecondaryButton
@@ -384,7 +528,7 @@ export function AdminDocuments() {
                 disabled={busy}
                 onClick={() => submit("brouillon")}
               >
-                Enregistrer en brouillon
+                {t("docs.saveDraft")}
               </SecondaryButton>
               <PrimaryButton
                 type="button"
@@ -392,7 +536,7 @@ export function AdminDocuments() {
                 disabled={busy}
                 onClick={() => submit("publié")}
               >
-                {busy ? "Envoi en cours…" : "Publier"}
+                {busy ? t("docs.uploading") : t("docs.publishNow")}
               </PrimaryButton>
             </div>
           </form>
@@ -401,8 +545,8 @@ export function AdminDocuments() {
 
       {deleting && (
         <ConfirmDialog
-          title="Supprimer le document"
-          message={`« ${deleting.title} » et son fichier seront définitivement supprimés. Cette action est irréversible.`}
+          title={t("docs.deleteTitle")}
+          message={t("docs.deleteMsg", { title: deleting.title })}
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}
           busy={busy}

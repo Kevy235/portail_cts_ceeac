@@ -15,6 +15,24 @@ export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   return pool.query<T>(text, params);
 }
 
+/** Exécute `fn` dans une transaction (COMMIT si succès, ROLLBACK sinon). */
+export async function withTransaction<T>(
+  fn: (client: pg.PoolClient) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 /** Applique les migrations SQL non encore exécutées (idempotent au démarrage). */
 export async function runMigrations() {
   await pool.query(`

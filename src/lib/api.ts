@@ -1,7 +1,8 @@
 export class ApiError extends Error {
   constructor(
     public status: number,
-    message: string
+    message: string,
+    public code?: string
   ) {
     super(message);
   }
@@ -19,13 +20,15 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     let message = `Erreur ${res.status}`;
+    let code: string | undefined;
     try {
       const data = await res.json();
       if (data?.error) message = data.error;
+      if (data?.code) code = data.code;
     } catch {
       /* réponse non JSON */
     }
-    throw new ApiError(res.status, message);
+    throw new ApiError(res.status, message, code);
   }
   return res.json() as Promise<T>;
 }

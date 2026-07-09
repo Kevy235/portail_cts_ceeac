@@ -2,8 +2,10 @@ import { query } from "./db.js";
 
 export type ActivityType =
   | "participant_created"
+  | "participant_registered"
   | "participant_updated"
   | "participant_deleted"
+  | "broadcast_sent"
   | "document_published"
   | "document_updated"
   | "document_deleted"

@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { z } from "zod";
-import { query } from "../db.js";
+import { query, withTransaction } from "../db.js";
+import { ah } from "../http.js";
 import { logActivity } from "../activity.js";
 
 export const statsRouter = Router();
 
-statsRouter.get("/", async (_req, res) => {
+statsRouter.get("/", ah(async (_req, res) => {
   const [participants, documents, sessions, downloads, activity] =
     await Promise.all([
       query<{ total: string; actifs: string }>(
@@ -71,10 +72,12 @@ statsRouter.get("/", async (_req, res) => {
     },
     activity: activity.rows,
   });
-});
+}));
 
-// ─── Paramètres du portail (contenus éditables) ───────────────────────────────
+// ─── Paramètres du portail (contenus éditables, par langue) ───────────────────
 export const settingsRouter = Router();
+
+const LANGS = ["fr", "en", "pt", "es"] as const;
 
 const EDITABLE_KEYS = [
   "platform_name",
@@ -86,51 +89,70 @@ const EDITABLE_KEYS = [
   "login_notice",
 ] as const;
 
-settingsRouter.get("/", async (_req, res) => {
-  const { rows } = await query<{ key: string; value: string }>(
-    "SELECT key, value FROM settings"
+async function allSettings() {
+  const { rows } = await query<{ key: string; lang: string; value: string }>(
+    "SELECT key, lang, value FROM settings"
   );
-  const settings = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-  res.json({ settings });
-});
-
-const settingsSchema = z.record(z.string(), z.string().max(2000));
-
-settingsRouter.put("/", async (req, res) => {
-  const parsed = settingsSchema.safeParse(req.body?.settings);
-  if (!parsed.success) return res.status(400).json({ error: "Données invalides" });
-
-  const entries = Object.entries(parsed.data).filter(([k]) =>
-    (EDITABLE_KEYS as readonly string[]).includes(k)
-  );
-  for (const [key, value] of entries) {
-    await query(
-      `INSERT INTO settings (key, value) VALUES ($1, $2)
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
-      [key, value]
-    );
+  const byLang: Record<string, Record<string, string>> = { fr: {}, en: {}, pt: {}, es: {} };
+  for (const r of rows) {
+    (byLang[r.lang] ??= {})[r.key] = r.value;
   }
+  return byLang;
+}
 
-  await logActivity("settings_updated", "Contenus du portail mis à jour", "", req.user!.id);
-  const { rows } = await query<{ key: string; value: string }>(
-    "SELECT key, value FROM settings"
-  );
-  res.json({ settings: Object.fromEntries(rows.map((r) => [r.key, r.value])) });
-});
+settingsRouter.get(
+  "/",
+  ah(async (_req, res) => {
+    res.json({ settings: await allSettings() });
+  })
+);
+
+const settingsSchema = z.record(
+  z.enum(LANGS),
+  z.record(z.string(), z.string().max(2000))
+);
+
+settingsRouter.put(
+  "/",
+  ah(async (req, res) => {
+    const parsed = settingsSchema.safeParse(req.body?.settings);
+    if (!parsed.success) return res.status(400).json({ error: "Données invalides" });
+
+    // Transaction : mise à jour tout-ou-rien des contenus.
+    await withTransaction(async (client) => {
+      for (const [lang, values] of Object.entries(parsed.data)) {
+        for (const [key, value] of Object.entries(values ?? {})) {
+          if (!(EDITABLE_KEYS as readonly string[]).includes(key)) continue;
+          await client.query(
+            `INSERT INTO settings (key, lang, value) VALUES ($1, $2, $3)
+             ON CONFLICT (key, lang) DO UPDATE SET value = EXCLUDED.value`,
+            [key, lang, value]
+          );
+        }
+      }
+    });
+
+    await logActivity("settings_updated", "Contenus du portail mis à jour", "", req.user!.id);
+    res.json({ settings: await allSettings() });
+  })
+);
 
 // ─── Journal d'activité complet ───────────────────────────────────────────────
 export const activityRouter = Router();
 
-activityRouter.get("/", async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 30, 100);
-  const { rows } = await query(
-    `SELECT a.id, a.type, a.message, a.detail, a.created_at AS "createdAt",
-            u.name AS "actorName"
-     FROM activity_log a
-     LEFT JOIN users u ON u.id = a.actor_id
-     ORDER BY a.created_at DESC
-     LIMIT $1`,
-    [limit]
-  );
-  res.json({ activity: rows });
-});
+activityRouter.get(
+  "/",
+  ah(async (req, res) => {
+    const limit = Math.min(Number(req.query.limit) || 30, 100);
+    const { rows } = await query(
+      `SELECT a.id, a.type, a.message, a.detail, a.created_at AS "createdAt",
+              u.name AS "actorName"
+       FROM activity_log a
+       LEFT JOIN users u ON u.id = a.actor_id
+       ORDER BY a.created_at DESC
+       LIMIT $1`,
+      [limit]
+    );
+    res.json({ activity: rows });
+  })
+);
