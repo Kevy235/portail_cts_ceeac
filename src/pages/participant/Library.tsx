@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
-import { Clock, Download, FileText, Search } from "lucide-react";
+import { Clock, FileText, Search } from "lucide-react";
 import { clsx } from "clsx";
 import type { Doc } from "@/lib/types";
 import { useApiResource } from "@/lib/useApiResource";
-import { formatDate, formatSize } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { useSettings } from "@/context/SettingsContext";
 import { useAuth } from "@/context/AuthContext";
-import { LANG_LABELS, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
+import { DownloadButton } from "@/components/DownloadButton";
 import {
   CodedBadge,
   EmptyState,
@@ -151,15 +152,12 @@ export function ParticipantLibrary() {
                     <p className="text-[10px] text-slate2/70">{t("lib.dlShort")}</p>
                   </div>
                   {availableFiles.map((f) => (
-                    <a
+                    <DownloadButton
                       key={f.lang}
-                      href={`/api/documents/${doc.id}/download/${f.lang}`}
-                      title={`${LANG_LABELS[f.lang]} · ${formatSize(f.fileSize)}`}
-                      className="flex items-center gap-1.5 bg-brand text-white px-2.5 py-2 rounded-lg text-xs font-medium hover:bg-brand-dark transition-colors"
-                    >
-                      <Download size={12} />
-                      <span className="uppercase font-bold">{f.lang}</span>
-                    </a>
+                      docId={doc.id}
+                      file={f}
+                      onDone={resource.reload}
+                    />
                   ))}
                 </div>
               </div>

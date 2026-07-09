@@ -95,6 +95,16 @@
     border-radius: 4px;
   }
 
+  /* Une taille de police < 16px dans un champ provoque un zoom automatique
+     au focus sur iOS/Android : on force 16px sur mobile. */
+  @media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
   /* Respect des préférences de mouvement réduit (accessibilité). */
   @media (prefers-reduced-motion: reduce) {
     *,

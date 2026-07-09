@@ -371,7 +371,10 @@ documentsRouter.get(
     );
 
     const asciiName = doc.file_name.replace(/[^\x20-\x7E]/g, "_").replace(/["\\]/g, "_");
+    const { size } = await fs.promises.stat(filePath);
     res.setHeader("Content-Type", doc.mime_type);
+    // Taille annoncée au client : permet d'afficher la progression du téléchargement.
+    res.setHeader("Content-Length", size);
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(doc.file_name)}`

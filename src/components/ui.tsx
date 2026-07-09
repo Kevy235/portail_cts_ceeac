@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import { AlertTriangle, Check, Copy, Globe, Lock, RefreshCw, X, ZoomIn } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import type { Dict } from "@/i18n/fr";
@@ -219,6 +220,7 @@ export function CopyButton({ text, label }: { text: string; label?: string }) {
 }
 
 // ─── Champs de formulaire ──────────────────────────────────────────────────────
+// Le libellé enveloppe le champ : cliquer sur le texte donne le focus au champ.
 export function Field({
   label,
   required,
@@ -229,17 +231,20 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-ink mb-1.5">
+    <label className="block">
+      <span className="block text-sm font-medium text-ink mb-1.5">
         {label} {required && <span className="text-danger">*</span>}
-      </label>
+      </span>
       {children}
-    </div>
+    </label>
   );
 }
 
 export const inputClass =
-  "w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all";
+  "w-full px-3 py-2.5 border border-line rounded-lg text-sm bg-white transition-all " +
+  "placeholder:text-slate2/45 hover:border-brand/40 " +
+  "focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 " +
+  "disabled:bg-mist disabled:text-slate2 disabled:cursor-not-allowed";
 
 // ─── Modale accessible ─────────────────────────────────────────────────────────
 const FOCUSABLE =
@@ -306,9 +311,11 @@ export function Modal({
     };
   }, [onClose]);
 
-  return (
+  /* Portail vers <body> : la modale échappe aux contextes d'empilement créés
+     par les animations du contenu et passe toujours au-dessus du menu fixe. */
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-overlay-in"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-overlay-in"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -340,7 +347,8 @@ export function Modal({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

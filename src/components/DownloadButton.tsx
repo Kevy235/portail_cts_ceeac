@@ -1,0 +1,92 @@
+import { useState } from "react";
+import { Check, Download } from "lucide-react";
+import { clsx } from "clsx";
+import { toast } from "sonner";
+import type { DocFile } from "@/lib/types";
+import { downloadWithProgress } from "@/lib/download";
+import { formatSize } from "@/lib/format";
+import { LANG_LABELS, useI18n } from "@/i18n";
+
+/**
+ * Bouton de téléchargement d'une version linguistique avec progression :
+ * le fond se remplit de gauche à droite et le pourcentage remplace le libellé.
+ */
+export function DownloadButton({
+  docId,
+  file,
+  compact,
+  onDone,
+}: {
+  docId: string;
+  file: DocFile;
+  compact?: boolean;
+  onDone?: () => void;
+}) {
+  const { t } = useI18n();
+  const [percent, setPercent] = useState<number | null>(null);
+  const [done, setDone] = useState(false);
+
+  const busy = percent !== null;
+
+  const handleClick = async () => {
+    if (busy) return;
+    setPercent(0);
+    try {
+      await downloadWithProgress(
+        `/api/documents/${docId}/download/${file.lang}`,
+        file.fileName,
+        (p) => setPercent(p)
+      );
+      setDone(true);
+      onDone?.();
+      setTimeout(() => setDone(false), 2000);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setPercent(null);
+    }
+  };
+
+  const fill = percent !== null && percent >= 0 ? percent : 0;
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={busy}
+      title={`${t("docs.download")} — ${LANG_LABELS[file.lang]} (${formatSize(file.fileSize)})`}
+      aria-label={`${t("docs.download")} — ${LANG_LABELS[file.lang]}`}
+      className={clsx(
+        "relative overflow-hidden flex items-center justify-center gap-1.5 rounded-lg font-medium transition-colors",
+        compact ? "px-2 py-1 text-[11px]" : "px-2.5 py-2 text-xs",
+        done
+          ? "bg-accent text-white"
+          : busy
+            ? "bg-brand/70 text-white cursor-wait"
+            : "bg-brand text-white hover:bg-brand-dark"
+      )}
+    >
+      {/* Remplissage de progression */}
+      {busy && (
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 bg-accent/80 transition-[width] duration-200 ease-out"
+          style={{ width: `${fill}%` }}
+        />
+      )}
+      <span className="relative flex items-center gap-1.5">
+        {done ? (
+          <Check size={compact ? 11 : 12} aria-hidden />
+        ) : (
+          <Download size={compact ? 11 : 12} aria-hidden className={busy ? "animate-bounce" : undefined} />
+        )}
+        <span className="uppercase font-bold">{file.lang}</span>
+        {busy && (
+          <span className="font-mono tabular-nums">
+            {percent !== null && percent >= 0 ? `${percent}%` : "…"}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}

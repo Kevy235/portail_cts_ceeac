@@ -21,6 +21,7 @@ import {
   SecondaryButton,
   StatusBadge,
 } from "@/components/ui";
+import { DownloadButton } from "@/components/DownloadButton";
 
 interface FormState {
   title: string;
@@ -53,6 +54,8 @@ export function AdminDocuments() {
   const [editing, setEditing] = useState<Doc | null>(null);
   const [deleting, setDeleting] = useState<Doc | null>(null);
   const [busy, setBusy] = useState(false);
+  // Pourcentage d'envoi en cours (null = aucun envoi)
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const fileInputs = useRef<Partial<Record<Lang, HTMLInputElement | null>>>({});
 
   const load = () => {
@@ -130,7 +133,8 @@ export function AdminDocuments() {
         fd.append("status", status);
         fd.append("isCoded", String(form.isCoded));
         for (const lang of provided) fd.append(`file_${lang}`, files[lang]!);
-        await api.postForm("/documents", fd);
+        setUploadPercent(0);
+        await api.postFormWithProgress("/documents", fd, setUploadPercent);
         toast.success(status === "publié" ? t("docs.published") : t("docs.draftSaved"));
       } else if (editing) {
         await api.put(`/documents/${editing.id}`, {
@@ -148,6 +152,7 @@ export function AdminDocuments() {
       toast.error(err instanceof Error ? err.message : t("common.error"));
     } finally {
       setBusy(false);
+      setUploadPercent(null);
     }
   };
 
@@ -155,12 +160,14 @@ export function AdminDocuments() {
   const uploadVersion = async (lang: Lang, f: File | undefined) => {
     if (!f || !editing) return;
     setBusy(true);
+    setUploadPercent(0);
     try {
       const fd = new FormData();
       fd.append("file", f);
-      const { document } = await api.postForm<{ document: Doc }>(
+      const { document } = await api.postFormWithProgress<{ document: Doc }>(
         `/documents/${editing.id}/files/${lang}`,
-        fd
+        fd,
+        setUploadPercent
       );
       setEditing(document);
       toast.success(t("docs.fileAdded", { lang: LANG_LABELS[lang] }));
@@ -169,6 +176,7 @@ export function AdminDocuments() {
       toast.error(err instanceof Error ? err.message : t("common.error"));
     } finally {
       setBusy(false);
+      setUploadPercent(null);
     }
   };
 
@@ -311,14 +319,13 @@ export function AdminDocuments() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       {doc.files.map((f) => (
-                        <a
+                        <DownloadButton
                           key={f.lang}
-                          href={`/api/documents/${doc.id}/download/${f.lang}`}
-                          title={`${t("docs.download")} — ${LANG_LABELS[f.lang]} (${formatSize(f.fileSize)})`}
-                          className="hover:opacity-70 transition-opacity"
-                        >
-                          <LangChip lang={f.lang} />
-                        </a>
+                          docId={doc.id}
+                          file={f}
+                          compact
+                          onDone={load}
+                        />
                       ))}
                     </div>
                   </td>
@@ -380,7 +387,7 @@ export function AdminDocuments() {
                 className={inputClass}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("docs.category")}>
                 <select
                   value={form.categoryId}
@@ -521,6 +528,24 @@ export function AdminDocuments() {
               </div>
             </div>
 
+            {/* Barre de progression de l'envoi */}
+            {uploadPercent !== null && (
+              <div aria-live="polite">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate2">{t("docs.uploading")}</span>
+                  <span className="text-xs font-mono font-semibold text-brand tabular-nums">
+                    {uploadPercent}%
+                  </span>
+                </div>
+                <div className="h-2 bg-mist rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-brand rounded-full transition-[width] duration-200 ease-out"
+                    style={{ width: `${uploadPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 pt-1">
               <SecondaryButton
                 type="button"
@@ -536,7 +561,11 @@ export function AdminDocuments() {
                 disabled={busy}
                 onClick={() => submit("publié")}
               >
-                {busy ? t("docs.uploading") : t("docs.publishNow")}
+                {uploadPercent !== null
+                  ? `${t("docs.uploading")} ${uploadPercent}%`
+                  : busy
+                    ? t("docs.uploading")
+                    : t("docs.publishNow")}
               </PrimaryButton>
             </div>
           </form>

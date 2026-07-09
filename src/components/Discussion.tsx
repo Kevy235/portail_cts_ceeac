@@ -27,6 +27,7 @@ export function Discussion({ sessionId }: { sessionId: string }) {
   const [toDelete, setToDelete] = useState<ChatMessage | null>(null);
   const [deleting, setDeleting] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   // Invalide les réponses en vol après démontage ou changement de session.
   const generationRef = useRef(0);
   const lastCountRef = useRef(0);
@@ -89,6 +90,7 @@ export function Discussion({ sessionId }: { sessionId: string }) {
         prev.some((m) => m.id === message.id) ? prev : [...prev, message]
       );
       setBody("");
+      if (inputRef.current) inputRef.current.style.height = "auto";
       // Après un envoi, toujours défiler vers le bas.
       requestAnimationFrame(() => {
         const el = listRef.current;
@@ -188,8 +190,15 @@ export function Discussion({ sessionId }: { sessionId: string }) {
         className="flex items-end gap-2 p-3 bg-white border-t border-line-soft"
       >
         <textarea
+          ref={inputRef}
           value={body}
-          onChange={(e) => setBody(e.target.value)}
+          onChange={(e) => {
+            setBody(e.target.value);
+            // Auto-agrandissement du champ (jusqu'à ~5 lignes).
+            const el = e.currentTarget;
+            el.style.height = "auto";
+            el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();

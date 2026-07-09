@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import {
   BookOpen,
@@ -49,6 +50,11 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
 
   const nav = variant === "admin" ? ADMIN_NAV : PARTICIPANT_NAV;
 
+  // Retour en haut de page à chaque changement de route.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -59,8 +65,9 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
   };
 
   return (
-    /* Un seul conteneur de défilement : le bandeau défile, le menu reste collé en haut. */
-    <div className="h-screen overflow-y-auto bg-mist">
+    /* Défilement au niveau de la page : le bandeau défile, le menu reste collé
+       en haut, et le verrou de défilement des modales (overflow sur body) agit. */
+    <div className="min-h-screen bg-mist">
       {/* ─── Bandeau : utilitaires + logo centré (défile) ────────────── */}
       <header className="bg-gradient-to-b from-brand-deep to-brand-night relative overflow-hidden">
         {/* Halo décoratif derrière le logo */}
@@ -78,7 +85,7 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
             </div>
             <div className="hidden sm:block">
               <p className="text-white text-xs font-medium leading-tight">{user?.name}</p>
-              <p className="text-white/40 text-[10px] leading-tight">
+              <p className="text-white/75 text-[10px] leading-tight">
                 {variant === "admin"
                   ? t("header.admin")
                   : [user?.functionTitle, user?.country].filter(Boolean).join(" — ")}

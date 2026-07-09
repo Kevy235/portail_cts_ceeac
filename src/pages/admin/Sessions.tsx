@@ -29,7 +29,8 @@ interface FormState {
   status: SessionStatus;
   reference: string;
   description: string;
-  expectedParticipants: number;
+  // Chaîne (et non nombre) pour permettre un champ vide sans « 0 » collant.
+  expectedParticipants: string;
 }
 
 const EMPTY_FORM: FormState = {
@@ -40,7 +41,7 @@ const EMPTY_FORM: FormState = {
   status: "à-venir",
   reference: "",
   description: "",
-  expectedParticipants: 0,
+  expectedParticipants: "",
 };
 
 /** Accès d'inscription de la session : identifiant + mot de passe + invitation. */
@@ -130,7 +131,7 @@ export function AdminSessions() {
       status: s.status,
       reference: s.reference,
       description: s.description,
-      expectedParticipants: s.expectedParticipants,
+      expectedParticipants: s.expectedParticipants ? String(s.expectedParticipants) : "",
     });
     setEditing(s);
     setModal("edit");
@@ -288,14 +289,14 @@ export function AdminSessions() {
                 className={inputClass}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("sess.reference")}>
                 {modal === "create" ? (
                   <input
                     disabled
                     value=""
                     placeholder={t("sess.referenceAuto")}
-                    className={`${inputClass} bg-mist text-slate2 cursor-not-allowed`}
+                    className={inputClass}
                   />
                 ) : (
                   <input
@@ -315,7 +316,7 @@ export function AdminSessions() {
                 />
               </Field>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("sess.startDate")} required>
                 <input
                   required
@@ -335,7 +336,7 @@ export function AdminSessions() {
                 />
               </Field>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("sess.status")}>
                 <select
                   value={form.status}
@@ -351,9 +352,11 @@ export function AdminSessions() {
                 <input
                   type="number"
                   min={0}
+                  inputMode="numeric"
+                  placeholder="0"
                   value={form.expectedParticipants}
                   onChange={(e) =>
-                    setForm({ ...form, expectedParticipants: Number(e.target.value) })
+                    setForm({ ...form, expectedParticipants: e.target.value })
                   }
                   className={inputClass}
                 />

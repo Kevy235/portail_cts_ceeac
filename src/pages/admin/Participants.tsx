@@ -307,7 +307,7 @@ export function AdminParticipants() {
                 className={inputClass}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("part.country")} required>
                 <select
                   required
@@ -333,7 +333,7 @@ export function AdminParticipants() {
                 />
               </Field>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("part.institution")}>
                 <input
                   value={form.institution}
