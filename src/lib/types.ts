@@ -1,6 +1,7 @@
 import type { Lang } from "@/i18n";
 
-export type Role = "admin" | "participant";
+/** "guest" : accès documentaire via les codes de session, sans compte. */
+export type Role = "admin" | "participant" | "guest";
 export type UserStatus = "actif" | "en-attente" | "inactif";
 export type DocStatus = "publié" | "brouillon";
 export type SessionStatus = "à-venir" | "en-cours" | "terminé";
@@ -126,16 +127,5 @@ export const COUNTRIES = [
   "Tchad",
 ];
 
-export const COUNTRY_FLAGS: Record<string, string> = {
-  Angola: "🇦🇴",
-  Burundi: "🇧🇮",
-  Cameroun: "🇨🇲",
-  Congo: "🇨🇬",
-  Gabon: "🇬🇦",
-  "Guinée Équatoriale": "🇬🇶",
-  RCA: "🇨🇫",
-  RDC: "🇨🇩",
-  Rwanda: "🇷🇼",
-  "São Tomé et Príncipe": "🇸🇹",
-  Tchad: "🇹🇩",
-};
+/* Les drapeaux des pays sont rendus par le composant CountryFlag (SVG) :
+   les emojis drapeaux ne s'affichent pas sous Windows. */

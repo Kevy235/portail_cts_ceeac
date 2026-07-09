@@ -174,7 +174,8 @@ export const pt: Dict = {
   "docs.colSession": "Sessão",
   "docs.colDate": "Data",
   "docs.colLangs": "Línguas",
-  "docs.colDl": "Transf.",
+  "docs.colDl": "Transferências",
+  "docs.colDlFull": "Número de transferências",
   "docs.colStatus": "Estado",
   "docs.colActions": "Ações",
   "docs.empty": "Nenhum documento nesta vista",
@@ -313,6 +314,7 @@ export const pt: Dict = {
   "common.copy": "Copiar",
   "common.copied": "Copiado",
   "common.copyFailed": "Não foi possível copiar — copie o texto manualmente",
+  "common.optional": "(facultativo)",
 
   // ─── Auto-inscrição por sessão ────────────────────────────────────────
   "login.registerPrompt": "Recebeu os acessos de uma sessão CTE?",
@@ -394,4 +396,45 @@ export const pt: Dict = {
   "broadcast.sending": "A enviar…",
   "broadcast.sent": "E-mail enviado a {sent} participante(s)",
   "broadcast.partial": "{sent} enviado(s), {failed} falha(s)",
+  "broadcast.attachments": "Anexos do e-mail",
+  "broadcast.attachNote":
+    "Até {max} ficheiros ({mb} MB cada, {total} MB no total) — enviados diretamente como anexos do e-mail.",
+  "broadcast.attachBtn": "Anexar um documento do meu computador",
+  "broadcast.attachMax": "Máximo de {n} anexos",
+  "broadcast.attachTooBig": "« {name} » excede {n} MB",
+  "broadcast.attachTotal": "Total de anexos limitado a {n} MB",
+
+  "set.groupIdentity": "Identidade da plataforma (cabeçalho)",
+  "set.groupLogin": "Página de início de sessão",
+  "set.groupFooter": "Contacto e rodapé",
+
+  "login.tabAccount": "Tenho uma conta",
+  "login.tabCodes": "Códigos de sessão",
+  "login.codesHint":
+    "Introduza os acessos transmitidos ao seu Estado-membro para consultar diretamente os documentos da sessão — sem criar conta.",
+  "login.codesSubmit": "Aceder aos documentos",
+  "login.codesOptional": "Facultativo: crie uma conta de participante para participar nas discussões.",
+  "guest.name": "Convidado",
+  "guest.banner":
+    "Está a consultar os documentos como convidado via « {title} ». Para participar nas discussões, crie a sua conta:",
+  "guest.register": "Criar a minha conta",
+
+  "docs.view": "Ver no navegador",
+  "docs.allSessions": "Todas as sessões",
+  "part.allStatuses": "Todos os estados",
+  "part.allCountries": "Todos os países",
+
+  "set.groupParticipant": "Espaço do participante (menus e biblioteca)",
+  "set.participantNote":
+    "Deixe um campo vazio para manter o texto padrão traduzido da plataforma.",
+  "set.nav_library": "Rótulo do menu « Biblioteca documental »",
+  "set.nav_psessions": "Rótulo do menu « Sessões e discussões »",
+  "set.nav_profile": "Rótulo do menu « O meu perfil »",
+  "set.library_title": "Faixa da biblioteca — título",
+  "set.library_notice": "Faixa da biblioteca — subtexto",
+
+  "account.title": "A minha conta de administrador",
+  "account.hint": "Credenciais utilizadas para iniciar sessão na plataforma.",
+  "account.nameLbl": "Nome de utilizador",
+  "account.saved": "Conta atualizada",
 };

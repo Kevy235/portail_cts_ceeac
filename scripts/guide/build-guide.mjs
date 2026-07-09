@@ -1,6 +1,9 @@
 /**
  * Génère le guide d'utilisation participant au format Word (.docx),
  * avec les captures d'écran réelles de la plateforme.
+ *
+ * Version 2.0 — intègre l'accès invité par codes de session, la consultation
+ * des documents dans le navigateur, les filtres enrichis et le profil épuré.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -31,9 +34,9 @@ const CAPTURES = path.join(HERE, "captures");
 const PROJECT = "k:/Portail-Web-Document-CTS";
 const OUT = path.join(PROJECT, "docs", "Guide-Participant-Plateforme-CTS-APPS.docx");
 
-const BRAND = "006EB5";
+const BRAND = "0077C8";
 const BRAND_DEEP = "073E63";
-const ACCENT = "3DA281";
+const ACCENT = "2AA87C";
 
 const img = (name) => fs.readFileSync(path.join(CAPTURES, name));
 
@@ -127,12 +130,12 @@ const infoBox = (title, text) =>
       new TableRow({
         children: [
           new TableCell({
-            shading: { type: ShadingType.CLEAR, fill: "E4F4EE" },
+            shading: { type: ShadingType.CLEAR, fill: "DDF5EC" },
             margins: { top: 120, bottom: 120, left: 160, right: 160 },
             children: [
               new Paragraph({
                 spacing: { after: 60 },
-                children: [new TextRun({ text: title, bold: true, size: 22, color: "2E8A6C" })],
+                children: [new TextRun({ text: title, bold: true, size: 22, color: "1E8862" })],
               }),
               new Paragraph({
                 spacing: { after: 0, line: 280 },
@@ -147,82 +150,134 @@ const infoBox = (title, text) =>
 
 const spacer = () => new Paragraph({ spacing: { after: 160 }, children: [] });
 
+// ─── Tableaux génériques (comparaison des accès, FAQ) ───────────────────────
+const cell = (text, { header = false, width, center = false } = {}) =>
+  new TableCell({
+    ...(width ? { width: { size: width, type: WidthType.PERCENTAGE } } : {}),
+    shading: header ? { type: ShadingType.CLEAR, fill: BRAND } : undefined,
+    margins: { top: 100, bottom: 100, left: 140, right: 140 },
+    children: [
+      new Paragraph({
+        spacing: { after: 0, line: 280 },
+        alignment: center ? AlignmentType.CENTER : AlignmentType.LEFT,
+        children: [
+          new TextRun({
+            text,
+            size: 20,
+            bold: header,
+            color: header ? "FFFFFF" : undefined,
+          }),
+        ],
+      }),
+    ],
+  });
+
+const tableBorders = {
+  top: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
+  bottom: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
+  left: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
+  right: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
+  insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
+  insideVertical: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
+};
+
+// Tableau comparatif : ce que permet chaque mode d'accès
+const accessCompare = new Table({
+  width: { size: 100, type: WidthType.PERCENTAGE },
+  borders: tableBorders,
+  rows: [
+    new TableRow({
+      tableHeader: true,
+      children: [
+        cell("Ce que vous pouvez faire", { header: true, width: 50 }),
+        cell("Invité (codes de session)", { header: true, width: 25, center: true }),
+        cell("Participant (compte)", { header: true, width: 25, center: true }),
+      ],
+    }),
+    ...[
+      ["Consulter les documents publiés en ligne", "Oui", "Oui"],
+      ["Télécharger les documents (toutes langues)", "Oui", "Oui"],
+      ["Rechercher et filtrer la bibliothèque", "Oui", "Oui"],
+      ["Suivre le calendrier des sessions", "—", "Oui"],
+      ["Participer aux fils de discussion", "—", "Oui"],
+      ["Recevoir les rapports diffusés par e-mail", "—", "Oui"],
+      ["Disposer d'un profil personnel permanent", "—", "Oui"],
+      ["Durée de l'accès", "24 heures, renouvelable", "Permanent"],
+    ].map(
+      ([a, b, c]) =>
+        new TableRow({
+          children: [
+            cell(a, { width: 50 }),
+            cell(b, { width: 25, center: true }),
+            cell(c, { width: 25, center: true }),
+          ],
+        })
+    ),
+  ],
+});
+
 // ─── FAQ ─────────────────────────────────────────────────────────────────────
 const faqRow = (probleme, solution, header = false) =>
   new TableRow({
     tableHeader: header,
-    children: [probleme, solution].map(
-      (text, i) =>
-        new TableCell({
-          width: { size: i === 0 ? 40 : 60, type: WidthType.PERCENTAGE },
-          shading: header
-            ? { type: ShadingType.CLEAR, fill: BRAND }
-            : undefined,
-          margins: { top: 100, bottom: 100, left: 140, right: 140 },
-          children: [
-            new Paragraph({
-              spacing: { after: 0, line: 280 },
-              children: [
-                new TextRun({
-                  text,
-                  size: 20,
-                  bold: header,
-                  color: header ? "FFFFFF" : undefined,
-                }),
-              ],
-            }),
-          ],
-        })
-    ),
+    children: [
+      cell(probleme, { header, width: 40 }),
+      cell(solution, { header, width: 60 }),
+    ],
   });
 
 const faq = new Table({
   width: { size: 100, type: WidthType.PERCENTAGE },
-  borders: {
-    top: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
-    bottom: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
-    left: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
-    right: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
-    insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
-    insideVertical: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" },
-  },
+  borders: tableBorders,
   rows: [
-    faqRow("Situation", "Que faire ?", true),
+    faqRow("Situation rencontrée", "Marche à suivre", true),
     faqRow(
-      "« Identifiant ou mot de passe de session incorrect » à l'inscription",
-      "Vérifiez l'identifiant (format CTS-XXXXXX) et le mot de passe reçus, en respectant les tirets. Si le message persiste, les accès ont peut-être été renouvelés : rapprochez-vous de votre point focal national ou du Secrétariat DAPPS."
+      "« Identifiant ou mot de passe de session incorrect »",
+      "Veuillez vérifier l'identifiant (format CTS-XXXXXX) et le mot de passe reçus, en respectant les tirets et les majuscules. Si le message persiste, les accès ont pu être renouvelés par le Secrétariat : rapprochez-vous de votre point focal national ou du Secrétariat DAPPS."
     ),
     faqRow(
-      "« Les inscriptions pour cette session sont closes »",
-      "La session est terminée. Contactez le Secrétariat DAPPS pour obtenir un accès à la plateforme."
+      "« Cette session est terminée, ses accès ne sont plus valides »",
+      "Les codes d'une session close ne permettent plus d'accéder à la plateforme. Veuillez contacter le Secrétariat DAPPS pour obtenir un accès."
+    ),
+    faqRow(
+      "« Accès invité expiré, saisissez à nouveau les codes de session »",
+      "L'accès invité est valable 24 heures : saisissez de nouveau les codes de session pour le renouveler. Si les codes ne fonctionnent plus, ils ont été renouvelés — rapprochez-vous de votre point focal national."
     ),
     faqRow(
       "« Un compte existe déjà avec cet e-mail »",
-      "Vous avez déjà un compte : utilisez la page de connexion. En cas de mot de passe oublié, demandez une réinitialisation au Secrétariat DAPPS."
+      "Un compte est déjà associé à cette adresse : utilisez l'onglet « J'ai un compte » de la page de connexion. En cas de mot de passe oublié, veuillez solliciter une réinitialisation auprès du Secrétariat DAPPS."
     ),
     faqRow(
       "« Identifiants incorrects » à la connexion",
-      "Vérifiez l'adresse e-mail et le mot de passe (attention aux majuscules). Après plusieurs échecs, patientez 15 minutes avant de réessayer."
+      "Veuillez vérifier l'adresse e-mail et le mot de passe (attention aux majuscules). Après plusieurs tentatives infructueuses, un délai d'attente de 15 minutes s'applique par mesure de sécurité."
     ),
     faqRow(
       "« Votre compte est désactivé »",
-      "Votre accréditation a été suspendue. Contactez le Secrétariat DAPPS."
+      "Votre accréditation a été suspendue. Veuillez prendre l'attache du Secrétariat DAPPS pour en connaître les motifs et, le cas échéant, solliciter sa réactivation."
     ),
     faqRow(
       "« Session expirée, veuillez vous reconnecter »",
-      "Votre session a expiré (7 jours) ou votre mot de passe a été réinitialisé. Reconnectez-vous simplement."
+      "Votre session de travail a expiré (7 jours) ou votre mot de passe a été réinitialisé entre-temps. Il vous suffit de vous reconnecter."
+    ),
+    faqRow(
+      "Impossible d'écrire dans les fils de discussion",
+      "Les fils de discussion sont réservés aux titulaires d'un compte participant. Si vous êtes connecté(e) en qualité d'invité, créez votre compte via le lien « Créer mon compte » du menu."
     ),
     faqRow(
       "Un document attendu n'apparaît pas dans la bibliothèque",
-      "Vérifiez vos langues de documents dans Mon profil : seuls les documents disponibles dans les langues sélectionnées sont affichés. Sinon, le document n'est peut-être pas encore publié."
+      "Le document n'a vraisemblablement pas encore été publié par le Secrétariat. Vous pouvez également élargir vos filtres (catégorie, session) et vider le champ de recherche."
     ),
     faqRow(
       "Un fichier téléchargé « codé » ne s'ouvre pas normalement",
-      "C'est le comportement attendu : les documents portant le badge « Document codé » sont chiffrés avant leur mise en ligne. La clé de lecture est communiquée séparément par le Secrétariat, par un canal sécurisé."
+      "Ce comportement est attendu : les documents portant le badge « Document codé » sont chiffrés avant leur mise en ligne. La clé de lecture est communiquée séparément par le Secrétariat, par un canal sécurisé. Si vous ne l'avez pas reçue, rapprochez-vous de votre point focal."
     ),
     faqRow(
       "Le texte est trop petit à l'écran",
-      "Utilisez le bouton A / A+ / A++ dans la barre d'en-tête pour agrandir toute l'interface. Votre choix est mémorisé."
+      "Utilisez le bouton A / A+ / A++ de la barre d'en-tête pour agrandir l'ensemble de l'interface. Votre réglage est conservé d'une visite à l'autre."
+    ),
+    faqRow(
+      "Mot de passe oublié",
+      "Veuillez adresser une demande de réinitialisation au Secrétariat DAPPS. Un mot de passe provisoire vous sera remis ; il vous sera demandé d'en définir un nouveau à la connexion suivante."
     ),
   ],
 });
@@ -232,7 +287,7 @@ const doc = new Document({
   creator: "CEEAC · DAPPS",
   title: "Guide du participant — Plateforme CTS-APPS",
   description:
-    "Guide d'utilisation de la plateforme d'accès aux documents du CTS-APPS pour les experts accrédités",
+    "Guide d'utilisation de la plateforme d'accès aux documents du CTS-APPS à l'attention des représentants et experts accrédités des États membres",
   features: { updateFields: true },
   styles: {
     default: {
@@ -240,10 +295,10 @@ const doc = new Document({
     },
   },
   sections: [
-    // ─── Page de garde ───────────────────────────────────────────────
     {
       properties: {},
       children: [
+        // ─── Page de garde ───────────────────────────────────────────
         new Paragraph({ spacing: { after: 800 }, children: [] }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
@@ -317,13 +372,13 @@ const doc = new Document({
         new Paragraph({
           alignment: AlignmentType.CENTER,
           spacing: { after: 60 },
-          children: [new TextRun({ text: "Version 1.0 — Juillet 2026", size: 22, color: "5A6E82" })],
+          children: [new TextRun({ text: "Version 2.0 — Juillet 2026", size: 22, color: "5A6E82" })],
         }),
         new Paragraph({
           alignment: AlignmentType.CENTER,
           children: [
             new TextRun({
-              text: "À l'attention des experts accrédités des États membres",
+              text: "À l'attention des représentants et experts accrédités des États membres",
               size: 22,
               color: "5A6E82",
             }),
@@ -345,168 +400,238 @@ const doc = new Document({
         // ─── 1. Présentation ─────────────────────────────────────────
         h1("1. Présentation de la plateforme"),
         p(
-          "La Plateforme CTS-APPS est le portail documentaire officiel du Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité de la CEEAC. Elle permet aux experts accrédités des États membres :"
+          "La Plateforme CTS-APPS est le portail documentaire officiel du Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité de la CEEAC. Mise en œuvre par le Secrétariat du DAPPS, elle offre aux représentants et experts des États membres :"
         ),
-        bullet("de consulter et télécharger les documents officiels des sessions (rapports, résolutions, ordres du jour, notes conceptuelles, instruments juridiques…), dans les quatre langues de la Communauté (français, anglais, portugais, espagnol) ;"),
-        bullet("de suivre le calendrier des sessions du CTS et d'échanger avec les autres participants dans le fil de discussion de chaque session ;"),
-        bullet("de recevoir par e-mail les rapports de réunion diffusés par le Secrétariat ;"),
-        bullet("de gérer leur profil et leurs préférences de langue."),
+        bullet(
+          "la consultation en ligne et le téléchargement des documents officiels des sessions (rapports, résolutions, ordres du jour, notes conceptuelles, instruments juridiques…), dans les quatre langues de la Communauté — français, anglais, portugais et espagnol ;"
+        ),
+        bullet(
+          "le suivi du calendrier des sessions du CTS et la possibilité d'échanger avec les autres participants dans le fil de discussion propre à chaque session ;"
+        ),
+        bullet("la réception, par courrier électronique, des rapports de réunion diffusés par le Secrétariat ;"),
+        bullet("la consultation des informations de leur accréditation."),
         p(
-          "L'accès est strictement réservé aux personnes accréditées. L'adresse de la plateforme vous est communiquée par le Secrétariat DAPPS ou par votre point focal national."
+          "L'accès est réservé aux personnes dûment autorisées. L'adresse de la plateforme vous est communiquée par le Secrétariat DAPPS ou par votre point focal national."
         ),
         infoBox(
           "Bon à savoir",
-          "La plateforme fonctionne sur tout navigateur récent (Chrome, Edge, Firefox, Safari), sur ordinateur, tablette ou téléphone. Aucune installation n'est nécessaire."
+          "La plateforme fonctionne sur tout navigateur récent (Chrome, Edge, Firefox, Safari), depuis un ordinateur, une tablette ou un téléphone. Aucune installation n'est requise."
         ),
         spacer(),
 
-        // ─── 2. Obtenir un compte ────────────────────────────────────
-        h1("2. Obtenir votre accès"),
-        p("Il existe deux façons d'obtenir un compte participant :"),
-        bullet(
-          "vous créez vous-même votre compte à l'aide de l'identifiant et du mot de passe de session transmis à votre État membre (voir chapitre 3) — c'est la voie normale avant chaque session du CTS ;",
-          "L'auto-inscription"
-        ),
-        bullet(
-          "le Secrétariat crée votre compte et vous remet un mot de passe provisoire, à changer lors de votre première connexion (voir chapitre 4.1).",
-          "La création par le Secrétariat"
-        ),
-        spacer(),
-
-        // ─── 3. Auto-inscription ─────────────────────────────────────
-        h1("3. Créer votre compte avec les accès de session"),
+        // ─── 2. Modes d'accès ────────────────────────────────────────
+        h1("2. Les modes d'accès : invité ou participant"),
         p(
-          "Avant chaque session du CTS, le Secrétariat DAPPS transmet aux États membres une invitation contenant un identifiant de session (au format CTS-XXXXXX) et un mot de passe d'accès. Ces accès vous permettent de créer votre compte personnel :"
+          "En amont de chaque session du CTS, le Secrétariat DAPPS transmet aux États membres deux codes d'accès : un identifiant de session (au format CTS-XXXXXX) et un mot de passe d'accès. À partir de ces codes, deux niveaux d'accès vous sont proposés :"
         ),
-        step(1, "Ouvrez la page d'inscription :", "adresse de la plateforme suivie de /inscription (le lien figure aussi dans l'invitation et sur la page de connexion)."),
+        bullet(
+          "vous saisissez les codes de session sur la page de connexion et accédez immédiatement à la bibliothèque documentaire, sans créer de compte. Cet accès convient à la consultation et au téléchargement des documents (voir chapitre 3) ;",
+          "L'accès invité"
+        ),
+        bullet(
+          "vous créez, si vous le souhaitez, votre compte personnel à l'aide des mêmes codes de session. Le compte est nécessaire pour participer aux fils de discussion et recevoir les diffusions par e-mail (voir chapitre 4). Cette inscription est facultative et demeure possible à tout moment ;",
+          "Le compte participant"
+        ),
+        bullet(
+          "dans certains cas, le Secrétariat crée directement votre compte et vous remet un mot de passe provisoire, à personnaliser lors de votre première connexion (voir chapitre 5.1).",
+          "Le compte créé par le Secrétariat"
+        ),
+        p("Le tableau ci-dessous récapitule les possibilités offertes par chaque niveau d'accès :"),
+        accessCompare,
+        spacer(),
+
+        // ─── 3. Accès invité ─────────────────────────────────────────
+        h1("3. Accéder aux documents avec les codes de session (invité)"),
+        p(
+          "Cette voie est la plus directe : elle ne requiert aucune création de compte et convient parfaitement à la consultation des documents de session."
+        ),
+        step(1, "Ouvrez l'adresse de la plateforme dans votre navigateur."),
+        step(2, "Sur la page de connexion, sélectionnez l'onglet « Codes de session »."),
+        step(
+          3,
+          "Saisissez l'identifiant de session (CTS-XXXXXX) et le mot de passe d'accès reçus.",
+          "Les majuscules sont appliquées automatiquement."
+        ),
+        step(4, "Cliquez sur « Accéder aux documents ».", "La bibliothèque documentaire s'ouvre immédiatement."),
+        ...figure("01b-connexion-codes.png", "L'onglet « Codes de session » de la page de connexion"),
+        p(
+          "En qualité d'invité, vous consultez et téléchargez librement l'ensemble des documents publiés. Un bandeau discret vous rappelle votre statut et vous propose, à tout moment, de créer votre compte participant."
+        ),
+        ...figure("03b-espace-invite.png", "L'espace documentaire en accès invité, avec le bandeau d'information"),
+        infoBox(
+          "Durée et renouvellement de l'accès invité",
+          "L'accès invité est valable 24 heures ; il suffit de saisir à nouveau les codes de session pour le renouveler. Si le Secrétariat renouvelle les accès d'une session, les anciens codes cessent immédiatement de fonctionner. Veuillez ne communiquer les codes de session qu'aux personnes autorisées de votre délégation."
+        ),
+        spacer(),
+
+        // ─── 4. Créer un compte ──────────────────────────────────────
+        h1("4. Créer votre compte participant (facultatif)"),
+        p(
+          "La création d'un compte personnel n'est pas requise pour consulter les documents. Elle vous ouvre en revanche les fonctionnalités de collaboration : fils de discussion des sessions, réception des rapports diffusés par e-mail et profil permanent. Les mêmes codes de session servent à l'inscription :"
+        ),
+        step(
+          1,
+          "Ouvrez la page d'inscription :",
+          "lien « Inscrivez-vous ici » de l'onglet « Codes de session », lien « Créer mon compte » de l'espace invité, ou adresse de la plateforme suivie de /inscription."
+        ),
         step(2, "Saisissez l'identifiant de session et le mot de passe d'accès reçus."),
-        step(3, "Renseignez vos informations personnelles :", "nom complet, adresse e-mail institutionnelle, pays, fonction et institution."),
+        step(
+          3,
+          "Renseignez vos informations personnelles :",
+          "nom complet, adresse e-mail institutionnelle et pays sont requis ; la fonction et l'institution sont facultatives."
+        ),
         step(4, "Choisissez votre mot de passe personnel (8 caractères minimum) et confirmez-le."),
         step(5, "Cliquez sur « Créer mon compte ».", "Vous êtes immédiatement connecté(e) et dirigé(e) vers la bibliothèque documentaire."),
         ...figure("02-inscription.png", "La page d'inscription : accès de session en haut, informations personnelles en dessous"),
         infoBox(
           "Important",
-          "Le mot de passe de session sert uniquement à créer votre compte. Par la suite, vous vous connecterez toujours avec votre adresse e-mail et le mot de passe personnel que vous avez choisi. Ne communiquez les accès de session qu'aux personnes autorisées de votre délégation."
+          "Les codes de session servent uniquement à ouvrir l'accès. Une fois votre compte créé, vous vous connecterez toujours avec votre adresse e-mail et le mot de passe personnel que vous avez choisi."
         ),
         spacer(),
 
-        // ─── 4. Connexion ────────────────────────────────────────────
-        h1("4. Se connecter"),
+        // ─── 5. Connexion ────────────────────────────────────────────
+        h1("5. Se connecter avec votre compte"),
         step(1, "Ouvrez l'adresse de la plateforme dans votre navigateur."),
-        step(2, "Saisissez votre adresse e-mail et votre mot de passe."),
+        step(2, "Dans l'onglet « J'ai un compte », saisissez votre adresse e-mail et votre mot de passe."),
         step(3, "Cliquez sur « Se connecter »."),
-        ...figure("01-connexion.png", "La page de connexion"),
+        ...figure("01-connexion.png", "La page de connexion — onglet « J'ai un compte »"),
         p(
-          "Votre session reste active pendant 7 jours sur l'appareil utilisé. Pour vous déconnecter manuellement, cliquez sur l'icône de déconnexion en haut à droite de l'écran."
+          "Votre session de travail demeure active pendant 7 jours sur l'appareil utilisé. Pour vous déconnecter manuellement, cliquez sur l'icône de déconnexion située en haut à droite de l'écran."
         ),
 
-        h2("4.1. Première connexion avec un mot de passe provisoire"),
+        h2("5.1. Première connexion avec un mot de passe provisoire"),
         p(
-          "Si votre compte a été créé par le Secrétariat, vous avez reçu un mot de passe provisoire. Lors de votre première connexion, la plateforme vous demande de définir votre mot de passe personnel :"
+          "Si votre compte a été créé par le Secrétariat, un mot de passe provisoire vous a été remis. Lors de votre première connexion, la plateforme vous invite à définir votre mot de passe personnel :"
         ),
-        step(1, "Connectez-vous avec votre e-mail et le mot de passe provisoire reçu."),
+        step(1, "Connectez-vous avec votre adresse e-mail et le mot de passe provisoire reçu."),
         step(2, "Saisissez le mot de passe provisoire, puis votre nouveau mot de passe (8 caractères minimum) et sa confirmation."),
         step(3, "Cliquez sur « Définir mon mot de passe ».", "Vous accédez alors à votre espace."),
         ...figure("03-premiere-connexion.png", "L'écran de première connexion : définition du mot de passe personnel"),
-        spacer(),
-
-        // ─── 5. Bibliothèque ─────────────────────────────────────────
-        h1("5. La bibliothèque documentaire"),
-        p(
-          "La bibliothèque est votre page d'accueil : elle rassemble tous les documents officiels publiés par le Secrétariat."
-        ),
-        ...figure("04-bibliotheque.png", "La bibliothèque documentaire : recherche, filtres par catégorie et téléchargement par langue"),
-        h2("5.1. Rechercher et filtrer"),
-        bullet("saisissez un ou plusieurs mots du titre dans le champ de recherche ;", "Recherche"),
-        bullet("cliquez sur une catégorie (Rapport, Résolution, Ordre du Jour…) pour n'afficher que les documents correspondants ;", "Filtres"),
-        bullet("chaque document indique sa catégorie, la référence de la session à laquelle il se rattache et sa date de publication.", "Repères"),
-        h2("5.2. Télécharger un document"),
-        p(
-          "Chaque document peut exister en plusieurs versions linguistiques. Cliquez sur le bouton de la langue souhaitée (FR, EN, PT, ES) pour télécharger le fichier correspondant. Seules les langues disponibles pour ce document sont proposées."
-        ),
         infoBox(
-          "Langues affichées",
-          "La bibliothèque n'affiche que les documents disponibles dans vos langues de travail, définies dans Mon profil (voir chapitre 7). Si un document semble manquer, vérifiez d'abord vos langues sélectionnées."
-        ),
-        h2("5.3. Les documents codés"),
-        p(
-          "Certains documents sensibles portent le badge rouge « Document codé » : le fichier a été chiffré par le Secrétariat avant sa mise en ligne, par mesure de sécurité. Après téléchargement, son ouverture nécessite la clé de lecture communiquée séparément par le Secrétariat, par un canal sécurisé. Si vous n'avez pas reçu cette clé, rapprochez-vous de votre point focal ou du Secrétariat DAPPS."
+          "Sécurité de votre mot de passe",
+          "Choisissez un mot de passe robuste et qui vous est propre (lettres, chiffres, caractères spéciaux). Il est conservé sous forme chiffrée : ni le Secrétariat ni l'administrateur ne peuvent le consulter. En cas d'oubli, une réinitialisation peut être sollicitée auprès du Secrétariat DAPPS."
         ),
         spacer(),
 
-        // ─── 6. Sessions & discussions ───────────────────────────────
-        h1("6. Sessions CTS et fils de discussion"),
+        // ─── 6. Bibliothèque ─────────────────────────────────────────
+        h1("6. La bibliothèque documentaire"),
         p(
-          "La page « Sessions & échanges » présente le calendrier des sessions du CTS : dates, lieu, statut (à venir, en cours, terminée), description et nombre de documents rattachés."
+          "La bibliothèque constitue votre page d'accueil : elle rassemble l'ensemble des documents officiels publiés par le Secrétariat, présentés du plus récent au plus ancien."
+        ),
+        ...figure("04-bibliotheque.png", "La bibliothèque documentaire : recherche, filtres, consultation et téléchargement par langue"),
+
+        h2("6.1. Rechercher et filtrer"),
+        bullet("saisissez un ou plusieurs mots du titre dans le champ de recherche ;", "Recherche"),
+        bullet(
+          "cliquez sur une catégorie (Rapport, Résolution, Ordre du Jour…) pour restreindre l'affichage aux documents correspondants ;",
+          "Catégories"
+        ),
+        bullet(
+          "le sélecteur « Toutes les sessions » permet de n'afficher que les documents rattachés à une session donnée ;",
+          "Session"
+        ),
+        bullet(
+          "chaque document indique sa catégorie, la référence de la session à laquelle il se rattache et sa date de publication.",
+          "Repères"
+        ),
+
+        h2("6.2. Consulter un document en ligne"),
+        p(
+          "Les documents au format PDF peuvent être consultés directement dans le navigateur, sans téléchargement : cliquez sur le bouton marqué d'un œil, à gauche du bouton de téléchargement de la langue souhaitée. Le document s'ouvre dans un nouvel onglet."
+        ),
+
+        h2("6.3. Télécharger un document"),
+        p(
+          "Chaque document peut exister en plusieurs versions linguistiques, identifiées par leur drapeau et leur code (FR, EN, PT, ES). Cliquez sur le bouton de la langue souhaitée pour télécharger le fichier correspondant ; la progression s'affiche dans le bouton. Seules les langues effectivement disponibles pour ce document sont proposées."
+        ),
+
+        h2("6.4. Les documents codés"),
+        p(
+          "Certains documents sensibles portent le badge rouge « Document codé » : le fichier a été chiffré par le Secrétariat avant sa mise en ligne, par mesure de sécurité. Après téléchargement, son ouverture nécessite la clé de lecture communiquée séparément par le Secrétariat, par un canal sécurisé. Si vous n'avez pas reçu cette clé, veuillez vous rapprocher de votre point focal ou du Secrétariat DAPPS."
+        ),
+        spacer(),
+
+        // ─── 7. Sessions & discussions ───────────────────────────────
+        h1("7. Sessions CTS et fils de discussion"),
+        p(
+          "La page « Sessions & échanges » présente le calendrier des sessions du CTS : dates, lieu, statut (à venir, en cours, terminée), description et nombre de documents rattachés. Cette page est réservée aux titulaires d'un compte participant."
         ),
         p(
           "Chaque session dispose d'un fil de discussion ouvert aux participants et au Secrétariat. Cliquez sur le bouton « Discussion » d'une session pour l'ouvrir :"
         ),
         ...figure("05-sessions-discussion.png", "Une session CTS avec son fil de discussion ouvert"),
-        bullet("saisissez votre message dans le champ du bas, puis appuyez sur Entrée ou cliquez sur le bouton d'envoi (2 000 caractères maximum) ;", "Écrire"),
-        bullet("les nouveaux messages des autres participants apparaissent automatiquement, sans recharger la page ;", "Suivre"),
-        bullet("vous pouvez supprimer vos propres messages (icône corbeille au survol) ; le Secrétariat peut modérer l'ensemble du fil.", "Supprimer"),
+        bullet(
+          "saisissez votre message dans le champ inférieur, puis appuyez sur Entrée ou cliquez sur le bouton d'envoi (2 000 caractères au maximum) ;",
+          "Écrire"
+        ),
+        bullet("les messages des autres participants apparaissent automatiquement, sans qu'il soit nécessaire de recharger la page ;", "Suivre"),
+        bullet(
+          "vous pouvez supprimer vos propres messages (icône corbeille au survol) ; le Secrétariat assure la modération de l'ensemble du fil.",
+          "Supprimer"
+        ),
         infoBox(
           "Bonnes pratiques",
-          "Le fil de discussion est un espace de travail officiel entre experts accrédités. Restez courtois et factuel, et n'y partagez aucune information confidentielle qui ne serait pas destinée à l'ensemble des participants."
+          "Le fil de discussion est un espace de travail officiel entre experts accrédités. Nous vous invitons à y observer la courtoisie d'usage, à demeurer factuel et à n'y partager aucune information confidentielle qui ne serait pas destinée à l'ensemble des participants."
         ),
         spacer(),
 
-        // ─── 7. Profil ───────────────────────────────────────────────
-        h1("7. Votre profil et vos préférences"),
-        ...figure("06-profil.png", "La page Mon profil : informations d'accréditation, préférences de langue et mot de passe"),
-        h2("7.1. Vos informations d'accréditation"),
+        // ─── 8. Profil ───────────────────────────────────────────────
+        h1("8. Votre profil"),
         p(
-          "La page « Mon profil » récapitule vos informations : e-mail, pays représenté, fonction, institution, date d'accréditation, statut et, le cas échéant, la session via laquelle vous vous êtes inscrit(e). Pour toute correction, contactez le Secrétariat DAPPS (les informations ne sont pas modifiables directement)."
+          "La page « Mon profil » récapitule les informations de votre accréditation : adresse e-mail, institution, pays représenté, fonction, date d'accréditation, statut et, le cas échéant, la session au titre de laquelle vous vous êtes inscrit(e)."
         ),
-        h2("7.2. Vos langues"),
-        bullet("choisissez la langue d'affichage de la plateforme (français, anglais, portugais ou espagnol) ;", "Langue de l'interface"),
-        bullet("sélectionnez les langues dans lesquelles vous souhaitez voir les documents de la bibliothèque (au moins une).", "Langues des documents"),
-        p("Cliquez sur « Enregistrer » pour appliquer vos préférences : elles sont conservées d'une connexion à l'autre, sur tous vos appareils."),
-        h2("7.3. Changer votre mot de passe"),
-        step(1, "Dans « Changer mon mot de passe », saisissez votre mot de passe actuel."),
-        step(2, "Saisissez le nouveau mot de passe (8 caractères minimum) et sa confirmation."),
-        step(3, "Cliquez sur « Mettre à jour »."),
+        ...figure("06-profil.png", "La page Mon profil : les informations de votre accréditation"),
         infoBox(
-          "Sécurité",
-          "Choisissez un mot de passe robuste et unique (lettres, chiffres, caractères spéciaux). Votre mot de passe est chiffré : ni le Secrétariat ni l'administrateur ne peuvent le consulter. Après un changement, les éventuelles sessions ouvertes sur d'autres appareils sont automatiquement déconnectées."
+          "Mise à jour de vos informations",
+          "Les informations d'accréditation ne sont pas modifiables directement, par souci d'intégrité des données officielles. Pour toute correction (changement de fonction, d'institution ou d'adresse e-mail) ou pour un changement de mot de passe, veuillez adresser votre demande au Secrétariat DAPPS."
         ),
         spacer(),
 
-        // ─── 8. Confort de lecture ───────────────────────────────────
-        h1("8. Confort de lecture et langue de l'interface"),
-        p("Deux outils sont disponibles en permanence dans la barre d'en-tête :"),
-        ...figure("07-entete-outils.png", "Les outils de l'en-tête : taille du texte (A), langue, profil et déconnexion", 620, 62),
-        bullet("le bouton A agrandit le texte de toute la plateforme en trois paliers (A, A+, A++). Cliquez plusieurs fois pour passer d'un palier à l'autre ; votre choix est mémorisé ;", "Taille du texte"),
-        bullet("le sélecteur de langue change immédiatement la langue de l'interface, sans déconnexion.", "Langue"),
+        // ─── 9. Confort de lecture ───────────────────────────────────
+        h1("9. Confort de lecture et langue de l'interface"),
+        p("Deux réglages sont disponibles en permanence dans la barre d'en-tête, y compris sur la page de connexion :"),
+        ...figure("07-entete-outils.png", "Les outils de l'en-tête : taille du texte, langues (avec drapeaux), profil et déconnexion", 620, 42),
+        bullet(
+          "le bouton A agrandit le texte de toute la plateforme en trois paliers (A, A+, A++). Cliquez successivement pour passer d'un palier à l'autre ; votre réglage est conservé ;",
+          "Taille du texte"
+        ),
+        bullet(
+          "les boutons de langue (drapeaux FR · EN · PT · ES) changent immédiatement la langue de l'interface, sans déconnexion.",
+          "Langue de l'interface"
+        ),
         spacer(),
 
-        // ─── 9. E-mails ──────────────────────────────────────────────
-        h1("9. Les e-mails de la plateforme"),
+        // ─── 10. E-mails ─────────────────────────────────────────────
+        h1("10. Les courriers électroniques de la plateforme"),
         p(
-          "Après les réunions, le Secrétariat peut vous adresser par e-mail les rapports et documents officiels : le message contient des liens de téléchargement directs par langue. Vous devez être connecté(e) à la plateforme pour que le téléchargement démarre (connectez-vous puis cliquez à nouveau sur le lien si nécessaire)."
+          "À l'issue des réunions, le Secrétariat peut adresser aux participants les rapports et documents officiels par courrier électronique. Ces messages peuvent contenir :"
         ),
+        bullet("des liens de téléchargement directs, par langue, vers les documents publiés sur la plateforme — une connexion à votre compte est nécessaire pour que le téléchargement s'effectue ;"),
+        bullet("des documents joints directement au message, lisibles sans connexion."),
         infoBox(
           "Vigilance",
-          "Les e-mails officiels proviennent de l'adresse du Secrétariat et pointent uniquement vers l'adresse officielle de la plateforme. En cas de doute sur un message, ne cliquez pas et signalez-le au Secrétariat."
+          "Les courriers officiels proviennent exclusivement de l'adresse du Secrétariat et renvoient uniquement vers l'adresse officielle de la plateforme. En cas de doute sur l'authenticité d'un message, veuillez vous abstenir de cliquer et le signaler au Secrétariat."
         ),
         spacer(),
 
-        // ─── 10. FAQ ─────────────────────────────────────────────────
-        h1("10. Questions fréquentes"),
+        // ─── 11. FAQ ─────────────────────────────────────────────────
+        h1("11. Questions fréquentes"),
         faq,
         spacer(),
 
-        // ─── 11. Assistance ──────────────────────────────────────────
-        h1("11. Assistance"),
+        // ─── 12. Assistance ──────────────────────────────────────────
+        h1("12. Assistance"),
         p(
-          "Pour toute difficulté d'accès, demande de réinitialisation de mot de passe ou question relative à votre accréditation, contactez le Secrétariat du DAPPS-CEEAC :"
+          "Pour toute difficulté d'accès, demande de réinitialisation de mot de passe, correction de vos informations d'accréditation ou question relative à la plateforme, le Secrétariat du DAPPS-CEEAC demeure à votre disposition :"
         ),
-        bullet("par e-mail, à l'adresse de contact indiquée sur la page de connexion de la plateforme ;"),
+        bullet("par courrier électronique, à l'adresse de contact indiquée sur la page de connexion de la plateforme ;"),
         bullet("ou par l'intermédiaire de votre point focal national."),
         p(
-          "Merci d'indiquer dans votre message : votre nom complet, votre pays, votre institution et une description précise du problème rencontré (avec, si possible, le message d'erreur affiché)."
+          "Afin de faciliter le traitement de votre demande, nous vous saurions gré d'indiquer dans votre message : votre nom complet, votre pays, votre institution, ainsi qu'une description précise de la difficulté rencontrée (accompagnée, si possible, du message d'erreur affiché)."
         ),
+        p("Le Secrétariat vous remercie de votre collaboration et vous souhaite une excellente utilisation de la plateforme.", {
+          run: { italics: true, color: "5A6E82" },
+        }),
       ],
       headers: {
         default: new Header({

@@ -1,11 +1,13 @@
 import { Router } from "express";
+import multer from "multer";
+import path from "node:path";
 import { z } from "zod";
 import { query } from "../db.js";
 import { config, isMailConfigured } from "../config.js";
-import { requireAdmin } from "../auth.js";
+import { requireAccount, requireAdmin } from "../auth.js";
 import { ah, uuidParams } from "../http.js";
 import { generateAccessCode, generateAccessPassword } from "../codes.js";
-import { buildReportMail, sendBroadcast } from "../mailer.js";
+import { buildReportMail, sendBroadcast, type MailAttachment } from "../mailer.js";
 import { logActivity } from "../activity.js";
 
 export const sessionsRouter = Router();
@@ -175,15 +177,53 @@ sessionsRouter.delete(
 const broadcastSchema = z.object({
   subject: z.string().trim().min(3, "Objet trop court").max(200),
   message: z.string().trim().min(3, "Message trop court").max(5000),
-  documentIds: z.array(z.string().uuid()).max(20).default([]),
+  // Tableau (JSON) ou chaîne JSON (multipart/form-data avec pièces jointes).
+  documentIds: z.preprocess((v) => {
+    if (typeof v !== "string") return v;
+    try {
+      return JSON.parse(v);
+    } catch {
+      return v;
+    }
+  }, z.array(z.string().uuid()).max(20).default([])),
   // "session" : participants inscrits via cette session ; "all" : tous les actifs.
   scope: z.enum(["session", "all"]).default("all"),
 });
+
+// Pièces jointes de l'e-mail : en mémoire (jamais écrites sur disque), mêmes
+// types que les documents, limites adaptées aux messageries des destinataires.
+const ATTACHMENT_MAX_MB = 10;
+const ATTACHMENT_TOTAL_MB = 15;
+const ATTACHMENT_EXT = new Set([".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"]);
+const attachmentUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: ATTACHMENT_MAX_MB * 1024 * 1024, files: 3 },
+  fileFilter: (_req, file, cb) => {
+    if (ATTACHMENT_EXT.has(path.extname(file.originalname).toLowerCase())) {
+      return cb(null, true);
+    }
+    cb(new Error("Type de pièce jointe non autorisé (PDF, Word, Excel, PowerPoint uniquement)"));
+  },
+}).array("attachments", 3);
 
 sessionsRouter.post(
   "/:id/broadcast",
   requireAdmin,
   uuidParams("id"),
+  (req, res, next) => {
+    attachmentUpload(req, res, (err) => {
+      if (err) {
+        const msg =
+          err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE"
+            ? `Pièce jointe trop volumineuse (max. ${ATTACHMENT_MAX_MB} Mo par fichier)`
+            : err instanceof multer.MulterError && err.code === "LIMIT_FILE_COUNT"
+              ? "3 pièces jointes maximum"
+              : err.message;
+        return res.status(400).json({ error: msg });
+      }
+      next();
+    });
+  },
   ah(async (req, res) => {
     if (!isMailConfigured()) {
       return res.status(503).json({
@@ -199,6 +239,19 @@ sessionsRouter.post(
         .json({ error: parsed.error.issues[0]?.message ?? "Données invalides" });
     }
     const d = parsed.data;
+
+    const uploaded = (req.files ?? []) as Express.Multer.File[];
+    const totalBytes = uploaded.reduce((sum, f) => sum + f.size, 0);
+    if (totalBytes > ATTACHMENT_TOTAL_MB * 1024 * 1024) {
+      return res.status(400).json({
+        error: `Total des pièces jointes limité à ${ATTACHMENT_TOTAL_MB} Mo`,
+      });
+    }
+    const attachments: MailAttachment[] = uploaded.map((f) => ({
+      filename: f.originalname,
+      content: f.buffer,
+      contentType: f.mimetype,
+    }));
 
     const session = await query<{ title: string }>(
       "SELECT title FROM cts_sessions WHERE id = $1",
@@ -255,6 +308,7 @@ sessionsRouter.post(
       documents: links,
       appUrl,
     });
+    if (attachments.length > 0) mail.attachments = attachments;
 
     const result = await sendBroadcast(
       recipients.rows.map((r) => r.email),
@@ -303,6 +357,7 @@ const messageSchema = z.object({
 
 sessionsRouter.post(
   "/:id/messages",
+  requireAccount,
   uuidParams("id"),
   ah(async (req, res) => {
     const parsed = messageSchema.safeParse(req.body);
@@ -330,6 +385,7 @@ sessionsRouter.post(
 // Suppression : auteur du message ou administrateur
 sessionsRouter.delete(
   "/:id/messages/:messageId",
+  requireAccount,
   uuidParams("id"),
   ah(async (req, res) => {
     const messageId = Number(req.params.messageId);

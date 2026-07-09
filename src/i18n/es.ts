@@ -174,7 +174,8 @@ export const es: Dict = {
   "docs.colSession": "Sesión",
   "docs.colDate": "Fecha",
   "docs.colLangs": "Idiomas",
-  "docs.colDl": "Desc.",
+  "docs.colDl": "Descargas",
+  "docs.colDlFull": "Número de descargas",
   "docs.colStatus": "Estado",
   "docs.colActions": "Acciones",
   "docs.empty": "Ningún documento en esta vista",
@@ -313,6 +314,7 @@ export const es: Dict = {
   "common.copy": "Copiar",
   "common.copied": "Copiado",
   "common.copyFailed": "No se pudo copiar — copie el texto manualmente",
+  "common.optional": "(opcional)",
 
   // ─── Autoinscripción por sesión ───────────────────────────────────────
   "login.registerPrompt": "¿Recibió los accesos de una sesión CTE?",
@@ -394,4 +396,45 @@ export const es: Dict = {
   "broadcast.sending": "Enviando…",
   "broadcast.sent": "Correo enviado a {sent} participante(s)",
   "broadcast.partial": "{sent} enviado(s), {failed} fallo(s)",
+  "broadcast.attachments": "Adjuntos del correo",
+  "broadcast.attachNote":
+    "Hasta {max} archivos ({mb} MB cada uno, {total} MB en total) — enviados directamente como adjuntos del correo.",
+  "broadcast.attachBtn": "Adjuntar un documento desde mi ordenador",
+  "broadcast.attachMax": "Máximo {n} adjuntos",
+  "broadcast.attachTooBig": "«{name}» supera {n} MB",
+  "broadcast.attachTotal": "Total de adjuntos limitado a {n} MB",
+
+  "set.groupIdentity": "Identidad de la plataforma (encabezado)",
+  "set.groupLogin": "Página de inicio de sesión",
+  "set.groupFooter": "Contacto y pie de página",
+
+  "login.tabAccount": "Tengo una cuenta",
+  "login.tabCodes": "Códigos de sesión",
+  "login.codesHint":
+    "Introduzca los accesos transmitidos a su Estado miembro para consultar directamente los documentos de la sesión — sin crear una cuenta.",
+  "login.codesSubmit": "Acceder a los documentos",
+  "login.codesOptional": "Opcional: cree una cuenta de participante para participar en los intercambios.",
+  "guest.name": "Invitado",
+  "guest.banner":
+    "Está consultando los documentos como invitado a través de «{title}». Para participar en las discusiones, cree su cuenta:",
+  "guest.register": "Crear mi cuenta",
+
+  "docs.view": "Ver en el navegador",
+  "docs.allSessions": "Todas las sesiones",
+  "part.allStatuses": "Todos los estados",
+  "part.allCountries": "Todos los países",
+
+  "set.groupParticipant": "Espacio del participante (menús y biblioteca)",
+  "set.participantNote":
+    "Deje un campo vacío para conservar el texto estándar traducido de la plataforma.",
+  "set.nav_library": "Etiqueta del menú « Biblioteca documental »",
+  "set.nav_psessions": "Etiqueta del menú « Sesiones e intercambios »",
+  "set.nav_profile": "Etiqueta del menú « Mi perfil »",
+  "set.library_title": "Banner de la biblioteca — título",
+  "set.library_notice": "Banner de la biblioteca — subtexto",
+
+  "account.title": "Mi cuenta de administrador",
+  "account.hint": "Credenciales utilizadas para iniciar sesión en la plataforma.",
+  "account.nameLbl": "Nombre de usuario",
+  "account.saved": "Cuenta actualizada",
 };

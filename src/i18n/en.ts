@@ -174,7 +174,8 @@ export const en: Dict = {
   "docs.colSession": "Session",
   "docs.colDate": "Date",
   "docs.colLangs": "Languages",
-  "docs.colDl": "DL",
+  "docs.colDl": "Downloads",
+  "docs.colDlFull": "Number of downloads",
   "docs.colStatus": "Status",
   "docs.colActions": "Actions",
   "docs.empty": "No documents in this view",
@@ -312,6 +313,7 @@ export const en: Dict = {
   "common.copy": "Copy",
   "common.copied": "Copied",
   "common.copyFailed": "Unable to copy — please copy the text manually",
+  "common.optional": "(optional)",
 
   // ─── Session self-registration ────────────────────────────────────────
   "login.registerPrompt": "Did you receive access codes for a STC session?",
@@ -393,4 +395,45 @@ export const en: Dict = {
   "broadcast.sending": "Sending…",
   "broadcast.sent": "E-mail sent to {sent} participant(s)",
   "broadcast.partial": "{sent} sent, {failed} failed",
+  "broadcast.attachments": "Email attachments",
+  "broadcast.attachNote":
+    "Up to {max} files ({mb} MB each, {total} MB in total) — sent directly as email attachments.",
+  "broadcast.attachBtn": "Attach a document from my computer",
+  "broadcast.attachMax": "Maximum {n} attachments",
+  "broadcast.attachTooBig": "“{name}” exceeds {n} MB",
+  "broadcast.attachTotal": "Attachments limited to {n} MB in total",
+
+  "set.groupIdentity": "Platform identity (header)",
+  "set.groupLogin": "Login page",
+  "set.groupFooter": "Contact & footer",
+
+  "login.tabAccount": "I have an account",
+  "login.tabCodes": "Session codes",
+  "login.codesHint":
+    "Enter the access codes sent to your Member State to view the session documents directly — no account needed.",
+  "login.codesSubmit": "Access the documents",
+  "login.codesOptional": "Optional: create a participant account to take part in the discussions.",
+  "guest.name": "Guest",
+  "guest.banner":
+    "You are viewing the documents as a guest via “{title}”. To join the discussions, create your account:",
+  "guest.register": "Create my account",
+
+  "docs.view": "View in browser",
+  "docs.allSessions": "All sessions",
+  "part.allStatuses": "All statuses",
+  "part.allCountries": "All countries",
+
+  "set.groupParticipant": "Participant area (menus & library)",
+  "set.participantNote":
+    "Leave a field empty to keep the platform's standard translated text.",
+  "set.nav_library": "Label of the “Document library” menu",
+  "set.nav_psessions": "Label of the “Sessions & discussions” menu",
+  "set.nav_profile": "Label of the “My profile” menu",
+  "set.library_title": "Library banner — title",
+  "set.library_notice": "Library banner — subtext",
+
+  "account.title": "My administrator account",
+  "account.hint": "Credentials used to sign in to the platform.",
+  "account.nameLbl": "Username",
+  "account.saved": "Account updated",
 };

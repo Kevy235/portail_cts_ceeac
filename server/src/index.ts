@@ -70,6 +70,7 @@ async function main() {
   // ─── API ─────────────────────────────────────────────────────────────────
   const api = express.Router();
   api.use("/auth/login", loginLimiter);
+  api.use("/auth/session-login", loginLimiter);
   api.use("/auth/register", registerLimiter);
   api.use("/auth", authRouter);
   api.use("/participants", requireAuth, requireAdmin, participantsRouter);

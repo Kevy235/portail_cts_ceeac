@@ -183,7 +183,8 @@ export const fr = {
   "docs.colSession": "Session",
   "docs.colDate": "Date",
   "docs.colLangs": "Langues",
-  "docs.colDl": "Tél.",
+  "docs.colDl": "Téléch.",
+  "docs.colDlFull": "Nombre de téléchargements",
   "docs.colStatus": "Statut",
   "docs.colActions": "Actions",
   "docs.empty": "Aucun document dans cette vue",
@@ -327,6 +328,7 @@ export const fr = {
   "common.copy": "Copier",
   "common.copied": "Copié",
   "common.copyFailed": "Copie impossible — copiez le texte manuellement",
+  "common.optional": "(facultatif)",
 
   // ─── Auto-inscription par session ─────────────────────────────────────
   "login.registerPrompt": "Vous avez reçu les accès d'une session CTS ?",
@@ -408,6 +410,52 @@ export const fr = {
   "broadcast.sending": "Envoi en cours…",
   "broadcast.sent": "E-mail envoyé à {sent} participant(s)",
   "broadcast.partial": "{sent} envoyé(s), {failed} échec(s)",
+  "broadcast.attachments": "Pièces jointes de l'e-mail",
+  "broadcast.attachNote":
+    "Jusqu'à {max} fichiers ({mb} Mo max chacun, {total} Mo au total) — envoyés directement en pièces jointes de l'e-mail.",
+  "broadcast.attachBtn": "Joindre un document depuis mon ordinateur",
+  "broadcast.attachMax": "{n} pièces jointes maximum",
+  "broadcast.attachTooBig": "« {name} » dépasse {n} Mo",
+  "broadcast.attachTotal": "Total des pièces jointes limité à {n} Mo",
+
+  // ─── Contenus du portail (groupes) ────────────────────────────────────
+  "set.groupIdentity": "Identité de la plateforme (en-tête)",
+  "set.groupLogin": "Page de connexion",
+  "set.groupFooter": "Contact & pied de page",
+
+  // ─── Accès invité par codes de session ────────────────────────────────
+  "login.tabAccount": "J'ai un compte",
+  "login.tabCodes": "Codes de session",
+  "login.codesHint":
+    "Saisissez les accès transmis à votre État membre pour consulter directement les documents de la session — sans créer de compte.",
+  "login.codesSubmit": "Accéder aux documents",
+  "login.codesOptional": "Facultatif : créez un compte participant pour prendre part aux échanges.",
+  "guest.name": "Invité",
+  "guest.banner":
+    "Vous consultez les documents en tant qu'invité via « {title} ». Pour participer aux discussions, créez votre compte :",
+  "guest.register": "Créer mon compte",
+
+  // ─── Filtres & consultation ───────────────────────────────────────────
+  "docs.view": "Consulter dans le navigateur",
+  "docs.allSessions": "Toutes les sessions",
+  "part.allStatuses": "Tous les statuts",
+  "part.allCountries": "Tous les pays",
+
+  // ─── Espace participant (contenus éditables) ──────────────────────────
+  "set.groupParticipant": "Espace participant (menus & bibliothèque)",
+  "set.participantNote":
+    "Laissez un champ vide pour conserver le texte standard traduit de la plateforme.",
+  "set.nav_library": "Libellé du menu « Bibliothèque documentaire »",
+  "set.nav_psessions": "Libellé du menu « Sessions & échanges »",
+  "set.nav_profile": "Libellé du menu « Mon profil »",
+  "set.library_title": "Bannière de la bibliothèque — titre",
+  "set.library_notice": "Bannière de la bibliothèque — sous-texte",
+
+  // ─── Mon compte (admin) ───────────────────────────────────────────────
+  "account.title": "Mon compte administrateur",
+  "account.hint": "Identifiants utilisés pour vous connecter à la plateforme.",
+  "account.nameLbl": "Nom d'utilisateur",
+  "account.saved": "Compte mis à jour",
 } as const;
 
 export type Dict = Record<keyof typeof fr, string>;

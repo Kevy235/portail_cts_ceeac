@@ -1,11 +1,47 @@
 import { useState } from "react";
-import { Check, Download } from "lucide-react";
+import { Check, Download, Eye } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import type { DocFile } from "@/lib/types";
 import { downloadWithProgress } from "@/lib/download";
 import { formatSize } from "@/lib/format";
 import { LANG_LABELS, useI18n } from "@/i18n";
+import { FlagIcon } from "@/components/ui";
+
+/**
+ * Bouton « Consulter » : ouvre le document dans un nouvel onglet du navigateur
+ * (affichage direct, sans téléchargement). Proposé pour les PDF uniquement —
+ * les autres formats seraient téléchargés de toute façon.
+ */
+export function ViewButton({
+  docId,
+  file,
+  compact,
+}: {
+  docId: string;
+  file: DocFile;
+  compact?: boolean;
+}) {
+  const { t } = useI18n();
+  if (file.mimeType !== "application/pdf") return null;
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        window.open(`/api/documents/${docId}/download/${file.lang}?inline=1`, "_blank", "noopener")
+      }
+      title={`${t("docs.view")} — ${LANG_LABELS[file.lang]}`}
+      aria-label={`${t("docs.view")} — ${LANG_LABELS[file.lang]}`}
+      className={clsx(
+        "flex items-center justify-center rounded-lg border transition-colors",
+        "border-brand/30 text-brand hover:bg-brand-soft hover:border-brand",
+        compact ? "px-1.5 py-1" : "px-2 py-2"
+      )}
+    >
+      <Eye size={compact ? 12 : 14} aria-hidden />
+    </button>
+  );
+}
 
 /**
  * Bouton de téléchargement d'une version linguistique avec progression :
@@ -80,6 +116,7 @@ export function DownloadButton({
         ) : (
           <Download size={compact ? 11 : 12} aria-hidden className={busy ? "animate-bounce" : undefined} />
         )}
+        <FlagIcon lang={file.lang} className="w-[14px] h-[9px] ring-white/40" />
         <span className="uppercase font-bold">{file.lang}</span>
         {busy && (
           <span className="font-mono tabular-nums">

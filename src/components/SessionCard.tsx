@@ -28,7 +28,7 @@ export function SessionCard({
   const { t } = useI18n();
 
   return (
-    <div className="bg-white rounded-xl border border-line-soft p-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+    <div className="bg-white rounded-xl border border-line-soft shadow-sm p-5 hover:shadow-lg hover:border-brand/25 hover:-translate-y-0.5 transition-all duration-200">
       <div className="flex items-start gap-4 flex-wrap">
         <div
           className={clsx(
@@ -65,12 +65,12 @@ export function SessionCard({
               </h3>
               <p className="text-slate2/80 text-sm mt-0.5 flex items-center gap-3 flex-wrap">
                 <span className="flex items-center gap-1">
-                  <Clock size={13} aria-hidden />{" "}
+                  <Clock size={13} className="text-brand" aria-hidden />{" "}
                   {formatDateRange(session.startDate, session.endDate)}
                 </span>
                 {session.location && (
                   <span className="flex items-center gap-1">
-                    <MapPin size={13} aria-hidden /> {session.location}
+                    <MapPin size={13} className="text-danger/70" aria-hidden /> {session.location}
                   </span>
                 )}
               </p>
@@ -82,15 +82,15 @@ export function SessionCard({
           )}
           <div className="flex items-center gap-4 mt-3 flex-wrap">
             <span className="flex items-center gap-1.5 text-sm text-slate2">
-              <Users size={14} className="text-slate2/60" aria-hidden />
+              <Users size={14} className="text-brand" aria-hidden />
               {t("sess.expected", { n: session.expectedParticipants })}
             </span>
             <span className="flex items-center gap-1.5 text-sm text-slate2">
-              <UserCheck size={14} className="text-slate2/60" aria-hidden />
+              <UserCheck size={14} className="text-accent-dark" aria-hidden />
               {t("sess.registered", { n: session.registeredCount })}
             </span>
             <span className="flex items-center gap-1.5 text-sm text-slate2">
-              <FileText size={14} className="text-slate2/60" aria-hidden />
+              <FileText size={14} className="text-violet-500" aria-hidden />
               {t("sess.nDocs", { n: session.documentCount })}
             </span>
           </div>

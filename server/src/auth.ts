@@ -5,7 +5,9 @@ import { query } from "./db.js";
 
 export interface AuthUser {
   id: string;
-  role: "admin" | "participant";
+  role: "admin" | "participant" | "guest";
+  /** Session CTS d'un accès invité (connexion par codes de session). */
+  sessionId?: string;
 }
 
 declare global {
@@ -23,6 +25,19 @@ export function signToken(user: AuthUser, tokenVersion: number): string {
     { sub: user.id, role: user.role, ver: tokenVersion },
     config.jwtSecret,
     { expiresIn: config.jwtExpiresIn }
+  );
+}
+
+/**
+ * Jeton invité : accès aux documents via les codes d'une session CTS, sans
+ * compte. Le code d'accès est embarqué et revérifié à chaque requête :
+ * régénérer les accès de la session révoque immédiatement tous les invités.
+ */
+export function signGuestToken(sessionId: string, accessCode: string): string {
+  return jwt.sign(
+    { sub: `guest:${sessionId}`, role: "guest", sid: sessionId, code: accessCode },
+    config.jwtSecret,
+    { expiresIn: "24h" }
   );
 }
 
@@ -88,6 +103,26 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ error: "Session expirée, veuillez vous reconnecter" });
   }
 
+  // ─── Jeton invité : le code d'accès de la session doit toujours être valide.
+  if (payload.role === "guest" && typeof payload.sid === "string") {
+    query<{ id: string }>(
+      "SELECT id FROM cts_sessions WHERE id = $1 AND access_code = $2 AND status <> 'terminé'",
+      [payload.sid, String(payload.code ?? "")]
+    )
+      .then(({ rows }) => {
+        if (!rows[0]) {
+          clearAuthCookie(res);
+          return res
+            .status(401)
+            .json({ error: "Accès invité expiré, saisissez à nouveau les codes de session" });
+        }
+        req.user = { id: `guest:${payload.sid}`, role: "guest", sessionId: payload.sid as string };
+        next();
+      })
+      .catch(next);
+    return;
+  }
+
   const userId = String(payload.sub);
   getAuthState(userId)
     .then((state) => {
@@ -106,6 +141,17 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   if (req.user?.role !== "admin") {
     return res.status(403).json({ error: "Accès réservé aux administrateurs" });
+  }
+  next();
+}
+
+/** Bloque les invités : réservé aux comptes (admin ou participant inscrit). */
+export function requireAccount(req: Request, res: Response, next: NextFunction) {
+  if (req.user?.role === "guest") {
+    return res.status(403).json({
+      error: "Créez un compte participant pour utiliser cette fonctionnalité",
+      code: "guest_not_allowed",
+    });
   }
   next();
 }

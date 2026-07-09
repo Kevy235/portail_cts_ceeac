@@ -22,10 +22,10 @@ import { ParticipantProfile } from "@/pages/participant/Profile";
 import "@/styles/index.css";
 
 function Guard({
-  role,
+  roles,
   children,
 }: {
-  role?: "admin" | "participant";
+  roles?: Array<"admin" | "participant" | "guest">;
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
@@ -33,9 +33,16 @@ function Guard({
   if (loading) return <LoadingBlock label={t("common.sessionCheck")} />;
   if (!user) return <Navigate to="/connexion" replace />;
   if (user.mustChangePassword) return <Navigate to="/premiere-connexion" replace />;
-  if (role && user.role !== role) {
+  if (roles && !roles.includes(user.role)) {
     return <Navigate to={user.role === "admin" ? "/admin" : "/espace"} replace />;
   }
+  return <>{children}</>;
+}
+
+/** Sous-pages réservées aux comptes : les invités restent sur la bibliothèque. */
+function AccountOnly({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role === "guest") return <Navigate to="/espace" replace />;
   return <>{children}</>;
 }
 
@@ -59,7 +66,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <Guard role="admin">
+            <Guard roles={["admin"]}>
               <AppLayout variant="admin" />
             </Guard>
           }
@@ -74,14 +81,28 @@ function App() {
         <Route
           path="/espace"
           element={
-            <Guard role="participant">
+            <Guard roles={["participant", "guest"]}>
               <AppLayout variant="participant" />
             </Guard>
           }
         >
           <Route index element={<ParticipantLibrary />} />
-          <Route path="sessions" element={<ParticipantSessions />} />
-          <Route path="profil" element={<ParticipantProfile />} />
+          <Route
+            path="sessions"
+            element={
+              <AccountOnly>
+                <ParticipantSessions />
+              </AccountOnly>
+            }
+          />
+          <Route
+            path="profil"
+            element={
+              <AccountOnly>
+                <ParticipantProfile />
+              </AccountOnly>
+            }
+          />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

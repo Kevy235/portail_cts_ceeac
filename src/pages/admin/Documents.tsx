@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Edit3, FileText, Trash2, Upload, X } from "lucide-react";
+import { Download, Edit3, FileText, Search, Trash2, Upload, X } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -21,7 +21,7 @@ import {
   SecondaryButton,
   StatusBadge,
 } from "@/components/ui";
-import { DownloadButton } from "@/components/DownloadButton";
+import { DownloadButton, ViewButton } from "@/components/DownloadButton";
 
 interface FormState {
   title: string;
@@ -48,6 +48,9 @@ export function AdminDocuments() {
   const [sessions, setSessions] = useState<CtsSession[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"tous" | DocStatus>("tous");
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("tous");
+  const [sessionFilter, setSessionFilter] = useState("tous");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [files, setFiles] = useState<FileMap>({});
@@ -84,8 +87,16 @@ export function AdminDocuments() {
 
   const filtered = useMemo(() => {
     if (!documents) return [];
-    return filter === "tous" ? documents : documents.filter((d) => d.status === filter);
-  }, [documents, filter]);
+    const q = search.toLowerCase();
+    return documents.filter(
+      (d) =>
+        (filter === "tous" || d.status === filter) &&
+        (categoryFilter === "tous" || d.categoryId === categoryFilter) &&
+        (sessionFilter === "tous" || d.sessionId === sessionFilter) &&
+        (d.title.toLowerCase().includes(q) ||
+          d.files.some((f) => f.fileName.toLowerCase().includes(q)))
+    );
+  }, [documents, filter, search, categoryFilter, sessionFilter]);
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -239,39 +250,82 @@ export function AdminDocuments() {
         }
       />
 
-      <div className="flex items-center gap-2 flex-wrap">
-        {(
-          [
-            { key: "tous", label: t("docs.filterAll") },
-            { key: "publié", label: t("docs.filterPublished") },
-            { key: "brouillon", label: t("docs.filterDrafts") },
-          ] as const
-        ).map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            className={clsx(
-              "px-3 py-1.5 rounded-lg text-sm transition-colors",
-              filter === key
-                ? "bg-brand text-white"
-                : "bg-white border border-line text-slate2 hover:bg-mist"
-            )}
+      {/* ─── Recherche + filtres (statut, catégorie, session) ────────── */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative w-full sm:w-72">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand/60" aria-hidden />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("lib.searchPh")}
+            aria-label={t("lib.searchPh")}
+            className={`${inputClass} pl-9 py-2`}
+          />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {(
+            [
+              { key: "tous", label: t("docs.filterAll") },
+              { key: "publié", label: t("docs.filterPublished") },
+              { key: "brouillon", label: t("docs.filterDrafts") },
+            ] as const
+          ).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className={clsx(
+                "px-3.5 py-1.5 rounded-full text-sm font-medium transition-all",
+                filter === key
+                  ? "bg-gradient-to-b from-brand to-brand-dark text-white shadow-sm shadow-brand/30"
+                  : "bg-white border border-line text-slate2 hover:bg-mist hover:border-brand/40"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {categories.length > 0 && (
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            aria-label={t("lib.allCategories")}
+            className={`${inputClass} py-2 w-auto`}
           >
-            {label}
-          </button>
-        ))}
+            <option value="tous">{t("lib.allCategories")}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        )}
+        {sessions.length > 0 && (
+          <select
+            value={sessionFilter}
+            onChange={(e) => setSessionFilter(e.target.value)}
+            aria-label={t("docs.allSessions")}
+            className={`${inputClass} py-2 w-auto max-w-56`}
+          >
+            <option value="tous">{t("docs.allSessions")}</option>
+            {sessions.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.reference || (s.title.length > 32 ? `${s.title.slice(0, 32)}…` : s.title)}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
-      <div className="bg-white rounded-xl border border-line-soft overflow-hidden">
+      <div className="bg-white rounded-xl border border-line-soft shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-mist border-b border-line-soft">
+            <thead className="bg-gradient-to-b from-mist to-brand-soft/40 border-b-2 border-line">
               <tr>
                 {columns.map((h) => (
                   <th
                     key={h}
                     scope="col"
-                    className="px-4 py-3 text-left text-xs font-semibold text-slate2 uppercase tracking-wide whitespace-nowrap"
+                    className="px-4 py-3 text-left text-xs font-bold text-brand-deep uppercase tracking-wide whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -283,7 +337,7 @@ export function AdminDocuments() {
                 <tr key={doc.id} className="hover:bg-mist/60 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3 max-w-xs">
-                      <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-soft to-brand/20 border border-brand/15 flex items-center justify-center flex-shrink-0">
                         <FileText size={15} className="text-brand" />
                       </div>
                       <div className="min-w-0">
@@ -317,19 +371,24 @@ export function AdminDocuments() {
                     {formatDate(doc.createdAt)}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       {doc.files.map((f) => (
-                        <DownloadButton
-                          key={f.lang}
-                          docId={doc.id}
-                          file={f}
-                          compact
-                          onDone={load}
-                        />
+                        <span key={f.lang} className="flex items-center gap-0.5">
+                          <ViewButton docId={doc.id} file={f} compact />
+                          <DownloadButton docId={doc.id} file={f} compact onDone={load} />
+                        </span>
                       ))}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs font-mono text-slate2">{doc.downloads}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-slate2 tabular-nums"
+                      title={t("docs.colDlFull")}
+                    >
+                      <Download size={12} className="text-brand/60" aria-hidden />
+                      {doc.downloads}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={doc.status} />
                   </td>
@@ -337,7 +396,7 @@ export function AdminDocuments() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEdit(doc)}
-                        className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
+                        className="p-1.5 rounded-lg text-brand hover:bg-brand-soft transition-colors"
                         title={t("common.edit")}
                         aria-label={t("common.edit")}
                       >
@@ -345,7 +404,7 @@ export function AdminDocuments() {
                       </button>
                       <button
                         onClick={() => setDeleting(doc)}
-                        className="p-1.5 rounded hover:bg-danger-soft text-slate2/60 hover:text-danger transition-colors"
+                        className="p-1.5 rounded-lg text-danger/80 hover:text-danger hover:bg-danger-soft transition-colors"
                         title={t("common.delete")}
                         aria-label={t("common.delete")}
                       >

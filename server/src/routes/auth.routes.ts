@@ -6,8 +6,10 @@ import { query } from "../db.js";
 import {
   clearAuthCookie,
   invalidateAuthCache,
+  requireAccount,
   requireAuth,
   setAuthCookie,
+  signGuestToken,
   signToken,
 } from "../auth.js";
 import { ah } from "../http.js";
@@ -124,7 +126,8 @@ const registerSchema = z.object({
   name: z.string().trim().min(2, "Nom trop court"),
   email: z.string().trim().email("E-mail invalide"),
   country: z.string().trim().min(1, "Pays requis"),
-  functionTitle: z.string().trim().min(1, "Fonction requise"),
+  // Fonction facultative : tous les participants n'ont pas de titre officiel.
+  functionTitle: z.string().trim().default(""),
   institution: z.string().trim().default(""),
   password: z
     .string()
@@ -203,6 +206,79 @@ authRouter.post(
   })
 );
 
+// ─── Accès invité : consultation des documents avec les seuls codes de session ─
+// Les représentants des États membres saisissent les codes reçus et accèdent
+// directement à l'espace documentaire. Ils ne deviennent participants (compte,
+// discussions) que s'ils choisissent de s'inscrire.
+const sessionLoginSchema = z.object({
+  accessCode: z.string().trim().min(4, "Identifiant de session requis"),
+  accessPassword: z.string().min(1, "Mot de passe de session requis"),
+});
+
+/** Représentation « utilisateur » d'un invité pour le client. */
+function guestUser(sessionId: string, sessionTitle: string) {
+  return {
+    id: `guest:${sessionId}`,
+    name: "",
+    email: "",
+    role: "guest" as const,
+    country: "",
+    functionTitle: "",
+    institution: "",
+    status: "actif",
+    mustChangePassword: false,
+    createdAt: new Date().toISOString(),
+    uiLang: "fr",
+    docLangs: ["fr", "en", "pt", "es"],
+    originSessionId: sessionId,
+    originSessionTitle: sessionTitle,
+  };
+}
+
+authRouter.post(
+  "/session-login",
+  ah(async (req, res) => {
+    const parsed = sessionLoginSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res
+        .status(400)
+        .json({ error: parsed.error.issues[0]?.message ?? "Données invalides" });
+    }
+    const d = parsed.data;
+
+    const sessions = await query<{
+      id: string;
+      title: string;
+      status: string;
+      access_code: string;
+      access_password: string;
+    }>(
+      "SELECT id, title, status, access_code, access_password FROM cts_sessions WHERE access_code = $1",
+      [d.accessCode.toUpperCase()]
+    );
+    const session = sessions.rows[0];
+    const accessOk =
+      session &&
+      session.access_password.length > 0 &&
+      timingSafeEqualStr(d.accessPassword.trim().toUpperCase(), session.access_password);
+    if (!accessOk) {
+      return res.status(401).json({
+        error: "Identifiant ou mot de passe de session incorrect",
+        code: "invalid_session_access",
+      });
+    }
+    if (session.status === "terminé") {
+      return res.status(403).json({
+        error: "Cette session est terminée, ses accès ne sont plus valides",
+        code: "session_closed",
+      });
+    }
+
+    setAuthCookie(res, signGuestToken(session.id, session.access_code));
+    res.json({ user: guestUser(session.id, session.title) });
+  })
+);
+
 function timingSafeEqualStr(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
   const bufB = Buffer.from(b);
@@ -219,6 +295,19 @@ authRouter.get(
   "/me",
   requireAuth,
   ah(async (req, res) => {
+    // Invité : pas de ligne utilisateur, on reconstruit depuis la session.
+    if (req.user!.role === "guest") {
+      const { rows } = await query<{ id: string; title: string }>(
+        "SELECT id, title FROM cts_sessions WHERE id = $1",
+        [req.user!.sessionId]
+      );
+      if (!rows[0]) {
+        clearAuthCookie(res);
+        return res.status(401).json({ error: "Session introuvable" });
+      }
+      return res.json({ user: guestUser(rows[0].id, rows[0].title) });
+    }
+
     const { rows } = await query<DbUser>(`${USER_SELECT} WHERE u.id = $1`, [
       req.user!.id,
     ]);
@@ -226,6 +315,50 @@ authRouter.get(
       clearAuthCookie(res);
       return res.status(401).json({ error: "Compte introuvable" });
     }
+    res.json({ user: publicUser(rows[0]) });
+  })
+);
+
+// ─── Mise à jour du compte (nom d'utilisateur + e-mail de connexion) ──────────
+const profileSchema = z.object({
+  name: z.string().trim().min(2, "Nom trop court"),
+  email: z.string().trim().email("E-mail invalide"),
+});
+
+authRouter.put(
+  "/me",
+  requireAuth,
+  requireAccount,
+  ah(async (req, res) => {
+    const parsed = profileSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res
+        .status(400)
+        .json({ error: parsed.error.issues[0]?.message ?? "Données invalides" });
+    }
+    const email = parsed.data.email.toLowerCase();
+
+    const taken = await query(
+      "SELECT id FROM users WHERE email = $1 AND id <> $2",
+      [email, req.user!.id]
+    );
+    if (taken.rows.length > 0) {
+      return res.status(409).json({
+        error: "Un autre compte utilise déjà cet e-mail.",
+        code: "email_taken",
+      });
+    }
+
+    const updated = await query(
+      "UPDATE users SET name = $1, email = $2, updated_at = now() WHERE id = $3 RETURNING id",
+      [parsed.data.name, email, req.user!.id]
+    );
+    if (!updated.rows[0]) return res.status(404).json({ error: "Compte introuvable" });
+    invalidateAuthCache(req.user!.id);
+
+    const { rows } = await query<DbUser>(`${USER_SELECT} WHERE u.id = $1`, [
+      req.user!.id,
+    ]);
     res.json({ user: publicUser(rows[0]) });
   })
 );
@@ -238,6 +371,7 @@ const changePasswordSchema = z.object({
 authRouter.post(
   "/change-password",
   requireAuth,
+  requireAccount,
   ah(async (req, res) => {
     const parsed = changePasswordSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -286,6 +420,7 @@ const preferencesSchema = z.object({
 authRouter.put(
   "/preferences",
   requireAuth,
+  requireAccount,
   ah(async (req, res) => {
     const parsed = preferencesSchema.safeParse(req.body);
     if (!parsed.success) {

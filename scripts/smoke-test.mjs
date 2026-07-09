@@ -130,6 +130,17 @@ async function main() {
     r = await admin("GET", "/auth/me");
     check("session persistée via cookie (/auth/me)", r.status === 200);
 
+    // ─── Mise à jour du compte (nom d'utilisateur + e-mail) ─────────
+    r = await admin("PUT", "/auth/me", {
+      json: { name: "Secrétariat DAPPS", email: "admin@test.org" },
+    });
+    check(
+      "l'admin modifie son nom d'utilisateur",
+      r.status === 200 && r.data.user.name === "Secrétariat DAPPS"
+    );
+    r = await admin("PUT", "/auth/me", { json: { name: "X", email: "admin@test.org" } });
+    check("nom trop court refusé (400)", r.status === 400);
+
     const anon = makeClient();
     r = await anon("GET", "/participants");
     check("accès anonyme bloqué (401)", r.status === 401);
@@ -266,6 +277,15 @@ async function main() {
     r = await participant("GET", `/documents/${docId}/download/es`);
     check("version espagnole inexistante (404)", r.status === 404);
 
+    // Consultation dans le navigateur : disposition inline, non comptée
+    // comme téléchargement (le total reste à 1 dans les statistiques).
+    r = await participant("GET", `/documents/${docId}/download/en?inline=1`);
+    check(
+      "consultation inline du document (Content-Disposition: inline)",
+      r.status === 200 &&
+        (r.headers.get("content-disposition") ?? "").startsWith("inline")
+    );
+
     // ─── Préférences de langue ──────────────────────────────────────
     r = await participant("PUT", "/auth/preferences", {
       json: { uiLang: "en", docLangs: ["en", "pt"] },
@@ -334,7 +354,7 @@ async function main() {
     r = await admin("PUT", "/settings/admin", {
       json: {
         settings: {
-          fr: { platform_name: "CEEAC · Portail modifié" },
+          fr: { platform_name: "CEEAC · Portail modifié", nav_library: "Mes documents" },
           en: { platform_name: "ECCAS · Updated portal" },
         },
       },
@@ -348,6 +368,10 @@ async function main() {
     check(
       "les contenus modifiés sont visibles publiquement (page de connexion)",
       r.data.settings.platform_name === "CEEAC · Portail modifié"
+    );
+    check(
+      "le libellé de menu participant personnalisé est servi",
+      r.data.settings.nav_library === "Mes documents"
     );
 
     r = await anon("GET", "/settings?lang=en");
@@ -447,6 +471,54 @@ async function main() {
       r.data.sessions.find((s) => s.id === sessionId)?.registeredCount === 1
     );
 
+    // ─── Accès invité : codes de session seuls, sans compte ─────────
+    const guest = makeClient();
+    r = await guest("POST", "/auth/session-login", {
+      json: { accessCode, accessPassword: "MAUVAIS-CODE" },
+    });
+    check("accès invité : mot de passe erroné refusé (401)", r.status === 401);
+
+    r = await guest("POST", "/auth/session-login", {
+      json: { accessCode, accessPassword },
+    });
+    check(
+      "accès invité avec les codes de session (rôle guest)",
+      r.status === 200 && r.data.user.role === "guest"
+    );
+
+    r = await guest("GET", "/auth/me");
+    check(
+      "session invité persistée (/auth/me → guest + titre de session)",
+      r.status === 200 &&
+        r.data.user.role === "guest" &&
+        typeof r.data.user.originSessionTitle === "string"
+    );
+
+    r = await guest("GET", "/documents");
+    check(
+      "l'invité voit uniquement les documents publiés",
+      r.status === 200 && r.data.documents.every((d) => d.status === "publié")
+    );
+
+    r = await guest("GET", `/documents/${docId}/download/fr`);
+    check("l'invité télécharge un document publié", r.status === 200);
+
+    r = await guest("POST", `/sessions/${sessionId}/messages`, {
+      json: { body: "Message d'invité" },
+    });
+    check(
+      "l'invité ne peut pas écrire dans les discussions (403)",
+      r.status === 403 && r.data.code === "guest_not_allowed"
+    );
+
+    r = await guest("POST", "/auth/change-password", {
+      json: { currentPassword: "x", newPassword: "MotDePasse#9" },
+    });
+    check("l'invité ne peut pas changer de mot de passe (403)", r.status === 403);
+
+    r = await guest("GET", "/participants");
+    check("l'invité n'accède pas à l'administration (403)", r.status === 403);
+
     // ─── Régénération des accès ──────────────────────────────────────
     r = await admin("POST", `/sessions/${sessionId}/regenerate-access`);
     check(
@@ -465,6 +537,13 @@ async function main() {
       },
     });
     check("les anciens accès ne fonctionnent plus (401)", r.status === 401);
+
+    // Le jeton invité embarque l'ancien code : il est révoqué lui aussi.
+    r = await guest("GET", "/documents");
+    check(
+      "les invités sont révoqués après régénération des accès (401)",
+      r.status === 401
+    );
 
     // ─── Référence auto-générée ──────────────────────────────────────
     r = await admin("POST", "/sessions", {

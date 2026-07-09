@@ -8,6 +8,7 @@ import { api, ApiError } from "@/lib/api";
 import type { User } from "@/lib/types";
 import { COUNTRIES } from "@/lib/types";
 import { Field, FontSizeControl, inputClass, LangSelector } from "@/components/ui";
+import { CountryFlag } from "@/components/CountryFlag";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 /**
@@ -35,8 +36,9 @@ export function RegisterPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Un utilisateur déjà connecté n'a rien à faire ici.
-  if (!loading && user) {
+  // Un titulaire de compte n'a rien à faire ici ; un invité (accès par codes
+  // de session) peut en revanche créer son compte participant.
+  if (!loading && user && user.role !== "guest") {
     return <Navigate to={user.role === "admin" ? "/admin" : "/espace"} replace />;
   }
 
@@ -82,8 +84,17 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-deep flex flex-col">
-      <div className="border-b border-white/10 px-6 py-3">
+    <div className="relative min-h-screen bg-gradient-to-br from-brand-deep via-brand-deep to-brand-night flex flex-col overflow-hidden">
+      {/* Halos décoratifs institutionnels */}
+      <div
+        aria-hidden
+        className="absolute -left-32 top-1/4 w-[480px] h-[480px] rounded-full bg-brand/25 blur-3xl pointer-events-none"
+      />
+      <div
+        aria-hidden
+        className="absolute -right-24 -bottom-24 w-[420px] h-[420px] rounded-full bg-accent/15 blur-3xl pointer-events-none"
+      />
+      <div className="relative border-b border-white/10 px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Globe size={14} className="text-white/40" aria-hidden />
@@ -98,9 +109,13 @@ export function RegisterPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-2xl bg-white shadow-2xl rounded-xl overflow-hidden">
-          <div className="bg-brand-night px-8 py-6 flex items-center gap-4">
+      <div className="relative flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-2xl bg-white shadow-2xl shadow-black/40 rounded-2xl overflow-hidden ring-1 ring-white/15">
+          <div className="relative overflow-hidden bg-gradient-to-r from-brand-night to-brand-deep px-8 py-6 flex items-center gap-4">
+            <div
+              aria-hidden
+              className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-accent/20 blur-2xl pointer-events-none"
+            />
             <img
               src={logoCeeac}
               alt="Logo CEEAC-ECCAS"
@@ -177,23 +192,30 @@ export function RegisterPage() {
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label={t("part.country")} required>
-                  <select
-                    required
-                    value={form.country}
-                    onChange={(e) => set("country")(e.target.value)}
-                    className={inputClass}
-                  >
-                    <option value="">{t("common.select")}</option>
-                    {COUNTRIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    {form.country && (
+                      <CountryFlag
+                        country={form.country}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                      />
+                    )}
+                    <select
+                      required
+                      value={form.country}
+                      onChange={(e) => set("country")(e.target.value)}
+                      className={`${inputClass} ${form.country ? "pl-9" : ""}`}
+                    >
+                      <option value="">{t("common.select")}</option>
+                      {COUNTRIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </Field>
-                <Field label={t("part.function")} required>
+                <Field label={t("part.function")} hint={t("common.optional")}>
                   <input
-                    required
                     value={form.functionTitle}
                     onChange={(e) => set("functionTitle")(e.target.value)}
                     placeholder={t("part.functionPh")}
@@ -248,7 +270,7 @@ export function RegisterPage() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full bg-brand text-white py-3 rounded-lg font-medium text-sm hover:bg-brand-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full bg-gradient-to-b from-brand to-brand-dark text-white py-3 rounded-lg font-semibold text-sm shadow-md shadow-brand/30 hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {busy ? t("register.submitting") : t("register.submit")}
               {!busy && <ChevronRight size={16} aria-hidden />}

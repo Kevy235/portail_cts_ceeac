@@ -15,6 +15,8 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  /** Accès invité : consultation des documents avec les codes d'une session CTS. */
+  sessionLogin: (accessCode: string, accessPassword: string) => Promise<User>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   setUser: (user: User) => void;
@@ -54,14 +56,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [setLang]
   );
 
+  const sessionLogin = useCallback(
+    async (accessCode: string, accessPassword: string) => {
+      const { user } = await api.post<{ user: User }>("/auth/session-login", {
+        accessCode,
+        accessPassword,
+      });
+      setUser(user);
+      return user;
+    },
+    []
+  );
+
   const logout = useCallback(async () => {
     await api.post("/auth/logout");
     setUser(null);
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, logout, refresh, setUser }),
-    [user, loading, login, logout, refresh]
+    () => ({ user, loading, login, sessionLogin, logout, refresh, setUser }),
+    [user, loading, login, sessionLogin, logout, refresh]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

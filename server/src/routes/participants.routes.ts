@@ -13,7 +13,8 @@ const participantSchema = z.object({
   name: z.string().trim().min(2, "Nom trop court"),
   email: z.string().trim().email("E-mail invalide"),
   country: z.string().trim().min(1, "Pays requis"),
-  functionTitle: z.string().trim().min(1, "Fonction requise"),
+  // Fonction facultative : tous les participants n'ont pas de titre officiel.
+  functionTitle: z.string().trim().default(""),
   institution: z.string().trim().default(""),
   status: z.enum(["actif", "en-attente", "inactif"]).default("en-attente"),
 });

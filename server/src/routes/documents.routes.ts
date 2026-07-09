@@ -365,10 +365,16 @@ documentsRouter.get(
       return res.status(410).json({ error: "Fichier absent du stockage" });
     }
 
-    await query(
-      "INSERT INTO document_downloads (document_id, user_id, lang) VALUES ($1, $2, $3)",
-      [req.params.id, req.user!.id, lang]
-    );
+    // ?inline=1 : consultation dans le navigateur (PDF) — n'est pas comptée
+    // comme téléchargement pour ne pas gonfler les statistiques.
+    // Invités : pas de ligne utilisateur → téléchargement non journalisé.
+    const inline = req.query.inline === "1";
+    if (!inline && req.user!.role !== "guest") {
+      await query(
+        "INSERT INTO document_downloads (document_id, user_id, lang) VALUES ($1, $2, $3)",
+        [req.params.id, req.user!.id, lang]
+      );
+    }
 
     const asciiName = doc.file_name.replace(/[^\x20-\x7E]/g, "_").replace(/["\\]/g, "_");
     const { size } = await fs.promises.stat(filePath);
@@ -377,7 +383,7 @@ documentsRouter.get(
     res.setHeader("Content-Length", size);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(doc.file_name)}`
+      `${inline ? "inline" : "attachment"}; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(doc.file_name)}`
     );
     fs.createReadStream(filePath).pipe(res);
   })

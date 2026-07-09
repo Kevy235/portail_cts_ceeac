@@ -1,0 +1,11 @@
+{
+  "name": "cts-guide-generator",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Génération du guide participant : captures Playwright + document Word (docs/Guide-Participant-Plateforme-CTS-APPS.docx)",
+  "type": "module",
+  "dependencies": {
+    "docx": "^9.7.1",
+    "playwright": "^1.61.1"
+  }
+}

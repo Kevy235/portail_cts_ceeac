@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Plus, Save, Tag, Trash2 } from "lucide-react";
+import { BookOpen, KeyRound, Landmark, LogIn, Mail, Plus, Save, Tag, Trash2, UserCog } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { Category } from "@/lib/types";
+import type { Category, User } from "@/lib/types";
+import { useAuth } from "@/context/AuthContext";
 import { useSettings } from "@/context/SettingsContext";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import type { Dict } from "@/i18n/fr";
@@ -11,26 +12,81 @@ import {
   ConfirmDialog,
   ErrorBlock,
   Field,
+  FlagIcon,
   inputClass,
   LoadingBlock,
   PageHeader,
   PrimaryButton,
 } from "@/components/ui";
 
-const FIELDS: { key: string; labelKey: keyof Dict; textarea?: boolean }[] = [
-  { key: "platform_name", labelKey: "set.platform_name" },
-  { key: "platform_subtitle", labelKey: "set.platform_subtitle" },
-  { key: "org_full_name", labelKey: "set.org_full_name", textarea: true },
-  { key: "org_description", labelKey: "set.org_description", textarea: true },
-  { key: "login_notice", labelKey: "set.login_notice" },
-  { key: "contact_email", labelKey: "set.contact_email" },
-  { key: "footer_text", labelKey: "set.footer_text" },
+interface SettingField {
+  key: string;
+  labelKey: keyof Dict;
+  textarea?: boolean;
+}
+
+/* Champs regroupés par zone du portail : chaque groupe correspond à un endroit
+   visible de l'interface, pour que l'admin sache ce qu'il modifie. */
+const GROUPS: {
+  key: string;
+  labelKey: keyof Dict;
+  noteKey?: keyof Dict;
+  icon: React.ReactNode;
+  tile: string;
+  fields: SettingField[];
+}[] = [
+  {
+    key: "identity",
+    labelKey: "set.groupIdentity",
+    icon: <Landmark size={15} className="text-white" />,
+    tile: "bg-gradient-to-br from-brand to-brand-deep",
+    fields: [
+      { key: "platform_name", labelKey: "set.platform_name" },
+      { key: "platform_subtitle", labelKey: "set.platform_subtitle" },
+      { key: "org_full_name", labelKey: "set.org_full_name", textarea: true },
+    ],
+  },
+  {
+    key: "login",
+    labelKey: "set.groupLogin",
+    icon: <LogIn size={15} className="text-white" />,
+    tile: "bg-gradient-to-br from-accent to-accent-dark",
+    fields: [
+      { key: "org_description", labelKey: "set.org_description", textarea: true },
+      { key: "login_notice", labelKey: "set.login_notice" },
+    ],
+  },
+  {
+    key: "participant",
+    labelKey: "set.groupParticipant",
+    noteKey: "set.participantNote",
+    icon: <BookOpen size={15} className="text-white" />,
+    tile: "bg-gradient-to-br from-violet-500 to-violet-700",
+    fields: [
+      { key: "nav_library", labelKey: "set.nav_library" },
+      { key: "nav_psessions", labelKey: "set.nav_psessions" },
+      { key: "nav_profile", labelKey: "set.nav_profile" },
+      { key: "library_title", labelKey: "set.library_title" },
+      { key: "library_notice", labelKey: "set.library_notice" },
+    ],
+  },
+  {
+    key: "footer",
+    labelKey: "set.groupFooter",
+    icon: <Mail size={15} className="text-white" />,
+    tile: "bg-gradient-to-br from-gold to-amber-600",
+    fields: [
+      { key: "contact_email", labelKey: "set.contact_email" },
+      { key: "footer_text", labelKey: "set.footer_text" },
+    ],
+  },
 ];
 
 type AllSettings = Record<Lang, Record<string, string>>;
 
 export function AdminSettings() {
   const { refresh } = useSettings();
+  const { user, setUser } = useAuth();
   const { t } = useI18n();
   const [form, setForm] = useState<AllSettings | null>(null);
   const [editLang, setEditLang] = useState<Lang>("fr");
@@ -40,6 +96,15 @@ export function AdminSettings() {
   const [busy, setBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  // ─── Mon compte (nom d'utilisateur, e-mail, mot de passe) ───────────
+  const [accountName, setAccountName] = useState(user?.name ?? "");
+  const [accountEmail, setAccountEmail] = useState(user?.email ?? "");
+  const [accountBusy, setAccountBusy] = useState(false);
+  const [pwdCurrent, setPwdCurrent] = useState("");
+  const [pwdNew, setPwdNew] = useState("");
+  const [pwdConfirm, setPwdConfirm] = useState("");
+  const [pwdBusy, setPwdBusy] = useState(false);
 
   const load = () => {
     setLoadError(null);
@@ -92,6 +157,48 @@ export function AdminSettings() {
     }
   };
 
+  const handleSaveAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (accountBusy) return;
+    setAccountBusy(true);
+    try {
+      const { user: updated } = await api.put<{ user: User }>("/auth/me", {
+        name: accountName,
+        email: accountEmail,
+      });
+      setUser(updated);
+      toast.success(t("account.saved"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setAccountBusy(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pwdBusy) return;
+    if (pwdNew !== pwdConfirm) {
+      toast.error(t("pwd.mismatch"));
+      return;
+    }
+    setPwdBusy(true);
+    try {
+      await api.post("/auth/change-password", {
+        currentPassword: pwdCurrent,
+        newPassword: pwdNew,
+      });
+      toast.success(t("pwd.updated"));
+      setPwdCurrent("");
+      setPwdNew("");
+      setPwdConfirm("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("pwd.updateFailed"));
+    } finally {
+      setPwdBusy(false);
+    }
+  };
+
   const handleDeleteCategory = async () => {
     if (!deletingCategory || catBusy) return;
     setCatBusy(true);
@@ -117,61 +224,83 @@ export function AdminSettings() {
       <PageHeader title={t("set.title")} subtitle={t("set.subtitle")} />
 
       <div className="grid gap-6 items-start xl:grid-cols-5">
-      <form onSubmit={handleSave} className="xl:col-span-3 bg-white rounded-xl border border-line-soft overflow-hidden">
-        {/* Onglets de langue */}
+      <form onSubmit={handleSave} className="xl:col-span-3 bg-white rounded-xl border border-line-soft shadow-sm overflow-hidden">
+        {/* Onglets de langue (avec drapeaux) */}
         <div className="flex border-b border-line-soft bg-mist/60">
           {LANGS.map((l) => (
             <button
               key={l}
               type="button"
               onClick={() => setEditLang(l)}
+              aria-pressed={editLang === l}
               className={clsx(
-                "px-4 py-3 text-xs font-medium transition-colors border-b-2 -mb-px",
+                "flex items-center gap-1.5 px-3 sm:px-4 py-3 text-xs font-medium transition-colors border-b-[3px] -mb-px",
                 editLang === l
-                  ? "border-brand text-brand bg-white"
-                  : "border-transparent text-slate2 hover:text-ink"
+                  ? "border-brand text-brand-dark bg-white font-bold"
+                  : "border-transparent text-slate2 hover:text-ink hover:bg-white/60"
               )}
             >
-              <span className="uppercase font-bold mr-1.5">{l}</span>
-              <span className="hidden sm:inline">{LANG_LABELS[l]}</span>
+              <FlagIcon lang={l} />
+              <span className="uppercase font-bold">{l}</span>
+              <span className="hidden sm:inline font-normal">{LANG_LABELS[l]}</span>
             </button>
           ))}
         </div>
 
-        <div className="p-6 space-y-4">
-          <p className="text-[11px] text-slate2/70 bg-mist rounded-lg px-3 py-2">
+        <div className="p-6 space-y-5">
+          <p className="text-xs text-slate2 bg-brand-soft/60 border border-brand/15 rounded-lg px-3 py-2.5 flex items-center gap-2">
+            <FlagIcon lang={editLang} />
             {t("set.langNote", { lang: LANG_LABELS[editLang] })}
           </p>
-          {FIELDS.map(({ key, labelKey, textarea }) => (
-            <Field key={`${editLang}-${key}`} label={t(labelKey)}>
-              {textarea ? (
-                <textarea
-                  rows={2}
-                  value={values[key] ?? ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      [editLang]: { ...values, [key]: e.target.value },
-                    })
-                  }
-                  className={inputClass}
-                />
-              ) : (
-                <input
-                  value={values[key] ?? ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      [editLang]: { ...values, [key]: e.target.value },
-                    })
-                  }
-                  className={inputClass}
-                />
-              )}
-            </Field>
+
+          {GROUPS.map(({ key: groupKey, labelKey, noteKey, icon, tile, fields }) => (
+            <fieldset
+              key={`${editLang}-${groupKey}`}
+              className="rounded-xl border border-line-soft bg-mist/40 p-4 space-y-4"
+            >
+              <legend className="flex items-center gap-2.5 px-1 -ml-1">
+                <span
+                  className={`w-7 h-7 rounded-lg ${tile} shadow-sm flex items-center justify-center`}
+                  aria-hidden
+                >
+                  {icon}
+                </span>
+                <span className="text-sm font-bold text-ink">{t(labelKey)}</span>
+              </legend>
+              {noteKey && <p className="text-[11px] text-slate2/80 -mt-1">{t(noteKey)}</p>}
+              {fields.map(({ key, labelKey: fieldLabelKey, textarea }) => (
+                <Field key={`${editLang}-${key}`} label={t(fieldLabelKey)}>
+                  {textarea ? (
+                    <textarea
+                      rows={2}
+                      value={values[key] ?? ""}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          [editLang]: { ...values, [key]: e.target.value },
+                        })
+                      }
+                      className={inputClass}
+                    />
+                  ) : (
+                    <input
+                      value={values[key] ?? ""}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          [editLang]: { ...values, [key]: e.target.value },
+                        })
+                      }
+                      className={inputClass}
+                    />
+                  )}
+                </Field>
+              ))}
+            </fieldset>
           ))}
+
           <div className="pt-1">
-            <PrimaryButton type="submit" disabled={busy}>
+            <PrimaryButton type="submit" disabled={busy} className="w-full sm:w-auto">
               <Save size={14} />
               {busy ? t("common.saving") : t("set.saveBtn")}
             </PrimaryButton>
@@ -179,7 +308,96 @@ export function AdminSettings() {
         </div>
       </form>
 
-      <div className="xl:col-span-2 bg-white rounded-xl border border-line-soft p-6">
+      <div className="xl:col-span-2 space-y-6">
+        {/* ─── Mon compte administrateur ──────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-line-soft shadow-sm p-6">
+          <div className="flex items-center gap-2.5 mb-1">
+            <span
+              className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand to-brand-deep shadow-sm flex items-center justify-center"
+              aria-hidden
+            >
+              <UserCog size={15} className="text-white" />
+            </span>
+            <h3 className="text-sm font-bold text-ink">{t("account.title")}</h3>
+          </div>
+          <p className="text-xs text-slate2 mb-4">{t("account.hint")}</p>
+
+          <form onSubmit={handleSaveAccount} className="space-y-4">
+            <Field label={t("account.nameLbl")} required>
+              <input
+                required
+                minLength={2}
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+                autoComplete="name"
+                className={inputClass}
+              />
+            </Field>
+            <Field label={t("prof.email")} required>
+              <input
+                required
+                type="email"
+                value={accountEmail}
+                onChange={(e) => setAccountEmail(e.target.value)}
+                autoComplete="email"
+                className={inputClass}
+              />
+            </Field>
+            <PrimaryButton type="submit" disabled={accountBusy}>
+              <Save size={14} />
+              {accountBusy ? t("common.saving") : t("common.save")}
+            </PrimaryButton>
+          </form>
+
+          <div className="border-t border-line-soft mt-5 pt-5">
+            <div className="flex items-center gap-2 mb-4">
+              <KeyRound size={15} className="text-brand" aria-hidden />
+              <h4 className="text-sm font-semibold text-ink">{t("prof.changePwd")}</h4>
+            </div>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <Field label={t("pwd.current")} required>
+                <input
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={pwdCurrent}
+                  onChange={(e) => setPwdCurrent(e.target.value)}
+                  className={inputClass}
+                />
+              </Field>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <Field label={t("pwd.new")} required>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    value={pwdNew}
+                    onChange={(e) => setPwdNew(e.target.value)}
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label={t("pwd.confirm")} required>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    value={pwdConfirm}
+                    onChange={(e) => setPwdConfirm(e.target.value)}
+                    className={inputClass}
+                  />
+                </Field>
+              </div>
+              <PrimaryButton type="submit" disabled={pwdBusy}>
+                {pwdBusy ? t("common.saving") : t("prof.update")}
+              </PrimaryButton>
+            </form>
+          </div>
+        </div>
+
+        {/* ─── Catégories de documents ────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-line-soft shadow-sm p-6">
         <div className="flex items-center gap-2 mb-1">
           <Tag size={15} className="text-brand" />
           <h3 className="text-sm font-semibold text-ink">{t("set.catTitle")}</h3>
@@ -226,6 +444,7 @@ export function AdminSettings() {
             <Plus size={13} />
             {t("common.add")}
           </button>
+        </div>
         </div>
       </div>
       </div>

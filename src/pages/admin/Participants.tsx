@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { clsx } from "clsx";
 import {
   Copy,
   Edit3,
@@ -11,7 +12,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { COUNTRIES, COUNTRY_FLAGS, type User, type UserStatus } from "@/lib/types";
+import { COUNTRIES, type User, type UserStatus } from "@/lib/types";
+import { CountryFlag } from "@/components/CountryFlag";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDate, initials } from "@/lib/format";
 import { useI18n } from "@/i18n";
@@ -55,6 +57,8 @@ export function AdminParticipants() {
   const load = resource.reload;
 
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"tous" | UserStatus>("tous");
+  const [countryFilter, setCountryFilter] = useState("tous");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editing, setEditing] = useState<User | null>(null);
@@ -68,11 +72,21 @@ export function AdminParticipants() {
     const q = search.toLowerCase();
     return participants.filter(
       (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.country.toLowerCase().includes(q) ||
-        p.email.toLowerCase().includes(q)
+        (statusFilter === "tous" || p.status === statusFilter) &&
+        (countryFilter === "tous" || p.country === countryFilter) &&
+        (p.name.toLowerCase().includes(q) ||
+          p.country.toLowerCase().includes(q) ||
+          p.email.toLowerCase().includes(q) ||
+          p.functionTitle.toLowerCase().includes(q) ||
+          p.institution.toLowerCase().includes(q))
     );
-  }, [participants, search]);
+  }, [participants, search, statusFilter, countryFilter]);
+
+  // Pays réellement présents dans la liste (filtre pertinent).
+  const presentCountries = useMemo(() => {
+    const set = new Set((participants ?? []).map((p) => p.country).filter(Boolean));
+    return COUNTRIES.filter((c) => set.has(c));
+  }, [participants]);
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -177,27 +191,74 @@ export function AdminParticipants() {
         }
       />
 
-      <div className="relative max-w-md">
-        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate2/50" aria-hidden />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("part.searchPh")}
-          aria-label={t("part.searchPh")}
-          className={`${inputClass} pl-9 py-2`}
-        />
+      {/* ─── Recherche + filtres (statut, pays) ─────────────────────── */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative w-full sm:w-72">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand/60" aria-hidden />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("part.searchPh")}
+            aria-label={t("part.searchPh")}
+            className={`${inputClass} pl-9 py-2`}
+          />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {(
+            [
+              { key: "tous", label: t("part.allStatuses") },
+              { key: "actif", label: t("status.actif") },
+              { key: "en-attente", label: t("status.en-attente") },
+              { key: "inactif", label: t("status.inactif") },
+            ] as const
+          ).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setStatusFilter(key)}
+              className={clsx(
+                "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                statusFilter === key
+                  ? "bg-gradient-to-b from-brand to-brand-dark text-white shadow-sm shadow-brand/30"
+                  : "bg-white border border-line text-slate2 hover:bg-mist hover:border-brand/40"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="relative">
+          {countryFilter !== "tous" && (
+            <CountryFlag
+              country={countryFilter}
+              className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            />
+          )}
+          <select
+            value={countryFilter}
+            onChange={(e) => setCountryFilter(e.target.value)}
+            aria-label={t("part.allCountries")}
+            className={`${inputClass} py-2 w-auto ${countryFilter !== "tous" ? "pl-9" : ""}`}
+          >
+            <option value="tous">{t("part.allCountries")}</option>
+            {presentCountries.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-line-soft overflow-hidden">
+      <div className="bg-white rounded-xl border border-line-soft shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-mist border-b border-line-soft">
+            <thead className="bg-gradient-to-b from-mist to-brand-soft/40 border-b-2 border-line">
               <tr>
                 {columns.map((h) => (
                   <th
                     key={h}
                     scope="col"
-                    className="px-4 py-3 text-left text-xs font-semibold text-slate2 uppercase tracking-wide whitespace-nowrap"
+                    className="px-4 py-3 text-left text-xs font-bold text-brand-deep uppercase tracking-wide whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -209,7 +270,7 @@ export function AdminParticipants() {
                 <tr key={p.id} className="hover:bg-mist/60 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand text-xs font-bold flex-shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand to-brand-deep flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm">
                         {initials(p.name)}
                       </div>
                       <div>
@@ -224,12 +285,17 @@ export function AdminParticipants() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="flex items-center gap-1.5 text-sm text-ink whitespace-nowrap">
-                      <span>{COUNTRY_FLAGS[p.country] ?? "🌍"}</span>
+                    <span className="flex items-center gap-2 text-sm text-ink whitespace-nowrap">
+                      <CountryFlag country={p.country} />
                       {p.country}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate2">{p.functionTitle}</td>
+                  <td className="px-4 py-3">
+                    <p className="text-sm text-ink">{p.functionTitle || "—"}</p>
+                    {p.institution && (
+                      <p className="text-xs text-slate2/70 mt-0.5">{p.institution}</p>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={p.status} />
                   </td>
@@ -240,7 +306,7 @@ export function AdminParticipants() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setResetting(p)}
-                        className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
+                        className="p-1.5 rounded-lg text-gold hover:bg-gold-soft hover:brightness-90 transition-all"
                         title={t("part.resetPwd")}
                         aria-label={t("part.resetPwd")}
                       >
@@ -248,7 +314,7 @@ export function AdminParticipants() {
                       </button>
                       <button
                         onClick={() => openEdit(p)}
-                        className="p-1.5 rounded hover:bg-line-soft text-slate2/60 hover:text-brand transition-colors"
+                        className="p-1.5 rounded-lg text-brand hover:bg-brand-soft transition-colors"
                         title={t("common.edit")}
                         aria-label={t("common.edit")}
                       >
@@ -256,7 +322,7 @@ export function AdminParticipants() {
                       </button>
                       <button
                         onClick={() => setDeleting(p)}
-                        className="p-1.5 rounded hover:bg-danger-soft text-slate2/60 hover:text-danger transition-colors"
+                        className="p-1.5 rounded-lg text-danger/80 hover:text-danger hover:bg-danger-soft transition-colors"
                         title={t("common.delete")}
                         aria-label={t("common.delete")}
                       >
@@ -309,23 +375,30 @@ export function AdminParticipants() {
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("part.country")} required>
-                <select
-                  required
-                  value={form.country}
-                  onChange={(e) => setForm({ ...form, country: e.target.value })}
-                  className={inputClass}
-                >
-                  <option value="">{t("common.select")}</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  {form.country && (
+                    <CountryFlag
+                      country={form.country}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                    />
+                  )}
+                  <select
+                    required
+                    value={form.country}
+                    onChange={(e) => setForm({ ...form, country: e.target.value })}
+                    className={`${inputClass} ${form.country ? "pl-9" : ""}`}
+                  >
+                    <option value="">{t("common.select")}</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </Field>
-              <Field label={t("part.function")} required>
+              <Field label={t("part.function")} hint={t("common.optional")}>
                 <input
-                  required
                   value={form.functionTitle}
                   onChange={(e) => setForm({ ...form, functionTitle: e.target.value })}
                   placeholder={t("part.functionPh")}

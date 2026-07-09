@@ -182,9 +182,22 @@ async function main() {
   };
 
   try {
-    // 1. Page de connexion
+    // 1. Page de connexion (onglet « J'ai un compte »)
     await page.goto(`${BASE}/connexion`, { waitUntil: "networkidle" });
     await shot("01-connexion");
+
+    // 1b. Onglet « Codes de session » (accès invité)
+    await page.getByRole("tab", { name: "Codes de session" }).click();
+    await page.locator("#access-code").fill(session.accessCode);
+    await page.locator("#access-password").fill(session.accessPassword);
+    await shot("01b-connexion-codes");
+
+    // 1c. Espace invité (bibliothèque + bandeau invité)
+    await page.getByRole("button", { name: "Accéder aux documents" }).click();
+    await page.waitForURL("**/espace");
+    await page.waitForSelector("text=Rapport de la 2ème Session");
+    await shot("03b-espace-invite");
+    await page.context().clearCookies();
 
     // 2. Page d'inscription (préremplie de façon réaliste)
     await page.goto(`${BASE}/inscription`, { waitUntil: "networkidle" });
@@ -241,12 +254,12 @@ async function main() {
     await page.goto(`${BASE}/espace/profil`, { waitUntil: "networkidle" });
     await shot("06-profil");
 
-    // 7. Gros plan sur l'en-tête (taille de texte + langue)
+    // 7. Gros plan sur l'en-tête (taille de texte + langues avec drapeaux)
     await page.goto(`${BASE}/espace`, { waitUntil: "networkidle" });
     await page.waitForTimeout(600);
     await page.screenshot({
       path: path.join(OUT, "07-entete-outils.png"),
-      clip: { x: 640, y: 0, width: 640, height: 64 },
+      clip: { x: 520, y: 0, width: 760, height: 52 },
     });
     console.log("  ✓ 07-entete-outils.png");
   } finally {

@@ -3,7 +3,7 @@ import { Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { ChatMessage } from "@/lib/types";
-import { COUNTRY_FLAGS } from "@/lib/types";
+import { CountryFlag } from "@/components/CountryFlag";
 import { formatTime, initials } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
 import { useI18n } from "@/i18n";
@@ -152,8 +152,9 @@ export function Discussion({ sessionId }: { sessionId: string }) {
                         <span className="ml-1 text-brand font-normal">· {t("header.admin")}</span>
                       )}
                       {!mine && m.authorCountry && (
-                        <span className="ml-1 font-normal text-slate2/80">
-                          {COUNTRY_FLAGS[m.authorCountry] ?? ""} {m.authorCountry}
+                        <span className="ml-1 font-normal text-slate2/80 inline-flex items-center gap-1">
+                          <CountryFlag country={m.authorCountry} className="w-[14px] h-[9px]" />
+                          {m.authorCountry}
                         </span>
                       )}
                     </span>

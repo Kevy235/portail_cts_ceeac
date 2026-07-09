@@ -17,10 +17,17 @@ function getTransporter(): Transporter {
   return transporter;
 }
 
+export interface MailAttachment {
+  filename: string;
+  content: Buffer;
+  contentType?: string;
+}
+
 export interface MailContent {
   subject: string;
   text: string;
   html: string;
+  attachments?: MailAttachment[];
 }
 
 export interface BroadcastResult {
@@ -50,6 +57,7 @@ export async function sendBroadcast(
         subject: content.subject,
         text: content.text,
         html: content.html,
+        attachments: content.attachments,
       });
       result.sent.push(to);
     } catch (err) {

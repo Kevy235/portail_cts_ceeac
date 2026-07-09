@@ -7,24 +7,29 @@
  */
 
 @theme {
-  --color-brand: #006eb5;
-  --color-brand-dark: #005a96;
+  /* Palette renforcée : mêmes teintes identitaires, saturation et contraste
+     relevés pour un rendu plus franc et plus lisible. */
+  --color-brand: #0077c8;
+  --color-brand-dark: #005d9e;
   --color-brand-deep: #003580;
-  --color-brand-night: #002559;
-  --color-brand-soft: #e3f0f9;
+  --color-brand-night: #001f4d;
+  --color-brand-soft: #e0f1fc;
 
-  --color-accent: #3da281;
-  --color-accent-dark: #2e8a6c;
-  --color-accent-soft: #e4f4ee;
+  --color-accent: #2aa87c;
+  --color-accent-dark: #1e8862;
+  --color-accent-soft: #ddf5ec;
 
-  --color-danger: #c1272d;
-  --color-danger-soft: #fbeaea;
+  --color-danger: #c8232a;
+  --color-danger-soft: #fcebeb;
 
-  --color-ink: #0a1a2e;
-  --color-slate2: #435a70;
-  --color-mist: #f2f6fa;
-  --color-line: #dee7f0;
-  --color-line-soft: #ecf2f8;
+  --color-gold: #e9a219;
+  --color-gold-soft: #fdf3dd;
+
+  --color-ink: #0b1c33;
+  --color-slate2: #3e556e;
+  --color-mist: #eef4fa;
+  --color-line: #d6e2ee;
+  --color-line-soft: #e6edf6;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Source Serif 4", ui-serif, Georgia, serif;
@@ -83,9 +88,23 @@
 
   body {
     background-color: var(--color-mist);
+    /* Léger dégradé de fond : donne de la profondeur sans gêner la lecture. */
+    background-image:
+      radial-gradient(1200px 500px at 50% -10%, rgba(0, 119, 200, 0.07), transparent 70%),
+      radial-gradient(900px 400px at 100% 100%, rgba(42, 168, 124, 0.05), transparent 70%);
+    background-attachment: fixed;
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Barres de défilement discrètes et cohérentes avec la charte. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-brand) 35%, transparent) transparent;
+  }
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-brand) 22%, transparent);
   }
 
   /* Anneau de focus visible au clavier, sur tous les éléments interactifs. */

@@ -73,14 +73,16 @@ export function AdminDashboard() {
       value: stats.participants.actifs,
       sub: t("dash.totalAccounts", { n: stats.participants.total }),
       color: "border-l-brand",
-      icon: <Users size={18} className="text-brand" />,
+      tile: "bg-gradient-to-br from-brand to-brand-deep",
+      icon: <Users size={18} className="text-white" />,
     },
     {
       label: t("dash.publishedDocs"),
       value: stats.documents.publies,
       sub: t("dash.pendingDrafts", { n: stats.documents.brouillons }),
       color: "border-l-accent",
-      icon: <FileText size={18} className="text-accent-dark" />,
+      tile: "bg-gradient-to-br from-accent to-accent-dark",
+      icon: <FileText size={18} className="text-white" />,
     },
     {
       label: t("dash.plannedSessions"),
@@ -89,14 +91,16 @@ export function AdminDashboard() {
         ? t("dash.nextOn", { date: formatDate(stats.sessions.prochaine.startDate) })
         : t("dash.noUpcoming"),
       color: "border-l-violet-500",
-      icon: <Calendar size={18} className="text-violet-500" />,
+      tile: "bg-gradient-to-br from-violet-500 to-violet-700",
+      icon: <Calendar size={18} className="text-white" />,
     },
     {
       label: t("dash.downloads"),
       value: stats.downloads.moisCourant,
       sub: t("dash.totalDownloads", { n: stats.downloads.total }),
-      color: "border-l-amber-500",
-      icon: <Download size={18} className="text-amber-500" />,
+      color: "border-l-gold",
+      tile: "bg-gradient-to-br from-gold to-amber-600",
+      icon: <Download size={18} className="text-white" />,
     },
   ];
 
@@ -105,17 +109,19 @@ export function AdminDashboard() {
       <PageHeader title={t("dash.title")} subtitle={t("dash.subtitle")} />
 
       <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
-        {cards.map(({ label, value, sub, color, icon }) => (
+        {cards.map(({ label, value, sub, color, tile, icon }) => (
           <div
             key={label}
-            className={`bg-white rounded-xl p-4 border border-line-soft border-l-4 ${color} shadow-sm flex items-center gap-3 md:block transition-all duration-200 hover:shadow-md hover:-translate-y-0.5`}
+            className={`bg-white rounded-xl p-4 border border-line-soft border-l-4 ${color} shadow-sm flex items-center gap-3 md:block transition-all duration-200 hover:shadow-lg hover:-translate-y-1`}
           >
-            <div className="w-9 h-9 rounded-lg bg-mist flex items-center justify-center flex-shrink-0 md:mb-3">
+            <div
+              className={`w-10 h-10 rounded-xl ${tile} shadow-md flex items-center justify-center flex-shrink-0 md:mb-3`}
+            >
               {icon}
             </div>
             <div className="min-w-0">
-              <p className="text-2xl font-bold text-ink leading-tight">{value}</p>
-              <p className="text-xs font-medium text-ink mt-0.5">{label}</p>
+              <p className="text-3xl font-bold text-ink leading-tight tabular-nums">{value}</p>
+              <p className="text-xs font-semibold text-slate2 mt-0.5">{label}</p>
               <p className="text-[11px] text-slate2/70 mt-0.5">{sub}</p>
             </div>
           </div>
@@ -166,7 +172,11 @@ export function AdminDashboard() {
         <div className="space-y-4">
           {/* Prochaine session */}
           {stats.sessions.prochaine ? (
-            <div className="bg-brand-deep rounded-xl p-5 text-white">
+            <div className="relative overflow-hidden bg-gradient-to-br from-brand-deep to-brand-night rounded-xl p-5 text-white shadow-md">
+              <div
+                aria-hidden
+                className="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-accent/20 blur-2xl pointer-events-none"
+              />
               <div className="flex items-center gap-2 mb-3">
                 <Calendar size={14} className="text-accent" />
                 <p className="text-white/60 text-xs uppercase tracking-wide">
@@ -192,7 +202,7 @@ export function AdminDashboard() {
               </div>
               <Link
                 to="/admin/sessions"
-                className="mt-4 block text-center w-full bg-accent text-white text-xs font-medium py-2 rounded-lg hover:bg-accent-dark transition-colors"
+                className="relative mt-4 block text-center w-full bg-gradient-to-b from-accent to-accent-dark text-white text-xs font-semibold py-2.5 rounded-lg shadow-sm shadow-black/20 hover:brightness-110 transition-all"
               >
                 {t("dash.manageSessions")}
               </Link>

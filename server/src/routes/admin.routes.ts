@@ -87,6 +87,13 @@ const EDITABLE_KEYS = [
   "contact_email",
   "footer_text",
   "login_notice",
+  // Espace participant : libellés de menu et bannière de la bibliothèque.
+  // Valeur vide = le texte standard traduit de l'interface est utilisé.
+  "nav_library",
+  "nav_psessions",
+  "nav_profile",
+  "library_title",
+  "library_notice",
 ] as const;
 
 async function allSettings() {
