@@ -1,6 +1,6 @@
 # Génération du guide participant (Word)
 
-Régénère `docs/Guide-Participant-Plateforme-CTS-APPS.docx` (version 2.0) avec
+Régénère `docs/Guide-Participant-Plateforme-CTS-DSS.docx` (version 2.0) avec
 des captures d'écran réelles de l'application : connexion (deux onglets),
 accès invité par codes de session, inscription, bibliothèque (consultation +
 téléchargement), discussions, profil.

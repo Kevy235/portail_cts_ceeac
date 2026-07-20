@@ -54,9 +54,9 @@ export const en: Dict = {
   "login.submitting": "Signing in…",
   "login.failed": "Unable to sign in",
   "login.invalidCredentials": "Invalid credentials. Please try again.",
-  "login.accountDisabled": "Your account is disabled. Contact the DPAPS Secretariat.",
+  "login.accountDisabled": "Your account is disabled. Contact the STC-DSS Secretariat.",
   "login.noAccount":
-    "Don't have an account? Contact the DPAPS Secretariat ({email}) for accreditation.",
+    "Don't have an account? Contact the STC-DSS Secretariat ({email}) for accreditation.",
 
   "pwd.firstTitle": "First sign-in",
   "pwd.firstSubtitle": "Set your personal password to activate your account.",
@@ -110,6 +110,8 @@ export const en: Dict = {
   "activity.session_updated": "Session updated",
   "activity.session_deleted": "Session deleted",
   "activity.settings_updated": "Portal contents updated",
+  "activity.guide_updated": "User guide updated",
+  "activity.guide_deleted": "User guide deleted",
   "activity.login": "Signed in to the platform",
   "time.now": "just now",
   "time.minutes": "{n} min ago",
@@ -161,7 +163,7 @@ export const en: Dict = {
   "part.copied": "Credentials copied",
   "part.pwdReset": "Password reset",
   "part.copyText":
-    "STC-PAPS Platform — temporary credentials\nE-mail: {email}\nPassword: {password}",
+    "STC-DSS Platform — temporary credentials\nE-mail: {email}\nPassword: {password}",
 
   "docs.title": "Document management",
   "docs.subtitle": "Published official documents and pending drafts",
@@ -208,7 +210,7 @@ export const en: Dict = {
   "docs.fileAdded": "{lang} version saved",
   "docs.fileDeleted": "Version deleted",
 
-  "sess.title": "STC-PAPS Sessions",
+  "sess.title": "STC-DSS Sessions",
   "sess.subtitle": "Calendar of ordinary and extraordinary sessions",
   "sess.psubtitle": "Session calendar and discussion threads",
   "sess.new": "New session",
@@ -220,9 +222,9 @@ export const en: Dict = {
   "sess.newTitle": "New STC session",
   "sess.editTitle": "Edit session",
   "sess.fieldTitle": "Session title",
-  "sess.fieldTitlePh": "3rd Ordinary Session STC-PAPS 2025",
+  "sess.fieldTitlePh": "3rd Ordinary Session STC-DSS 2025",
   "sess.reference": "Reference",
-  "sess.referencePh": "STC-PAPS/2025/03",
+  "sess.referencePh": "STC-DSS/2025/03",
   "sess.location": "Location",
   "sess.locationPh": "Brazzaville, Congo",
   "sess.startDate": "Start date",
@@ -272,6 +274,14 @@ export const en: Dict = {
   "set.catDeleteTitle": "Delete category",
   "set.catDeleteMsg":
     "The category “{name}” will be deleted. Associated documents will remain available without a category.",
+  "set.guideTitle": "User guide (document)",
+  "set.guideNote":
+    "Publish the downloadable official guide in each language: it is offered on the guide page (accessible from the sign-in page) and in the participant area.",
+  "set.guideUpdated": "Guide updated ({lang})",
+  "set.guideDeleted": "Guide deleted",
+  "set.guideDeleteTitle": "Delete guide",
+  "set.guideDeleteMsg":
+    "The “{lang}” version of the user guide will no longer be available for download.",
 
   "lib.kicker": "Document library",
   "lib.official": "Official ECCAS documents · Accredited access",
@@ -284,7 +294,7 @@ export const en: Dict = {
   "lib.langFilterNote": "Displayed languages (editable in your profile):",
 
   "prof.title": "My profile",
-  "prof.subtitle": "Your STC-PAPS accreditation details",
+  "prof.subtitle": "Your STC-DSS accreditation details",
   "prof.email": "E-mail address",
   "prof.institution": "Institution",
   "prof.country": "Represented country",
@@ -300,9 +310,9 @@ export const en: Dict = {
   "prof.prefsFailed": "Unable to save",
   "prof.changePwd": "Change my password",
   "prof.update": "Update",
-  "prof.accredTitle": "STC-PAPS Accreditation",
+  "prof.accredTitle": "STC-DSS Accreditation",
   "prof.accredText":
-    "Your access to this platform was granted by the DPAPS-ECCAS Secretariat. To modify your information, please contact {email}.",
+    "Your access to this platform was granted by the STC-DSS-ECCAS Secretariat. To modify your information, please contact {email}.",
   "prof.originSession": "Registration session",
 
   // ─── Common (additions) ───────────────────────────────────────────────
@@ -322,7 +332,7 @@ export const en: Dict = {
   "register.subtitle": "Create your account with the access codes sent to your Member State",
   "register.accessSection": "Session access",
   "register.accessHint":
-    "The session ID and password were sent to you by your Member State or the DPAPS Secretariat.",
+    "The session ID and password were sent to you by your Member State or the STC-DSS Secretariat.",
   "register.accessCode": "Session ID",
   "register.accessPassword": "Session password",
   "register.personalSection": "Your information",
@@ -360,7 +370,7 @@ export const en: Dict = {
     "Check if the file was encrypted/coded before upload. A “Coded” badge will be shown to participants.",
 
   // ─── Session access & broadcast ───────────────────────────────────────
-  "sess.referenceAuto": "Generated automatically (e.g. CTS-APPS/2026/01)",
+  "sess.referenceAuto": "Generated automatically (e.g. CTS-DSS/2026/01)",
   "sess.registered": "{n} registered",
   "sess.endBeforeStart": "The end date must be after the start date",
   "sess.broadcast": "Broadcast",
@@ -371,7 +381,7 @@ export const en: Dict = {
     "Send these access codes to the Member States: each participant then creates their own account on the registration page, with their own information.",
   "sess.access.copyInvite": "Copy invitation",
   "sess.access.invite":
-    "STC-PAPS Platform — Session registration\n{title}\n\nSession ID: {code}\nAccess password: {password}\n\nCreate your account here: {url}",
+    "STC-DSS Platform — Session registration\n{title}\n\nSession ID: {code}\nAccess password: {password}\n\nCreate your account here: {url}",
   "sess.access.regenerate": "Regenerate",
   "sess.access.regenerateTitle": "Regenerate access",
   "sess.access.regenerateMsg":
@@ -413,9 +423,9 @@ export const en: Dict = {
   "login.guideLink": "User guide",
   "nav.guide": "Guide",
   "guide.title": "User guide",
-  "guide.subtitle": "The essentials for using the CTS-APPS platform",
+  "guide.subtitle": "The essentials for using the CTS-DSS platform",
   "guide.intro":
-    "The CTS-APPS platform provides access to the official documents of the ECCAS Specialised Technical Committee on Political Affairs, Peace and Security. This guide summarises the essential procedures; the full guide is available from the DAPPS Secretariat.",
+    "The CTS-DSS platform provides access to the official documents of the ECCAS Specialised Technical Committee on Defence, Safety and Security. This guide summarises the essential procedures; the full guide is available from the STC-DSS Secretariat.",
   "guide.backToLogin": "Back to sign-in",
   "guide.s1.title": "Access with the session codes (guest)",
   "guide.s1.p":
@@ -448,10 +458,13 @@ export const en: Dict = {
   "guide.s5.2": "The flag buttons switch the interface language instantly (FR, EN, PT, ES).",
   "guide.s6.title": "Your profile",
   "guide.s6.1":
-    "“My profile” summarises your accreditation details. For any correction or password change, please contact the DAPPS Secretariat.",
+    "“My profile” summarises your accreditation details. For any correction or password change, please contact the STC-DSS Secretariat.",
   "guide.assistTitle": "Assistance",
   "guide.assist":
-    "For any difficulty (access, password, accreditation), the DAPPS Secretariat remains at your disposal:",
+    "For any difficulty (access, password, accreditation), the STC-DSS Secretariat remains at your disposal:",
+  "guide.dl.title": "Official guide to download",
+  "guide.dl.desc":
+    "Download the full user guide published by the Secretariat, in the language of your choice.",
 
   "login.tabAccount": "I have an account",
   "login.tabCodes": "Session codes",

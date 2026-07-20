@@ -14,6 +14,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { useI18n } from "@/i18n";
 import type { Dict } from "@/i18n/fr";
 import { FontSizeControl, LangSelector, PageHeader } from "@/components/ui";
+import { GuideDownload } from "@/components/GuideDownload";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 /** Étape numérotée d'une procédure. */
@@ -84,6 +85,9 @@ export function GuideContent() {
     <div className="space-y-5">
       <PageHeader title={t("guide.title")} subtitle={t("guide.subtitle")} />
       <p className="text-sm text-slate2 leading-relaxed max-w-3xl">{t("guide.intro")}</p>
+
+      {/* Guide officiel téléchargeable (publié par l'administrateur) */}
+      <GuideDownload />
 
       <Section
         icon={<KeyRound size={17} className="text-white" />}

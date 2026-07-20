@@ -95,7 +95,7 @@ authRouter.post(
     }
     if (user.status === "inactif") {
       return res.status(403).json({
-        error: "Votre compte est désactivé. Contactez le Secrétariat DAPPS.",
+        error: "Votre compte est désactivé. Contactez le Secrétariat CTS-DSS.",
         code: "account_disabled",
       });
     }

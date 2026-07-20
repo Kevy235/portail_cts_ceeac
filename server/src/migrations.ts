@@ -225,6 +225,58 @@ export const MIGRATIONS: Migration[] = [
       ALTER TABLE documents ADD COLUMN is_coded BOOLEAN NOT NULL DEFAULT FALSE;
     `,
   },
+  {
+    id: 6,
+    name: "renommage CTS-DSS et guide utilisateur téléchargeable",
+    sql: `
+      -- Nouvel intitulé : Comité Technique Spécialisé Défense, Sûreté et Sécurité
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'CEEAC · CTS-DSS'
+        WHEN 'platform_subtitle' THEN 'Plateforme CTS-DSS'
+        WHEN 'org_full_name' THEN 'Comité Technique Spécialisé Défense, Sûreté et Sécurité'
+        WHEN 'org_description' THEN 'Plateforme d''accès aux documents et ressources du CTS-DSS — CEEAC'
+        WHEN 'footer_text' THEN '© 2025 CEEAC-ECCAS · Comité Technique Spécialisé Défense, Sûreté et Sécurité'
+      END
+      WHERE lang = 'fr' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'ECCAS · STC-DSS'
+        WHEN 'platform_subtitle' THEN 'STC-DSS Platform'
+        WHEN 'org_full_name' THEN 'Specialised Technical Committee on Defence, Safety and Security'
+        WHEN 'org_description' THEN 'Document and resource access platform of the STC-DSS — ECCAS'
+        WHEN 'footer_text' THEN '© 2025 ECCAS-CEEAC · Specialised Technical Committee on Defence, Safety and Security'
+      END
+      WHERE lang = 'en' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'CEEAC · CTE-DSS'
+        WHEN 'platform_subtitle' THEN 'Plataforma CTE-DSS'
+        WHEN 'org_full_name' THEN 'Comité Técnico Especializado de Defesa, Proteção e Segurança'
+        WHEN 'org_description' THEN 'Plataforma de acesso aos documentos e recursos do CTE-DSS — CEEAC'
+        WHEN 'footer_text' THEN '© 2025 CEEAC-ECCAS · Comité Técnico Especializado de Defesa, Proteção e Segurança'
+      END
+      WHERE lang = 'pt' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'CEEAC · CTE-DSS'
+        WHEN 'platform_subtitle' THEN 'Plataforma CTE-DSS'
+        WHEN 'org_full_name' THEN 'Comité Técnico Especializado de Defensa, Protección y Seguridad'
+        WHEN 'org_description' THEN 'Plataforma de acceso a los documentos y recursos del CTE-DSS — CEEAC'
+        WHEN 'footer_text' THEN '© 2025 CEEAC-ECCAS · Comité Técnico Especializado de Defensa, Protección y Seguridad'
+      END
+      WHERE lang = 'es' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      -- Guide utilisateur téléchargeable : un fichier par langue, géré par l'admin
+      CREATE TABLE guide_files (
+        lang TEXT PRIMARY KEY CHECK (lang IN ('fr','en','pt','es')),
+        file_name TEXT NOT NULL,
+        stored_name TEXT NOT NULL,
+        file_size BIGINT NOT NULL DEFAULT 0,
+        mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `,
+  },
 ];
 
 export const LANGS = ["fr", "en", "pt", "es"] as const;

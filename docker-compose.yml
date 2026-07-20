@@ -14,7 +14,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?definir JWT_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@ceeac-eccas.org}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?definir ADMIN_PASSWORD}
-      ADMIN_NAME: ${ADMIN_NAME:-Secrétariat APPS}
+      ADMIN_NAME: ${ADMIN_NAME:-Secrétariat CTS-DSS}
       APP_URL: ${APP_URL:-}
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_MB: "50"

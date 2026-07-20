@@ -14,6 +14,8 @@ export type ActivityType =
   | "session_updated"
   | "session_deleted"
   | "settings_updated"
+  | "guide_updated"
+  | "guide_deleted"
   | "login";
 
 export async function logActivity(

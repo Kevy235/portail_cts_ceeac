@@ -54,9 +54,9 @@ export const pt: Dict = {
   "login.submitting": "A iniciar sessão…",
   "login.failed": "Não foi possível iniciar sessão",
   "login.invalidCredentials": "Credenciais incorretas. Tente novamente.",
-  "login.accountDisabled": "A sua conta está desativada. Contacte o Secretariado do DAPPS.",
+  "login.accountDisabled": "A sua conta está desativada. Contacte o Secretariado do CTE-DSS.",
   "login.noAccount":
-    "Não tem conta? Contacte o Secretariado do DAPPS ({email}) para obter acreditação.",
+    "Não tem conta? Contacte o Secretariado do CTE-DSS ({email}) para obter acreditação.",
 
   "pwd.firstTitle": "Primeiro acesso",
   "pwd.firstSubtitle": "Defina a sua palavra-passe pessoal para ativar a conta.",
@@ -110,6 +110,8 @@ export const pt: Dict = {
   "activity.session_updated": "Sessão atualizada",
   "activity.session_deleted": "Sessão eliminada",
   "activity.settings_updated": "Conteúdos do portal atualizados",
+  "activity.guide_updated": "Guia do utilizador atualizado",
+  "activity.guide_deleted": "Guia do utilizador eliminado",
   "activity.login": "Início de sessão na plataforma",
   "time.now": "agora mesmo",
   "time.minutes": "há {n} min",
@@ -161,7 +163,7 @@ export const pt: Dict = {
   "part.copied": "Credenciais copiadas",
   "part.pwdReset": "Palavra-passe reposta",
   "part.copyText":
-    "Plataforma CTE-APPS — credenciais provisórias\nE-mail: {email}\nPalavra-passe: {password}",
+    "Plataforma CTE-DSS — credenciais provisórias\nE-mail: {email}\nPalavra-passe: {password}",
 
   "docs.title": "Gestão documental",
   "docs.subtitle": "Documentos oficiais publicados e rascunhos pendentes",
@@ -209,7 +211,7 @@ export const pt: Dict = {
   "docs.fileAdded": "Versão {lang} guardada",
   "docs.fileDeleted": "Versão eliminada",
 
-  "sess.title": "Sessões CTE-APPS",
+  "sess.title": "Sessões CTE-DSS",
   "sess.subtitle": "Calendário das sessões ordinárias e extraordinárias",
   "sess.psubtitle": "Calendário das sessões e fios de discussão",
   "sess.new": "Nova sessão",
@@ -221,9 +223,9 @@ export const pt: Dict = {
   "sess.newTitle": "Nova sessão CTE",
   "sess.editTitle": "Editar a sessão",
   "sess.fieldTitle": "Título da sessão",
-  "sess.fieldTitlePh": "3.ª Sessão Ordinária CTE-APPS 2025",
+  "sess.fieldTitlePh": "3.ª Sessão Ordinária CTE-DSS 2025",
   "sess.reference": "Referência",
-  "sess.referencePh": "CTE-APPS/2025/03",
+  "sess.referencePh": "CTE-DSS/2025/03",
   "sess.location": "Local",
   "sess.locationPh": "Brazzaville, Congo",
   "sess.startDate": "Data de início",
@@ -273,6 +275,14 @@ export const pt: Dict = {
   "set.catDeleteTitle": "Eliminar a categoria",
   "set.catDeleteMsg":
     "A categoria «{name}» será eliminada. Os documentos associados continuarão disponíveis sem categoria.",
+  "set.guideTitle": "Guia do utilizador (documento)",
+  "set.guideNote":
+    "Publique o guia oficial descarregável em cada língua: é proposto na página do guia (acessível a partir do início de sessão) e no espaço do participante.",
+  "set.guideUpdated": "Guia atualizado ({lang})",
+  "set.guideDeleted": "Guia eliminado",
+  "set.guideDeleteTitle": "Eliminar o guia",
+  "set.guideDeleteMsg":
+    "A versão «{lang}» do guia do utilizador deixará de estar disponível para descarregamento.",
 
   "lib.kicker": "Biblioteca documental",
   "lib.official": "Documentos oficiais da CEEAC · Acesso acreditado",
@@ -285,7 +295,7 @@ export const pt: Dict = {
   "lib.langFilterNote": "Línguas apresentadas (editáveis no seu perfil):",
 
   "prof.title": "O meu perfil",
-  "prof.subtitle": "Informações da sua acreditação CTE-APPS",
+  "prof.subtitle": "Informações da sua acreditação CTE-DSS",
   "prof.email": "Endereço de e-mail",
   "prof.institution": "Instituição",
   "prof.country": "País representado",
@@ -301,9 +311,9 @@ export const pt: Dict = {
   "prof.prefsFailed": "Não foi possível guardar",
   "prof.changePwd": "Alterar a minha palavra-passe",
   "prof.update": "Atualizar",
-  "prof.accredTitle": "Acreditação CTE-APPS",
+  "prof.accredTitle": "Acreditação CTE-DSS",
   "prof.accredText":
-    "O seu acesso a esta plataforma foi concedido pelo Secretariado do DAPPS-CEEAC. Para qualquer alteração das suas informações, contacte {email}.",
+    "O seu acesso a esta plataforma foi concedido pelo Secretariado do CTE-DSS-CEEAC. Para qualquer alteração das suas informações, contacte {email}.",
   "prof.originSession": "Sessão de inscrição",
 
   // ─── Comum (complementos) ─────────────────────────────────────────────
@@ -323,7 +333,7 @@ export const pt: Dict = {
   "register.subtitle": "Crie a sua conta com os acessos transmitidos ao seu Estado-Membro",
   "register.accessSection": "Acessos da sessão",
   "register.accessHint":
-    "O identificador e a palavra-passe da sessão foram-lhe transmitidos pelo seu Estado-Membro ou pelo Secretariado DAPPS.",
+    "O identificador e a palavra-passe da sessão foram-lhe transmitidos pelo seu Estado-Membro ou pelo Secretariado CTE-DSS.",
   "register.accessCode": "Identificador da sessão",
   "register.accessPassword": "Palavra-passe da sessão",
   "register.personalSection": "As suas informações",
@@ -361,7 +371,7 @@ export const pt: Dict = {
     "Assinale se o ficheiro foi cifrado/codificado antes do carregamento. Um selo «Codificado» será apresentado aos participantes.",
 
   // ─── Acessos de sessão & difusão ──────────────────────────────────────
-  "sess.referenceAuto": "Gerada automaticamente (ex. CTS-APPS/2026/01)",
+  "sess.referenceAuto": "Gerada automaticamente (ex. CTS-DSS/2026/01)",
   "sess.registered": "{n} inscrito(s)",
   "sess.endBeforeStart": "A data de fim deve ser posterior à data de início",
   "sess.broadcast": "Difundir",
@@ -372,7 +382,7 @@ export const pt: Dict = {
     "Transmita estes acessos aos Estados-Membros: cada participante cria depois a sua própria conta na página de inscrição, com as suas próprias informações.",
   "sess.access.copyInvite": "Copiar o convite",
   "sess.access.invite":
-    "Plataforma CTE-APPS — Inscrição na sessão\n{title}\n\nIdentificador da sessão: {code}\nPalavra-passe de acesso: {password}\n\nCrie a sua conta aqui: {url}",
+    "Plataforma CTE-DSS — Inscrição na sessão\n{title}\n\nIdentificador da sessão: {code}\nPalavra-passe de acesso: {password}\n\nCrie a sua conta aqui: {url}",
   "sess.access.regenerate": "Regenerar",
   "sess.access.regenerateTitle": "Regenerar os acessos",
   "sess.access.regenerateMsg":
@@ -414,9 +424,9 @@ export const pt: Dict = {
   "login.guideLink": "Guia do utilizador",
   "nav.guide": "Guia",
   "guide.title": "Guia do utilizador",
-  "guide.subtitle": "O essencial para utilizar a plataforma CTS-APPS",
+  "guide.subtitle": "O essencial para utilizar a plataforma CTS-DSS",
   "guide.intro":
-    "A plataforma CTS-APPS dá acesso aos documentos oficiais do Comité Técnico Especializado dos Assuntos Políticos, Paz e Segurança da CEEAC. Este guia resume os procedimentos essenciais; o guia completo pode ser obtido junto do Secretariado DAPPS.",
+    "A plataforma CTS-DSS dá acesso aos documentos oficiais do Comité Técnico Especializado de Defesa, Proteção e Segurança da CEEAC. Este guia resume os procedimentos essenciais; o guia completo pode ser obtido junto do Secretariado CTE-DSS.",
   "guide.backToLogin": "Voltar ao início de sessão",
   "guide.s1.title": "Aceder com os códigos de sessão (convidado)",
   "guide.s1.p":
@@ -449,10 +459,13 @@ export const pt: Dict = {
   "guide.s5.2": "Os botões com bandeiras mudam imediatamente a língua da interface (FR, EN, PT, ES).",
   "guide.s6.title": "O seu perfil",
   "guide.s6.1":
-    "« O meu perfil » resume os dados da sua acreditação. Para qualquer correção ou mudança de palavra-passe, contacte o Secretariado DAPPS.",
+    "« O meu perfil » resume os dados da sua acreditação. Para qualquer correção ou mudança de palavra-passe, contacte o Secretariado CTE-DSS.",
   "guide.assistTitle": "Assistência",
   "guide.assist":
-    "Para qualquer dificuldade (acesso, palavra-passe, acreditação), o Secretariado DAPPS permanece à sua disposição:",
+    "Para qualquer dificuldade (acesso, palavra-passe, acreditação), o Secretariado CTE-DSS permanece à sua disposição:",
+  "guide.dl.title": "Guia oficial para descarregar",
+  "guide.dl.desc":
+    "Descarregue o guia do utilizador completo publicado pelo Secretariado, na língua da sua escolha.",
 
   "login.tabAccount": "Tenho uma conta",
   "login.tabCodes": "Códigos de sessão",

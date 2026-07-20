@@ -74,6 +74,15 @@ export interface Doc {
   downloads: number;
 }
 
+/** Guide utilisateur téléchargeable (un fichier par langue, géré par l'admin). */
+export interface GuideFile {
+  lang: Lang;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  updatedAt: string;
+}
+
 export interface ChatMessage {
   id: number;
   body: string;

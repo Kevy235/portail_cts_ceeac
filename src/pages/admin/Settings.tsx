@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { BookOpen, KeyRound, Landmark, LogIn, Mail, Plus, Save, Tag, Trash2, UserCog } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { BookOpen, FileDown, KeyRound, Landmark, LogIn, Mail, Plus, Save, Tag, Trash2, UserCog } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { Category, User } from "@/lib/types";
+import type { Category, GuideFile, User } from "@/lib/types";
+import { formatSize } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
 import { useSettings } from "@/context/SettingsContext";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
@@ -98,6 +99,14 @@ export function AdminSettings() {
   const [catBusy, setCatBusy] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // ─── Guide utilisateur téléchargeable (un fichier par langue) ────────
+  const [guides, setGuides] = useState<GuideFile[]>([]);
+  const [guidePercent, setGuidePercent] = useState<number | null>(null);
+  const [guideUploadingLang, setGuideUploadingLang] = useState<Lang | null>(null);
+  const [deletingGuide, setDeletingGuide] = useState<Lang | null>(null);
+  const [guideBusy, setGuideBusy] = useState(false);
+  const guideInputs = useRef<Partial<Record<Lang, HTMLInputElement | null>>>({});
+
   // ─── Mon compte (nom d'utilisateur, e-mail, mot de passe) ───────────
   const [accountName, setAccountName] = useState(user?.name ?? "");
   const [accountEmail, setAccountEmail] = useState(user?.email ?? "");
@@ -112,10 +121,12 @@ export function AdminSettings() {
     return Promise.all([
       api.get<{ settings: AllSettings }>("/settings/admin"),
       api.get<{ categories: Category[] }>("/categories"),
+      api.get<{ guides: GuideFile[] }>("/guide"),
     ])
-      .then(([s, c]) => {
+      .then(([s, c, g]) => {
         setForm(s.settings);
         setCategories(c.categories);
+        setGuides(g.guides);
       })
       .catch((err) =>
         setLoadError(err instanceof Error ? err.message : String(err))
@@ -197,6 +208,48 @@ export function AdminSettings() {
       toast.error(err instanceof Error ? err.message : t("pwd.updateFailed"));
     } finally {
       setPwdBusy(false);
+    }
+  };
+
+  // Ajout ou remplacement du guide d'une langue (avec progression d'envoi)
+  const uploadGuide = async (lang: Lang, file: File | undefined) => {
+    if (!file || guideBusy) return;
+    setGuideBusy(true);
+    setGuideUploadingLang(lang);
+    setGuidePercent(0);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const { guides: updated } = await api.putFormWithProgress<{ guides: GuideFile[] }>(
+        `/guide/${lang}`,
+        fd,
+        setGuidePercent
+      );
+      setGuides(updated);
+      toast.success(t("set.guideUpdated", { lang: LANG_LABELS[lang] }));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setGuideBusy(false);
+      setGuideUploadingLang(null);
+      setGuidePercent(null);
+    }
+  };
+
+  const handleDeleteGuide = async () => {
+    if (!deletingGuide || guideBusy) return;
+    setGuideBusy(true);
+    try {
+      const { guides: updated } = await api.delete<{ guides: GuideFile[] }>(
+        `/guide/${deletingGuide}`
+      );
+      setGuides(updated);
+      toast.success(t("set.guideDeleted"));
+      setDeletingGuide(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setGuideBusy(false);
     }
   };
 
@@ -441,6 +494,91 @@ export function AdminSettings() {
           </button>
         </div>
         </div>
+
+        {/* ─── Guide utilisateur téléchargeable ───────────────────────── */}
+        <div className="bg-white rounded-xl border border-line-soft shadow-sm p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <FileDown size={15} className="text-brand" aria-hidden />
+            <h3 className="text-sm font-semibold text-ink">{t("set.guideTitle")}</h3>
+          </div>
+          <p className="text-xs text-slate2 mb-4">{t("set.guideNote")}</p>
+
+          <div className="space-y-2">
+            {LANGS.map((lang) => {
+              const existing = guides.find((g) => g.lang === lang);
+              const uploading = guideUploadingLang === lang;
+              return (
+                <div
+                  key={lang}
+                  className="flex items-center gap-3 border border-line-soft rounded-lg px-3 py-2.5"
+                >
+                  <FlagIcon lang={lang} />
+                  <span className="text-xs font-bold uppercase w-6 flex-shrink-0">{lang}</span>
+                  <div className="flex-1 min-w-0">
+                    {uploading && guidePercent !== null ? (
+                      <div aria-live="polite">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[11px] text-slate2">{t("docs.uploading")}</span>
+                          <span className="text-[11px] font-mono font-semibold text-brand tabular-nums">
+                            {guidePercent}%
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-mist rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-brand rounded-full transition-[width] duration-200 ease-out"
+                            style={{ width: `${guidePercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    ) : existing ? (
+                      <p className="text-xs text-ink truncate">
+                        {existing.fileName}{" "}
+                        <span className="text-slate2/60">({formatSize(existing.fileSize)})</span>
+                      </p>
+                    ) : (
+                      <p className="text-xs text-slate2/50">{t("docs.noFile")}</p>
+                    )}
+                  </div>
+                  <input
+                    ref={(el) => {
+                      guideInputs.current[lang] = el;
+                    }}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      e.target.value = "";
+                      uploadGuide(lang, f);
+                    }}
+                  />
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button
+                      type="button"
+                      disabled={guideBusy}
+                      onClick={() => guideInputs.current[lang]?.click()}
+                      className="text-xs text-brand hover:underline px-2 py-1 disabled:opacity-50"
+                    >
+                      {existing ? t("docs.replaceFile") : t("docs.chooseFile")}
+                    </button>
+                    {existing && (
+                      <button
+                        type="button"
+                        disabled={guideBusy}
+                        onClick={() => setDeletingGuide(lang)}
+                        className="p-1 text-slate2/50 hover:text-danger transition-colors disabled:opacity-50"
+                        title={t("docs.deleteFile")}
+                        aria-label={t("docs.deleteFile")}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
       </div>
 
@@ -451,6 +589,16 @@ export function AdminSettings() {
           onConfirm={handleDeleteCategory}
           onCancel={() => setDeletingCategory(null)}
           busy={catBusy}
+        />
+      )}
+
+      {deletingGuide && (
+        <ConfirmDialog
+          title={t("set.guideDeleteTitle")}
+          message={t("set.guideDeleteMsg", { lang: LANG_LABELS[deletingGuide] })}
+          onConfirm={handleDeleteGuide}
+          onCancel={() => setDeletingGuide(null)}
+          busy={guideBusy}
         />
       )}
     </div>

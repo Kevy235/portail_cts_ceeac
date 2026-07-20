@@ -14,6 +14,7 @@ import { authRouter } from "./routes/auth.routes.js";
 import { participantsRouter } from "./routes/participants.routes.js";
 import { sessionsRouter } from "./routes/sessions.routes.js";
 import { categoriesRouter, documentsRouter } from "./routes/documents.routes.js";
+import { guideRouter } from "./routes/guide.routes.js";
 import { activityRouter, settingsRouter, statsRouter } from "./routes/admin.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -77,6 +78,8 @@ async function main() {
   api.use("/sessions", requireAuth, sessionsRouter);
   api.use("/documents", requireAuth, documentsRouter);
   api.use("/categories", requireAuth, categoriesRouter);
+  // Guide utilisateur : lecture publique (page de connexion), gestion admin dans le routeur.
+  api.use("/guide", guideRouter);
   api.use("/stats", requireAuth, requireAdmin, statsRouter);
   api.use("/settings/admin", requireAuth, requireAdmin, settingsRouter);
   api.use("/activity", requireAuth, requireAdmin, activityRouter);

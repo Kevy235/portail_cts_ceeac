@@ -12,15 +12,15 @@ import type { Settings } from "@/lib/types";
 import { useI18n } from "@/i18n";
 
 const DEFAULTS: Settings = {
-  platform_name: "CEEAC · DAPPS",
-  platform_subtitle: "Plateforme CTS-APPS",
+  platform_name: "CEEAC · CTS-DSS",
+  platform_subtitle: "Plateforme CTS-DSS",
   org_full_name:
-    "Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité",
+    "Comité Technique Spécialisé Défense, Sûreté et Sécurité",
   org_description:
-    "Plateforme d'accès aux documents et ressources du DAPPS — CEEAC",
+    "Plateforme d'accès aux documents et ressources du CTS-DSS — CEEAC",
   contact_email: "dapps@ceeac-eccas.org",
   footer_text:
-    "© 2025 CEEAC-ECCAS · Département Affaires Politiques, Paix et Sécurité",
+    "© 2025 CEEAC-ECCAS · Comité Technique Spécialisé Défense, Sûreté et Sécurité",
   login_notice: "Accès réservé aux experts accrédités et aux administrateurs",
 };
 

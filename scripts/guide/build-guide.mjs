@@ -32,7 +32,7 @@ import {
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CAPTURES = path.join(HERE, "captures");
 const PROJECT = "k:/Portail-Web-Document-CTS";
-const OUT = path.join(PROJECT, "docs", "Guide-Participant-Plateforme-CTS-APPS.docx");
+const OUT = path.join(PROJECT, "docs", "Guide-Participant-Plateforme-CTS-DSS.docx");
 
 const BRAND = "0077C8";
 const BRAND_DEEP = "073E63";
@@ -233,11 +233,11 @@ const faq = new Table({
     faqRow("Situation rencontrée", "Marche à suivre", true),
     faqRow(
       "« Identifiant ou mot de passe de session incorrect »",
-      "Veuillez vérifier l'identifiant (format CTS-XXXXXX) et le mot de passe reçus, en respectant les tirets et les majuscules. Si le message persiste, les accès ont pu être renouvelés par le Secrétariat : rapprochez-vous de votre point focal national ou du Secrétariat DAPPS."
+      "Veuillez vérifier l'identifiant (format CTS-XXXXXX) et le mot de passe reçus, en respectant les tirets et les majuscules. Si le message persiste, les accès ont pu être renouvelés par le Secrétariat : rapprochez-vous de votre point focal national ou du Secrétariat CTS-DSS."
     ),
     faqRow(
       "« Cette session est terminée, ses accès ne sont plus valides »",
-      "Les codes d'une session close ne permettent plus d'accéder à la plateforme. Veuillez contacter le Secrétariat DAPPS pour obtenir un accès."
+      "Les codes d'une session close ne permettent plus d'accéder à la plateforme. Veuillez contacter le Secrétariat CTS-DSS pour obtenir un accès."
     ),
     faqRow(
       "« Accès invité expiré, saisissez à nouveau les codes de session »",
@@ -245,7 +245,7 @@ const faq = new Table({
     ),
     faqRow(
       "« Un compte existe déjà avec cet e-mail »",
-      "Un compte est déjà associé à cette adresse : utilisez l'onglet « J'ai un compte » de la page de connexion. En cas de mot de passe oublié, veuillez solliciter une réinitialisation auprès du Secrétariat DAPPS."
+      "Un compte est déjà associé à cette adresse : utilisez l'onglet « J'ai un compte » de la page de connexion. En cas de mot de passe oublié, veuillez solliciter une réinitialisation auprès du Secrétariat CTS-DSS."
     ),
     faqRow(
       "« Identifiants incorrects » à la connexion",
@@ -253,7 +253,7 @@ const faq = new Table({
     ),
     faqRow(
       "« Votre compte est désactivé »",
-      "Votre accréditation a été suspendue. Veuillez prendre l'attache du Secrétariat DAPPS pour en connaître les motifs et, le cas échéant, solliciter sa réactivation."
+      "Votre accréditation a été suspendue. Veuillez prendre l'attache du Secrétariat CTS-DSS pour en connaître les motifs et, le cas échéant, solliciter sa réactivation."
     ),
     faqRow(
       "« Session expirée, veuillez vous reconnecter »",
@@ -277,17 +277,17 @@ const faq = new Table({
     ),
     faqRow(
       "Mot de passe oublié",
-      "Veuillez adresser une demande de réinitialisation au Secrétariat DAPPS. Un mot de passe provisoire vous sera remis ; il vous sera demandé d'en définir un nouveau à la connexion suivante."
+      "Veuillez adresser une demande de réinitialisation au Secrétariat CTS-DSS. Un mot de passe provisoire vous sera remis ; il vous sera demandé d'en définir un nouveau à la connexion suivante."
     ),
   ],
 });
 
 // ─── Document ────────────────────────────────────────────────────────────────
 const doc = new Document({
-  creator: "CEEAC · DAPPS",
-  title: "Guide du participant — Plateforme CTS-APPS",
+  creator: "CEEAC · CTS-DSS",
+  title: "Guide du participant — Plateforme CTS-DSS",
   description:
-    "Guide d'utilisation de la plateforme d'accès aux documents du CTS-APPS à l'attention des représentants et experts accrédités des États membres",
+    "Guide d'utilisation de la plateforme d'accès aux documents du CTS-DSS à l'attention des représentants et experts accrédités des États membres",
   features: { updateFields: true },
   styles: {
     default: {
@@ -327,7 +327,7 @@ const doc = new Document({
           spacing: { after: 60 },
           children: [
             new TextRun({
-              text: "Département des Affaires Politiques, Paix et Sécurité (DAPPS)",
+              text: "Comité Technique Spécialisé Défense, Sûreté et Sécurité (CTS-DSS)",
               size: 24,
               color: "5A6E82",
             }),
@@ -339,7 +339,7 @@ const doc = new Document({
           spacing: { after: 200 },
           children: [
             new TextRun({
-              text: "PLATEFORME CTS-APPS",
+              text: "PLATEFORME CTS-DSS",
               bold: true,
               size: 36,
               color: BRAND,
@@ -400,7 +400,7 @@ const doc = new Document({
         // ─── 1. Présentation ─────────────────────────────────────────
         h1("1. Présentation de la plateforme"),
         p(
-          "La Plateforme CTS-APPS est le portail documentaire officiel du Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité de la CEEAC. Mise en œuvre par le Secrétariat du DAPPS, elle offre aux représentants et experts des États membres :"
+          "La Plateforme CTS-DSS est le portail documentaire officiel du Comité Technique Spécialisé Défense, Sûreté et Sécurité de la CEEAC. Mise en œuvre par le Secrétariat du CTS-DSS, elle offre aux représentants et experts des États membres :"
         ),
         bullet(
           "la consultation en ligne et le téléchargement des documents officiels des sessions (rapports, résolutions, ordres du jour, notes conceptuelles, instruments juridiques…), dans les quatre langues de la Communauté — français, anglais, portugais et espagnol ;"
@@ -411,7 +411,7 @@ const doc = new Document({
         bullet("la réception, par courrier électronique, des rapports de réunion diffusés par le Secrétariat ;"),
         bullet("la consultation des informations de leur accréditation."),
         p(
-          "L'accès est réservé aux personnes dûment autorisées. L'adresse de la plateforme vous est communiquée par le Secrétariat DAPPS ou par votre point focal national."
+          "L'accès est réservé aux personnes dûment autorisées. L'adresse de la plateforme vous est communiquée par le Secrétariat CTS-DSS ou par votre point focal national."
         ),
         infoBox(
           "Bon à savoir",
@@ -422,7 +422,7 @@ const doc = new Document({
         // ─── 2. Modes d'accès ────────────────────────────────────────
         h1("2. Les modes d'accès : invité ou participant"),
         p(
-          "En amont de chaque session du CTS, le Secrétariat DAPPS transmet aux États membres deux codes d'accès : un identifiant de session (au format CTS-XXXXXX) et un mot de passe d'accès. À partir de ces codes, deux niveaux d'accès vous sont proposés :"
+          "En amont de chaque session du CTS, le Secrétariat CTS-DSS transmet aux États membres deux codes d'accès : un identifiant de session (au format CTS-XXXXXX) et un mot de passe d'accès. À partir de ces codes, deux niveaux d'accès vous sont proposés :"
         ),
         bullet(
           "vous saisissez les codes de session sur la page de connexion et accédez immédiatement à la bibliothèque documentaire, sans créer de compte. Cet accès convient à la consultation et au téléchargement des documents (voir chapitre 3) ;",
@@ -509,7 +509,7 @@ const doc = new Document({
         ...figure("03-premiere-connexion.png", "L'écran de première connexion : définition du mot de passe personnel"),
         infoBox(
           "Sécurité de votre mot de passe",
-          "Choisissez un mot de passe robuste et qui vous est propre (lettres, chiffres, caractères spéciaux). Il est conservé sous forme chiffrée : ni le Secrétariat ni l'administrateur ne peuvent le consulter. En cas d'oubli, une réinitialisation peut être sollicitée auprès du Secrétariat DAPPS."
+          "Choisissez un mot de passe robuste et qui vous est propre (lettres, chiffres, caractères spéciaux). Il est conservé sous forme chiffrée : ni le Secrétariat ni l'administrateur ne peuvent le consulter. En cas d'oubli, une réinitialisation peut être sollicitée auprès du Secrétariat CTS-DSS."
         ),
         spacer(),
 
@@ -547,7 +547,7 @@ const doc = new Document({
 
         h2("6.4. Les documents codés"),
         p(
-          "Certains documents sensibles portent le badge rouge « Document codé » : le fichier a été chiffré par le Secrétariat avant sa mise en ligne, par mesure de sécurité. Après téléchargement, son ouverture nécessite la clé de lecture communiquée séparément par le Secrétariat, par un canal sécurisé. Si vous n'avez pas reçu cette clé, veuillez vous rapprocher de votre point focal ou du Secrétariat DAPPS."
+          "Certains documents sensibles portent le badge rouge « Document codé » : le fichier a été chiffré par le Secrétariat avant sa mise en ligne, par mesure de sécurité. Après téléchargement, son ouverture nécessite la clé de lecture communiquée séparément par le Secrétariat, par un canal sécurisé. Si vous n'avez pas reçu cette clé, veuillez vous rapprocher de votre point focal ou du Secrétariat CTS-DSS."
         ),
         spacer(),
 
@@ -583,7 +583,7 @@ const doc = new Document({
         ...figure("06-profil.png", "La page Mon profil : les informations de votre accréditation"),
         infoBox(
           "Mise à jour de vos informations",
-          "Les informations d'accréditation ne sont pas modifiables directement, par souci d'intégrité des données officielles. Pour toute correction (changement de fonction, d'institution ou d'adresse e-mail) ou pour un changement de mot de passe, veuillez adresser votre demande au Secrétariat DAPPS."
+          "Les informations d'accréditation ne sont pas modifiables directement, par souci d'intégrité des données officielles. Pour toute correction (changement de fonction, d'institution ou d'adresse e-mail) ou pour un changement de mot de passe, veuillez adresser votre demande au Secrétariat CTS-DSS."
         ),
         spacer(),
 
@@ -622,7 +622,7 @@ const doc = new Document({
         // ─── 12. Assistance ──────────────────────────────────────────
         h1("12. Assistance"),
         p(
-          "Pour toute difficulté d'accès, demande de réinitialisation de mot de passe, correction de vos informations d'accréditation ou question relative à la plateforme, le Secrétariat du DAPPS-CEEAC demeure à votre disposition :"
+          "Pour toute difficulté d'accès, demande de réinitialisation de mot de passe, correction de vos informations d'accréditation ou question relative à la plateforme, le Secrétariat du CTS-DSS-CEEAC demeure à votre disposition :"
         ),
         bullet("par courrier électronique, à l'adresse de contact indiquée sur la page de connexion de la plateforme ;"),
         bullet("ou par l'intermédiaire de votre point focal national."),
@@ -641,7 +641,7 @@ const doc = new Document({
               border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "DEE7F0" } },
               children: [
                 new TextRun({
-                  text: "Plateforme CTS-APPS · Guide du participant",
+                  text: "Plateforme CTS-DSS · Guide du participant",
                   size: 16,
                   color: "5A6E82",
                 }),
@@ -657,7 +657,7 @@ const doc = new Document({
               alignment: AlignmentType.CENTER,
               children: [
                 new TextRun({
-                  text: "© 2026 CEEAC-ECCAS · Département des Affaires Politiques, Paix et Sécurité — Page ",
+                  text: "© 2026 CEEAC-ECCAS · Comité Technique Spécialisé Défense, Sûreté et Sécurité — Page ",
                   size: 16,
                   color: "5A6E82",
                 }),

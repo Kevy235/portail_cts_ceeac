@@ -1,6 +1,6 @@
 # Guide de déploiement — VPS Hostinger avec Dokploy
 
-Ce guide décrit le déploiement de la **Plateforme d'accès aux documents CTS-APPS** sur un VPS Hostinger où **Dokploy est déjà installé** et héberge d'autres projets.
+Ce guide décrit le déploiement de la **Plateforme d'accès aux documents CTS-DSS** sur un VPS Hostinger où **Dokploy est déjà installé** et héberge d'autres projets.
 
 ## Architecture déployée
 
@@ -34,7 +34,7 @@ Dokploy se connecte à GitHub, GitLab, Bitbucket ou Gitea. Si ce n'est pas déj�
 ```bash
 git init
 git add .
-git commit -m "Plateforme CTS-APPS : version dynamique (PostgreSQL + Express)"
+git commit -m "Plateforme CTS-DSS : version dynamique (PostgreSQL + Express)"
 git remote add origin https://github.com/VOTRE_COMPTE/portail-cts.git
 git push -u origin main
 ```
@@ -76,7 +76,7 @@ DATABASE_URL=postgresql://portail_cts:MOT_DE_PASSE@NOM_INTERNE_GENERE:5432/porta
 JWT_SECRET=CHAINE_ALEATOIRE_LONGUE
 ADMIN_EMAIL=admin@ceeac-eccas.org
 ADMIN_PASSWORD=MOT_DE_PASSE_ADMIN_FORT
-ADMIN_NAME=Secrétariat APPS
+ADMIN_NAME=Secrétariat CTS-DSS
 APP_URL=https://documents.votre-domaine.org
 UPLOAD_DIR=/app/uploads
 MAX_UPLOAD_MB=50
@@ -88,7 +88,7 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=no-reply@votre-domaine.org
 SMTP_PASS=MOT_DE_PASSE_SMTP
-SMTP_FROM="Plateforme CTS-APPS <no-reply@votre-domaine.org>"
+SMTP_FROM="Plateforme CTS-DSS <no-reply@votre-domaine.org>"
 ```
 
 - `JWT_SECRET` : générez-le avec `openssl rand -base64 48` (**obligatoire en production**, le démarrage échoue sinon).

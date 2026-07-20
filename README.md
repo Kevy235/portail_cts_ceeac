@@ -1,6 +1,6 @@
-# Plateforme d'accès aux documents — CTS-APPS · CEEAC
+# Plateforme d'accès aux documents — CTS-DSS · CEEAC
 
-Portail sécurisé permettant au Secrétariat du DAPPS-CEEAC de gérer les participants, les sessions et les documents officiels du Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité, et aux experts accrédités d'accéder à la bibliothèque documentaire.
+Portail sécurisé permettant au Secrétariat du CTS-DSS-CEEAC de gérer les participants, les sessions et les documents officiels du Comité Technique Spécialisé Défense, Sûreté et Sécurité, et aux experts accrédités d'accéder à la bibliothèque documentaire.
 
 ## Pile technique
 
@@ -20,6 +20,7 @@ Portail sécurisé permettant au Secrétariat du DAPPS-CEEAC de gérer les parti
 - **Diffusion des rapports par e-mail** : envoi en un clic d'un rapport de réunion à tous les participants actifs (ou aux seuls inscrits d'une session), avec liens de téléchargement par langue — nécessite la configuration SMTP (voir `.env.example`).
 - **Espace participant** : bibliothèque documentaire (recherche, filtres par catégorie, badge « codé », téléchargement par langue, filtrage selon les langues choisies), sessions & fils de discussion, profil avec préférences de langue (interface + documents) et changement de mot de passe.
 - **Discussions par session** : fil d'échanges lié à chaque session CTS, ouvert aux participants et aux administrateurs (rafraîchissement automatique avec prise en compte des suppressions, suspension en arrière-plan, suppression par l'auteur ou l'admin).
+- **Guide utilisateur téléchargeable** : l'administrateur publie le guide officiel dans chacune des 4 langues (Paramètres → Guide utilisateur) ; il est proposé au téléchargement sur la page du guide (accessible sans connexion depuis la page d'accueil) et dans l'espace participant.
 - **Accessibilité** : taille de texte réglable (A / A+ / A++, mémorisée), anneaux de focus visibles au clavier, dialogues modaux accessibles (focus piégé, Échap, `aria-modal`), libellés traduits pour les lecteurs d'écran.
 
 ## Développement local

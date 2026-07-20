@@ -375,7 +375,12 @@ export function AdminDocuments() {
                       {doc.files.map((f) => (
                         <span key={f.lang} className="flex items-center gap-0.5">
                           <ViewButton docId={doc.id} file={f} compact />
-                          <DownloadButton docId={doc.id} file={f} compact onDone={load} />
+                          <DownloadButton
+                            url={`/api/documents/${doc.id}/download/${f.lang}`}
+                            file={f}
+                            compact
+                            onDone={load}
+                          />
                         </span>
                       ))}
                     </div>

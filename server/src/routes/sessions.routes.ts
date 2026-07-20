@@ -53,7 +53,7 @@ sessionsRouter.get(
 );
 
 /**
- * Référence auto-générée : CTS-APPS/ANNÉE/NN, où NN suit la plus haute
+ * Référence auto-générée : CTS-DSS/ANNÉE/NN, où NN suit la plus haute
  * séquence existante pour l'année (robuste aux suppressions).
  */
 async function nextReference(startDate: string): Promise<string> {
@@ -62,9 +62,9 @@ async function nextReference(startDate: string): Promise<string> {
     `SELECT COALESCE(MAX(split_part(reference, '/', 3)::int), 0) + 1 AS next
      FROM cts_sessions
      WHERE reference LIKE $1 AND split_part(reference, '/', 3) ~ '^[0-9]+$'`,
-    [`CTS-APPS/${year}/%`]
+    [`CTS-DSS/${year}/%`]
   );
-  return `CTS-APPS/${year}/${String(rows[0].next).padStart(2, "0")}`;
+  return `CTS-DSS/${year}/${String(rows[0].next).padStart(2, "0")}`;
 }
 
 sessionsRouter.post(
@@ -301,7 +301,7 @@ sessionsRouter.post(
     );
 
     const mail = buildReportMail({
-      platformName: platform.rows[0]?.value ?? "CEEAC · DAPPS",
+      platformName: platform.rows[0]?.value ?? "CEEAC · CTS-DSS",
       sessionTitle: session.rows[0].title,
       subject: d.subject,
       message: d.message,

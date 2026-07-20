@@ -46,15 +46,16 @@ export function ViewButton({
 /**
  * Bouton de téléchargement d'une version linguistique avec progression :
  * le fond se remplit de gauche à droite et le pourcentage remplace le libellé.
+ * `url` : endpoint de téléchargement (document ou guide utilisateur).
  */
 export function DownloadButton({
-  docId,
+  url,
   file,
   compact,
   onDone,
 }: {
-  docId: string;
-  file: DocFile;
+  url: string;
+  file: Pick<DocFile, "lang" | "fileName" | "fileSize">;
   compact?: boolean;
   onDone?: () => void;
 }) {
@@ -68,11 +69,7 @@ export function DownloadButton({
     if (busy) return;
     setPercent(0);
     try {
-      await downloadWithProgress(
-        `/api/documents/${docId}/download/${file.lang}`,
-        file.fileName,
-        (p) => setPercent(p)
-      );
+      await downloadWithProgress(url, file.fileName, (p) => setPercent(p));
       setDone(true);
       onDone?.();
       setTimeout(() => setDone(false), 2000);

@@ -57,9 +57,9 @@ export const fr = {
   "login.submitting": "Connexion…",
   "login.failed": "Connexion impossible",
   "login.invalidCredentials": "Identifiants incorrects. Veuillez réessayer.",
-  "login.accountDisabled": "Votre compte est désactivé. Contactez le Secrétariat DAPPS.",
+  "login.accountDisabled": "Votre compte est désactivé. Contactez le Secrétariat CTS-DSS.",
   "login.noAccount":
-    "Vous n'avez pas de compte ? Contactez le Secrétariat DAPPS ({email}) pour une accréditation.",
+    "Vous n'avez pas de compte ? Contactez le Secrétariat CTS-DSS ({email}) pour une accréditation.",
 
   // ─── Mot de passe ─────────────────────────────────────────────────────
   "pwd.firstTitle": "Première connexion",
@@ -116,6 +116,8 @@ export const fr = {
   "activity.session_updated": "Session mise à jour",
   "activity.session_deleted": "Session supprimée",
   "activity.settings_updated": "Contenus du portail mis à jour",
+  "activity.guide_updated": "Guide utilisateur mis à jour",
+  "activity.guide_deleted": "Guide utilisateur supprimé",
   "activity.login": "Connexion à la plateforme",
   "time.now": "à l'instant",
   "time.minutes": "il y a {n} min",
@@ -169,7 +171,7 @@ export const fr = {
   "part.copied": "Identifiants copiés",
   "part.pwdReset": "Mot de passe réinitialisé",
   "part.copyText":
-    "Plateforme CTS-APPS — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
+    "Plateforme CTS-DSS — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
 
   // ─── Documents (admin) ────────────────────────────────────────────────
   "docs.title": "Gestion documentaire",
@@ -219,7 +221,7 @@ export const fr = {
   "docs.fileDeleted": "Version supprimée",
 
   // ─── Sessions ─────────────────────────────────────────────────────────
-  "sess.title": "Sessions CTS-APPS",
+  "sess.title": "Sessions CTS-DSS",
   "sess.subtitle": "Calendrier des sessions ordinaires et extraordinaires",
   "sess.psubtitle": "Calendrier des sessions et fils de discussion",
   "sess.new": "Nouvelle session",
@@ -231,9 +233,9 @@ export const fr = {
   "sess.newTitle": "Nouvelle session CTS",
   "sess.editTitle": "Modifier la session",
   "sess.fieldTitle": "Titre de la session",
-  "sess.fieldTitlePh": "3ème Session Ordinaire CTS-APPS 2025",
+  "sess.fieldTitlePh": "3ème Session Ordinaire CTS-DSS 2025",
   "sess.reference": "Référence",
-  "sess.referencePh": "CTS-APPS/2025/03",
+  "sess.referencePh": "CTS-DSS/2025/03",
   "sess.location": "Lieu",
   "sess.locationPh": "Brazzaville, Congo",
   "sess.startDate": "Date de début",
@@ -285,6 +287,14 @@ export const fr = {
   "set.catDeleteTitle": "Supprimer la catégorie",
   "set.catDeleteMsg":
     "La catégorie « {name} » sera supprimée. Les documents associés resteront disponibles sans catégorie.",
+  "set.guideTitle": "Guide utilisateur (document)",
+  "set.guideNote":
+    "Publiez le guide officiel téléchargeable dans chaque langue : il est proposé sur la page du guide (accessible depuis la connexion) et dans l'espace participant.",
+  "set.guideUpdated": "Guide mis à jour ({lang})",
+  "set.guideDeleted": "Guide supprimé",
+  "set.guideDeleteTitle": "Supprimer le guide",
+  "set.guideDeleteMsg":
+    "La version « {lang} » du guide utilisateur ne sera plus proposée au téléchargement.",
 
   // ─── Bibliothèque (participant) ───────────────────────────────────────
   "lib.kicker": "Bibliothèque documentaire",
@@ -299,7 +309,7 @@ export const fr = {
 
   // ─── Profil (participant) ─────────────────────────────────────────────
   "prof.title": "Mon profil",
-  "prof.subtitle": "Informations de votre accréditation CTS-APPS",
+  "prof.subtitle": "Informations de votre accréditation CTS-DSS",
   "prof.email": "Adresse e-mail",
   "prof.institution": "Institution",
   "prof.country": "Pays représenté",
@@ -315,9 +325,9 @@ export const fr = {
   "prof.prefsFailed": "Enregistrement impossible",
   "prof.changePwd": "Changer mon mot de passe",
   "prof.update": "Mettre à jour",
-  "prof.accredTitle": "Accréditation CTS-APPS",
+  "prof.accredTitle": "Accréditation CTS-DSS",
   "prof.accredText":
-    "Votre accès à cette plateforme a été accordé par le Secrétariat du DAPPS-CEEAC. Pour toute modification de vos informations, veuillez contacter {email}.",
+    "Votre accès à cette plateforme a été accordé par le Secrétariat du CTS-DSS-CEEAC. Pour toute modification de vos informations, veuillez contacter {email}.",
   "prof.originSession": "Session d'inscription",
 
   // ─── Commun (compléments) ─────────────────────────────────────────────
@@ -337,7 +347,7 @@ export const fr = {
   "register.subtitle": "Créez votre compte avec les accès transmis à votre État membre",
   "register.accessSection": "Accès de la session",
   "register.accessHint":
-    "L'identifiant et le mot de passe de session vous ont été transmis par votre État membre ou le Secrétariat DAPPS.",
+    "L'identifiant et le mot de passe de session vous ont été transmis par votre État membre ou le Secrétariat CTS-DSS.",
   "register.accessCode": "Identifiant de session",
   "register.accessPassword": "Mot de passe de session",
   "register.personalSection": "Vos informations",
@@ -375,7 +385,7 @@ export const fr = {
     "Cochez si le fichier a été chiffré/codé avant le téléversement. Un badge « Codé » sera affiché aux participants.",
 
   // ─── Accès de session & diffusion ─────────────────────────────────────
-  "sess.referenceAuto": "Générée automatiquement (ex. CTS-APPS/2026/01)",
+  "sess.referenceAuto": "Générée automatiquement (ex. CTS-DSS/2026/01)",
   "sess.registered": "{n} inscrit(s)",
   "sess.endBeforeStart": "La date de fin doit être postérieure à la date de début",
   "sess.broadcast": "Diffuser",
@@ -386,7 +396,7 @@ export const fr = {
     "Transmettez ces accès aux États membres : chaque participant crée ensuite son compte lui-même sur la page d'inscription, avec ses propres informations.",
   "sess.access.copyInvite": "Copier l'invitation",
   "sess.access.invite":
-    "Plateforme CTS-APPS — Inscription à la session\n{title}\n\nIdentifiant de session : {code}\nMot de passe d'accès : {password}\n\nCréez votre compte ici : {url}",
+    "Plateforme CTS-DSS — Inscription à la session\n{title}\n\nIdentifiant de session : {code}\nMot de passe d'accès : {password}\n\nCréez votre compte ici : {url}",
   "sess.access.regenerate": "Régénérer",
   "sess.access.regenerateTitle": "Régénérer les accès",
   "sess.access.regenerateMsg":
@@ -431,9 +441,9 @@ export const fr = {
   "login.guideLink": "Guide utilisateur",
   "nav.guide": "Guide",
   "guide.title": "Guide utilisateur",
-  "guide.subtitle": "L'essentiel pour bien utiliser la plateforme CTS-APPS",
+  "guide.subtitle": "L'essentiel pour bien utiliser la plateforme CTS-DSS",
   "guide.intro":
-    "La plateforme CTS-APPS donne accès aux documents officiels du Comité Technique Spécialisé des Affaires Politiques, Paix et Sécurité de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès du Secrétariat DAPPS.",
+    "La plateforme CTS-DSS donne accès aux documents officiels du Comité Technique Spécialisé Défense, Sûreté et Sécurité de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès du Secrétariat CTS-DSS.",
   "guide.backToLogin": "Retour à la connexion",
   "guide.s1.title": "Accéder avec les codes de session (invité)",
   "guide.s1.p":
@@ -467,10 +477,13 @@ export const fr = {
   "guide.s5.2": "Les boutons drapeaux changent immédiatement la langue de l'interface (FR, EN, PT, ES).",
   "guide.s6.title": "Votre profil",
   "guide.s6.1":
-    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous au Secrétariat DAPPS.",
+    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous au Secrétariat CTS-DSS.",
   "guide.assistTitle": "Assistance",
   "guide.assist":
-    "Pour toute difficulté (accès, mot de passe, accréditation), le Secrétariat DAPPS demeure à votre disposition :",
+    "Pour toute difficulté (accès, mot de passe, accréditation), le Secrétariat CTS-DSS demeure à votre disposition :",
+  "guide.dl.title": "Guide officiel à télécharger",
+  "guide.dl.desc":
+    "Téléchargez le guide utilisateur complet publié par le Secrétariat, dans la langue de votre choix.",
 
   // ─── Accès invité par codes de session ────────────────────────────────
   "login.tabAccount": "J'ai un compte",

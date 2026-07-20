@@ -41,7 +41,8 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
+// Exporté : réutilisé par les routes du guide utilisateur (mêmes règles).
+export const upload = multer({
   storage,
   limits: { fileSize: config.maxUploadMb * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {

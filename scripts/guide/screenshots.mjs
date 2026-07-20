@@ -47,11 +47,11 @@ const pdf = () =>
   });
 
 const DEMO_TITLES = [
-  "Rapport de la 2ème Session Ordinaire du CTS-APPS",
+  "Rapport de la 2ème Session Ordinaire du CTS-DSS",
   "Note Conceptuelle — Réforme du COPAX",
   "Ordre du Jour Provisoire — 3ème Session Ordinaire",
 ];
-const DEMO_SESSION_TITLE = "3ème Session Ordinaire du CTS-APPS";
+const DEMO_SESSION_TITLE = "3ème Session Ordinaire du CTS-DSS";
 
 /** Supprime toute donnée de démonstration (résidus d'exécutions échouées inclus). */
 async function purgeDemoData(admin) {
@@ -80,13 +80,13 @@ async function main() {
   // Session de démonstration
   const { session } = await admin("POST", "/sessions", {
     json: {
-      title: "3ème Session Ordinaire du CTS-APPS",
+      title: "3ème Session Ordinaire du CTS-DSS",
       location: "Brazzaville, République du Congo",
       startDate: "2026-09-22",
       endDate: "2026-09-25",
       status: "à-venir",
       description:
-        "Session ordinaire consacrée à l'examen du rapport d'activités du DAPPS, à la réforme du COPAX et à l'adoption de la feuille de route 2027.",
+        "Session ordinaire consacrée à l'examen du rapport d'activités du CTS-DSS, à la réforme du COPAX et à l'adoption de la feuille de route 2027.",
       expectedParticipants: 45,
     },
   });
@@ -116,7 +116,7 @@ async function main() {
   const catId = (name) => categories.find((c) => c.name === name)?.id;
 
   const doc1 = await admin("POST", "/documents", {
-    form: mkForm("Rapport de la 2ème Session Ordinaire du CTS-APPS", false, catId("Rapport")),
+    form: mkForm("Rapport de la 2ème Session Ordinaire du CTS-DSS", false, catId("Rapport")),
   });
   const doc2 = await admin("POST", "/documents", {
     form: mkForm("Note Conceptuelle — Réforme du COPAX", true, catId("Note Conceptuelle")),
@@ -237,7 +237,7 @@ async function main() {
     await page.goto(`${BASE}/espace/sessions`, { waitUntil: "networkidle" });
     const demoCard = page
       .locator("div.bg-white.rounded-xl")
-      .filter({ hasText: "3ème Session Ordinaire du CTS-APPS" })
+      .filter({ hasText: "3ème Session Ordinaire du CTS-DSS" })
       .first();
     await demoCard.scrollIntoViewIfNeeded();
     await demoCard.getByRole("button", { name: "Discussion" }).click();

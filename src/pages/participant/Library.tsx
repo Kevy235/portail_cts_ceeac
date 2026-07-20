@@ -172,7 +172,11 @@ export function ParticipantLibrary() {
                   {doc.files.map((f) => (
                     <span key={f.lang} className="flex items-center gap-1">
                       <ViewButton docId={doc.id} file={f} />
-                      <DownloadButton docId={doc.id} file={f} onDone={resource.reload} />
+                      <DownloadButton
+                        url={`/api/documents/${doc.id}/download/${f.lang}`}
+                        file={f}
+                        onDone={resource.reload}
+                      />
                     </span>
                   ))}
                 </div>

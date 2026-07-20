@@ -40,11 +40,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 function requestFormWithProgress<T>(
   path: string,
   form: FormData,
-  onProgress: (percent: number) => void
+  onProgress: (percent: number) => void,
+  method: "POST" | "PUT" = "POST"
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `/api${path}`);
+    xhr.open(method, `/api${path}`);
     xhr.withCredentials = true;
     xhr.responseType = "json";
 
@@ -75,6 +76,11 @@ export const api = {
     form: FormData,
     onProgress: (percent: number) => void
   ) => requestFormWithProgress<T>(path, form, onProgress),
+  putFormWithProgress: <T>(
+    path: string,
+    form: FormData,
+    onProgress: (percent: number) => void
+  ) => requestFormWithProgress<T>(path, form, onProgress, "PUT"),
   put: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),

@@ -21,7 +21,7 @@ export const config = {
   admin: {
     email: process.env.ADMIN_EMAIL ?? "admin@ceeac-eccas.org",
     password: process.env.ADMIN_PASSWORD ?? "ChangezMoi!2025",
-    name: process.env.ADMIN_NAME ?? "Secrétariat APPS",
+    name: process.env.ADMIN_NAME ?? "Secrétariat CTS-DSS",
   },
   /** Diffusion des rapports par e-mail — désactivée si SMTP_HOST est absent. */
   smtp: {

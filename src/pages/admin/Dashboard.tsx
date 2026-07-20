@@ -32,6 +32,8 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ReactNode; bg: string }> = {
   session_updated: { icon: <Calendar size={14} className="text-slate-500" />, bg: "bg-slate-100" },
   session_deleted: { icon: <Trash2 size={14} className="text-danger" />, bg: "bg-danger-soft" },
   settings_updated: { icon: <Settings size={14} className="text-amber-600" />, bg: "bg-amber-50" },
+  guide_updated: { icon: <FileText size={14} className="text-amber-600" />, bg: "bg-amber-50" },
+  guide_deleted: { icon: <Trash2 size={14} className="text-danger" />, bg: "bg-danger-soft" },
   login: { icon: <Users size={14} className="text-slate-400" />, bg: "bg-slate-100" },
 };
 
@@ -49,6 +51,8 @@ const ACTIVITY_KEYS: Record<string, keyof Dict> = {
   session_updated: "activity.session_updated",
   session_deleted: "activity.session_deleted",
   settings_updated: "activity.settings_updated",
+  guide_updated: "activity.guide_updated",
+  guide_deleted: "activity.guide_deleted",
   login: "activity.login",
 };
 

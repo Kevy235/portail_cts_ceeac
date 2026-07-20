@@ -132,11 +132,11 @@ async function main() {
 
     // ─── Mise à jour du compte (nom d'utilisateur + e-mail) ─────────
     r = await admin("PUT", "/auth/me", {
-      json: { name: "Secrétariat DAPPS", email: "admin@test.org" },
+      json: { name: "Secrétariat CTS-DSS", email: "admin@test.org" },
     });
     check(
       "l'admin modifie son nom d'utilisateur",
-      r.status === 200 && r.data.user.name === "Secrétariat DAPPS"
+      r.status === 200 && r.data.user.name === "Secrétariat CTS-DSS"
     );
     r = await admin("PUT", "/auth/me", { json: { name: "X", email: "admin@test.org" } });
     check("nom trop court refusé (400)", r.status === 400);
@@ -175,11 +175,11 @@ async function main() {
     // ─── Sessions ───────────────────────────────────────────────────
     r = await admin("POST", "/sessions", {
       json: {
-        title: "3ème Session Ordinaire CTS-APPS 2026",
+        title: "3ème Session Ordinaire CTS-DSS 2026",
         location: "Brazzaville, Congo",
         startDate: "2026-09-25",
         endDate: "2026-09-27",
-        reference: "CTS-APPS/2026/03",
+        reference: "CTS-DSS/2026/03",
         expectedParticipants: 38,
       },
     });
@@ -246,6 +246,40 @@ async function main() {
     badForm.append("title", "Fichier interdit");
     r = await admin("POST", "/documents", { form: badForm });
     check("type de fichier interdit refusé (400)", r.status === 400);
+
+    // ─── Guide utilisateur téléchargeable ───────────────────────────
+    r = await anon("GET", "/guide");
+    check("liste publique du guide (vide au départ)", r.status === 200 && r.data.guides.length === 0);
+
+    r = await anon("GET", "/guide/download/fr");
+    check("guide absent → 404", r.status === 404);
+
+    const guideForm = new FormData();
+    guideForm.append("file", new Blob([pdfBytes], { type: "application/pdf" }), "guide-utilisateur-fr.pdf");
+    r = await anon("PUT", "/guide/fr", { form: guideForm });
+    check("publication du guide refusée sans connexion (401)", r.status === 401);
+
+    const guideForm2 = new FormData();
+    guideForm2.append("file", new Blob([pdfBytes], { type: "application/pdf" }), "guide-utilisateur-fr.pdf");
+    r = await admin("PUT", "/guide/fr", { form: guideForm2 });
+    check(
+      "l'admin publie le guide (fr)",
+      r.status === 200 && r.data.guides.length === 1 && r.data.guides[0].lang === "fr"
+    );
+
+    const guideFormEn = new FormData();
+    guideFormEn.append("file", new Blob([pdfBytes], { type: "application/pdf" }), "user-guide-en.pdf");
+    r = await admin("PUT", "/guide/en", { form: guideFormEn });
+    check("l'admin publie le guide (en)", r.status === 200 && r.data.guides.length === 2);
+
+    r = await anon("GET", "/guide/download/fr");
+    check(
+      "téléchargement public du guide (fr)",
+      r.status === 200 && r.headers.get("content-type") === "application/pdf"
+    );
+
+    r = await admin("DELETE", "/guide/en");
+    check("suppression de la version anglaise du guide", r.status === 200 && r.data.guides.length === 1);
 
     // ─── Parcours participant ───────────────────────────────────────
     const participant = makeClient();
@@ -550,8 +584,8 @@ async function main() {
       json: { title: "Session sans référence explicite", startDate: "2026-11-10" },
     });
     check(
-      "référence auto-générée au format CTS-APPS/AAAA/NN",
-      r.status === 201 && /^CTS-APPS\/2026\/\d{2}$/.test(r.data.session.reference)
+      "référence auto-générée au format CTS-DSS/AAAA/NN",
+      r.status === 201 && /^CTS-DSS\/2026\/\d{2}$/.test(r.data.session.reference)
     );
     await admin("DELETE", `/sessions/${r.data.session.id}`);
 

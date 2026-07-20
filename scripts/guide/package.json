@@ -2,7 +2,7 @@
   "name": "cts-guide-generator",
   "private": true,
   "version": "2.0.0",
-  "description": "Génération du guide participant : captures Playwright + document Word (docs/Guide-Participant-Plateforme-CTS-APPS.docx)",
+  "description": "Génération du guide participant : captures Playwright + document Word (docs/Guide-Participant-Plateforme-CTS-DSS.docx)",
   "type": "module",
   "dependencies": {
     "docx": "^9.7.1",
