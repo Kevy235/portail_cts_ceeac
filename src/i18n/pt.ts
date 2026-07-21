@@ -318,6 +318,12 @@ export const pt: Dict = {
 
   // ─── Comum (complementos) ─────────────────────────────────────────────
   "common.retry": "Tentar novamente",
+
+  // ─── Filtros das listas de documentos ─────────────────────────────────
+  "filter.byLang": "Filtrar por língua",
+  "filter.allLangs": "Todas as línguas",
+  "filter.reset": "Repor os filtros",
+  "filter.results": "{n} documento(s)",
   "common.loadError": "O carregamento falhou",
   "common.language": "Língua",
   "common.fontSize": "Tamanho do texto",

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Edit3, FileText, Search, Trash2, Upload, X } from "lucide-react";
+import { Download, Edit3, FileText, RotateCcw, Search, Trash2, Upload, X } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -12,6 +12,7 @@ import {
   EmptyState,
   ErrorBlock,
   Field,
+  FlagIcon,
   inputClass,
   LangChip,
   LoadingBlock,
@@ -51,6 +52,7 @@ export function AdminDocuments() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("tous");
   const [sessionFilter, setSessionFilter] = useState("tous");
+  const [langFilter, setLangFilter] = useState<"tous" | Lang>("tous");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [files, setFiles] = useState<FileMap>({});
@@ -93,10 +95,26 @@ export function AdminDocuments() {
         (filter === "tous" || d.status === filter) &&
         (categoryFilter === "tous" || d.categoryId === categoryFilter) &&
         (sessionFilter === "tous" || d.sessionId === sessionFilter) &&
+        (langFilter === "tous" || d.files.some((f) => f.lang === langFilter)) &&
         (d.title.toLowerCase().includes(q) ||
           d.files.some((f) => f.fileName.toLowerCase().includes(q)))
     );
-  }, [documents, filter, search, categoryFilter, sessionFilter]);
+  }, [documents, filter, search, categoryFilter, sessionFilter, langFilter]);
+
+  const filtersActive =
+    filter !== "tous" ||
+    search !== "" ||
+    categoryFilter !== "tous" ||
+    sessionFilter !== "tous" ||
+    langFilter !== "tous";
+
+  const resetFilters = () => {
+    setFilter("tous");
+    setSearch("");
+    setCategoryFilter("tous");
+    setSessionFilter("tous");
+    setLangFilter("tous");
+  };
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -314,6 +332,57 @@ export function AdminDocuments() {
             ))}
           </select>
         )}
+
+        {/* Filtre par langue disponible */}
+        <div
+          className="flex items-center gap-1.5 flex-wrap"
+          role="group"
+          aria-label={t("filter.byLang")}
+        >
+          <button
+            onClick={() => setLangFilter("tous")}
+            aria-pressed={langFilter === "tous"}
+            className={clsx(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+              langFilter === "tous"
+                ? "bg-gradient-to-b from-brand to-brand-dark text-white shadow-sm shadow-brand/30"
+                : "bg-white border border-line text-slate2 hover:bg-mist hover:border-brand/40"
+            )}
+          >
+            {t("filter.allLangs")}
+          </button>
+          {LANGS.map((l) => (
+            <button
+              key={l}
+              onClick={() => setLangFilter(l)}
+              aria-pressed={langFilter === l}
+              title={LANG_LABELS[l]}
+              className={clsx(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold uppercase transition-all",
+                langFilter === l
+                  ? "bg-gradient-to-b from-brand to-brand-dark text-white shadow-sm shadow-brand/30"
+                  : "bg-white border border-line text-slate2 hover:bg-mist hover:border-brand/40"
+              )}
+            >
+              <FlagIcon lang={l} />
+              {l}
+            </button>
+          ))}
+        </div>
+
+        {/* Réinitialisation + compteur de résultats */}
+        {filtersActive && (
+          <button
+            onClick={resetFilters}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-danger border border-danger/25 bg-danger-soft/60 hover:bg-danger-soft transition-colors"
+          >
+            <RotateCcw size={12} aria-hidden />
+            {t("filter.reset")}
+          </button>
+        )}
+        <span className="text-xs text-slate2/80 tabular-nums ml-auto" aria-live="polite">
+          {t("filter.results", { n: filtered.length })}
+        </span>
       </div>
 
       <div className="bg-white rounded-xl border border-line-soft shadow-sm overflow-hidden">

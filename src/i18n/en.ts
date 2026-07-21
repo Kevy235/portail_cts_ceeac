@@ -317,6 +317,12 @@ export const en: Dict = {
 
   // ─── Common (additions) ───────────────────────────────────────────────
   "common.retry": "Try again",
+
+  // ─── Document list filters ────────────────────────────────────────────
+  "filter.byLang": "Filter by language",
+  "filter.allLangs": "All languages",
+  "filter.reset": "Reset filters",
+  "filter.results": "{n} document(s)",
   "common.loadError": "Loading failed",
   "common.language": "Language",
   "common.fontSize": "Text size",

@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
-import { Clock, FileText, Search } from "lucide-react";
+import { Clock, FileText, RotateCcw, Search } from "lucide-react";
 import { clsx } from "clsx";
 import type { Doc } from "@/lib/types";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDate } from "@/lib/format";
 import { useSettings } from "@/context/SettingsContext";
-import { useI18n } from "@/i18n";
+import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import { DownloadButton, ViewButton } from "@/components/DownloadButton";
 import {
   CodedBadge,
   EmptyState,
   ErrorBlock,
+  FlagIcon,
   inputClass,
   LoadingBlock,
 } from "@/components/ui";
@@ -23,6 +24,7 @@ export function ParticipantLibrary() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("tous");
   const [sessionFilter, setSessionFilter] = useState("tous");
+  const [langFilter, setLangFilter] = useState<"tous" | Lang>("tous");
 
   const visible = documents ?? [];
 
@@ -43,11 +45,30 @@ export function ParticipantLibrary() {
   }, [visible]);
 
   const filtered = useMemo(() => {
+    const q = search.toLowerCase();
     return visible
       .filter((d) => categoryFilter === "tous" || d.categoryName === categoryFilter)
       .filter((d) => sessionFilter === "tous" || d.sessionId === sessionFilter)
-      .filter((d) => d.title.toLowerCase().includes(search.toLowerCase()));
-  }, [visible, categoryFilter, sessionFilter, search]);
+      .filter((d) => langFilter === "tous" || d.files.some((f) => f.lang === langFilter))
+      .filter(
+        (d) =>
+          d.title.toLowerCase().includes(q) ||
+          d.files.some((f) => f.fileName.toLowerCase().includes(q))
+      );
+  }, [visible, categoryFilter, sessionFilter, langFilter, search]);
+
+  const filtersActive =
+    search !== "" ||
+    categoryFilter !== "tous" ||
+    sessionFilter !== "tous" ||
+    langFilter !== "tous";
+
+  const resetFilters = () => {
+    setSearch("");
+    setCategoryFilter("tous");
+    setSessionFilter("tous");
+    setLangFilter("tous");
+  };
 
   if (resource.error && !documents)
     return <ErrorBlock message={resource.error} onRetry={resource.reload} />;
@@ -125,6 +146,59 @@ export function ParticipantLibrary() {
             </button>
           ))}
         </div>
+
+        {/* Filtre par langue disponible */}
+        <div
+          className="flex items-center gap-1.5 flex-wrap"
+          role="group"
+          aria-label={t("filter.byLang")}
+        >
+          <button
+            onClick={() => setLangFilter("tous")}
+            aria-pressed={langFilter === "tous"}
+            className={clsx(
+              "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+              langFilter === "tous"
+                ? "bg-gradient-to-b from-accent to-accent-dark text-white shadow-sm shadow-accent/30"
+                : "bg-white border border-line text-slate2 hover:bg-mist hover:border-accent/40"
+            )}
+          >
+            {t("filter.allLangs")}
+          </button>
+          {LANGS.map((l) => (
+            <button
+              key={l}
+              onClick={() => setLangFilter(l)}
+              aria-pressed={langFilter === l}
+              title={LANG_LABELS[l]}
+              className={clsx(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold uppercase transition-all",
+                langFilter === l
+                  ? "bg-gradient-to-b from-accent to-accent-dark text-white shadow-sm shadow-accent/30"
+                  : "bg-white border border-line text-slate2 hover:bg-mist hover:border-accent/40"
+              )}
+            >
+              <FlagIcon lang={l} />
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Réinitialisation + compteur de résultats */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {filtersActive && (
+          <button
+            onClick={resetFilters}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-danger border border-danger/25 bg-danger-soft/60 hover:bg-danger-soft transition-colors"
+          >
+            <RotateCcw size={12} aria-hidden />
+            {t("filter.reset")}
+          </button>
+        )}
+        <span className="text-xs text-slate2/80 tabular-nums ml-auto" aria-live="polite">
+          {t("filter.results", { n: filtered.length })}
+        </span>
       </div>
 
       <div className="grid gap-3">

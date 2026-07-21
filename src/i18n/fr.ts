@@ -332,6 +332,12 @@ export const fr = {
 
   // ─── Commun (compléments) ─────────────────────────────────────────────
   "common.retry": "Réessayer",
+
+  // ─── Filtres des listes de documents ──────────────────────────────────
+  "filter.byLang": "Filtrer par langue",
+  "filter.allLangs": "Toutes les langues",
+  "filter.reset": "Réinitialiser les filtres",
+  "filter.results": "{n} document(s)",
   "common.loadError": "Le chargement a échoué",
   "common.language": "Langue",
   "common.fontSize": "Taille du texte",
