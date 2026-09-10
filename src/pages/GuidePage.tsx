@@ -195,7 +195,14 @@ export function GuidePage() {
               alt="Logo CEEAC-ECCAS"
               className="w-9 h-9 rounded-full bg-white object-contain shadow"
             />
-            <p className="text-white text-sm font-bold font-title">{settings.platform_name}</p>
+            <div>
+              <p className="text-white text-sm font-bold font-title">{settings.platform_name}</p>
+              {settings.platform_subtitle && (
+                <p className="text-white/65 text-[10px] leading-tight mt-0.5">
+                  {settings.platform_subtitle}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <FontSizeControl dark />

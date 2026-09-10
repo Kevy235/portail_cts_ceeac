@@ -356,6 +356,61 @@ export const MIGRATIONS: Migration[] = [
         );
     `,
   },
+  {
+    id: 9,
+    name: "organe statutaire en saisie libre",
+    sql: `
+      ALTER TABLE cts_sessions DROP CONSTRAINT IF EXISTS cts_sessions_organ_check;
+
+      UPDATE cts_sessions SET organ = CASE organ
+        WHEN 'conference' THEN 'Conférence des Chefs d''État et de Gouvernement'
+        WHEN 'conseil' THEN 'Conseil des Ministres'
+        WHEN 'comite' THEN 'Comité des Ambassadeurs'
+        WHEN 'cts' THEN 'Comité Technique Spécialisé'
+        WHEN 'autre' THEN 'Autre réunion statutaire'
+        ELSE organ
+      END;
+
+      ALTER TABLE cts_sessions ALTER COLUMN organ SET DEFAULT '';
+    `,
+  },
+  {
+    id: 10,
+    name: "identité PDRS-CEEAC",
+    sql: `
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'PDRS-CEEAC'
+        WHEN 'platform_subtitle' THEN 'Portail Documentaire des Réunions Statutaires de la CEEAC'
+        WHEN 'org_description' THEN 'Accès sécurisé aux documents officiels des réunions statutaires de la CEEAC'
+        WHEN 'footer_text' THEN '© 2026 PDRS-CEEAC · Communauté Économique des États de l''Afrique Centrale'
+      END
+      WHERE lang = 'fr' AND key IN ('platform_name','platform_subtitle','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'PDRS-CEEAC'
+        WHEN 'platform_subtitle' THEN 'Documentary Portal of ECCAS Statutory Meetings'
+        WHEN 'org_description' THEN 'Secure access to official documents of ECCAS statutory meetings'
+        WHEN 'footer_text' THEN '© 2026 PDRS-CEEAC · Economic Community of Central African States'
+      END
+      WHERE lang = 'en' AND key IN ('platform_name','platform_subtitle','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'PDRS-CEEAC'
+        WHEN 'platform_subtitle' THEN 'Portal Documental das Reuniões Estatutárias da CEEAC'
+        WHEN 'org_description' THEN 'Acesso seguro aos documentos oficiais das reuniões estatutárias da CEEAC'
+        WHEN 'footer_text' THEN '© 2026 PDRS-CEEAC · Comunidade Económica dos Estados da África Central'
+      END
+      WHERE lang = 'pt' AND key IN ('platform_name','platform_subtitle','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'PDRS-CEEAC'
+        WHEN 'platform_subtitle' THEN 'Portal Documental de las Reuniones Estatutarias de la CEEAC'
+        WHEN 'org_description' THEN 'Acceso seguro a los documentos oficiales de las reuniones estatutarias de la CEEAC'
+        WHEN 'footer_text' THEN '© 2026 PDRS-CEEAC · Comunidad Económica de los Estados de África Central'
+      END
+      WHERE lang = 'es' AND key IN ('platform_name','platform_subtitle','org_description','footer_text');
+    `,
+  },
 ];
 
 export const LANGS = ["fr", "en", "pt", "es"] as const;

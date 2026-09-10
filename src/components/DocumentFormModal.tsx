@@ -2,10 +2,10 @@ import { useRef, useState } from "react";
 import { Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { Category, CtsSession, Doc, DocStatus, MeetingOrgan } from "@/lib/types";
+import type { Category, CtsSession, Doc, DocStatus } from "@/lib/types";
+import { displayOrgan } from "@/lib/organ";
 import { formatSize } from "@/lib/format";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
-import type { Dict } from "@/i18n/fr";
 import {
   Field,
   inputClass,
@@ -32,11 +32,6 @@ export const EMPTY_DOC_FORM: FormState = {
 };
 
 type FileMap = Partial<Record<Lang, File>>;
-
-function organLabel(t: (key: keyof Dict) => string, organ?: MeetingOrgan | null) {
-  if (!organ) return "";
-  return t(`sess.organ.${organ}` as keyof Dict);
-}
 
 export function DocumentFormModal({
   mode,
@@ -217,7 +212,7 @@ export function DocumentFormModal({
               {sessions.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.title.length > 40 ? `${s.title.slice(0, 40)}…` : s.title}
-                  {s.organ ? ` — ${organLabel(t, s.organ)}` : ""}
+                  {s.organ ? ` — ${displayOrgan(s.organ, t)}` : ""}
                 </option>
               ))}
             </select>

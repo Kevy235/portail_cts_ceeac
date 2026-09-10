@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Portail documentaire des réunions statutaires de la CEEAC",
+  "description": "PDRS-CEEAC — Portail Documentaire des Réunions Statutaires de la CEEAC",
   "engines": {
     "node": ">=20"
   },

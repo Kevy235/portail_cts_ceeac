@@ -179,7 +179,7 @@ async function main() {
         location: "Malabo, Guinée Équatoriale",
         startDate: "2026-09-25",
         endDate: "2026-09-27",
-        organ: "conference",
+        organ: "Conférence des Chefs d'État et de Gouvernement",
         reference: "CEEAC/2026/03",
         expectedParticipants: 38,
       },
@@ -188,7 +188,7 @@ async function main() {
     check(
       "accès d'inscription générés (identifiant + mot de passe)",
       /^CEEAC-[A-Z0-9]{6}$/.test(r.data.session.accessCode) &&
-        r.data.session.organ === "conference" &&
+        r.data.session.organ === "Conférence des Chefs d'État et de Gouvernement" &&
         typeof r.data.session.accessPassword === "string" &&
         r.data.session.accessPassword.length >= 8
     );
@@ -255,12 +255,16 @@ async function main() {
         startDate: "2026-09-25",
         endDate: "2026-09-27",
         status: "en-cours",
-        organ: "conference",
+        organ: "Comité ad hoc sur la paix et la sécurité",
         reference: "CEEAC/2026/03",
         expectedParticipants: 38,
       },
     });
     check("passage de la réunion en cours", r.status === 200 && r.data.session.status === "en-cours");
+    check(
+      "saisie libre de l'organe statutaire",
+      r.data.session.organ === "Comité ad hoc sur la paix et la sécurité"
+    );
 
     const midMeetingDoc = new FormData();
     midMeetingDoc.append("file_fr", new Blob([pdfBytes], { type: "application/pdf" }), "odj-fr.pdf");
@@ -599,7 +603,7 @@ async function main() {
         startDate: "2026-09-25",
         endDate: "2026-09-27",
         status: "terminé",
-        organ: "conference",
+        organ: "Conférence des Chefs d'État et de Gouvernement",
         reference: "CEEAC/2026/03",
         expectedParticipants: 38,
       },

@@ -99,7 +99,8 @@ export function RegisterPage() {
           <div className="flex items-center gap-2">
             <Globe size={14} className="text-white/40" aria-hidden />
             <span className="text-white/40 text-xs">
-              ceeac-eccas.org · {settings.platform_subtitle}
+              {settings.platform_name}
+              {settings.platform_subtitle ? ` · ${settings.platform_subtitle}` : ""}
             </span>
           </div>
           <div className="flex items-center gap-2">

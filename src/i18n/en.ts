@@ -163,7 +163,7 @@ export const en: Dict = {
   "part.copied": "Credentials copied",
   "part.pwdReset": "Password reset",
   "part.copyText":
-    "ECCAS portal — temporary credentials\nE-mail: {email}\nPassword: {password}",
+    "{platform} — temporary credentials\nE-mail: {email}\nPassword: {password}",
 
   "docs.title": "Document management",
   "docs.subtitle": "Published official documents and pending drafts",
@@ -252,10 +252,12 @@ export const en: Dict = {
 
   "set.title": "Portal contents",
   "set.subtitle":
-    "Texts of the sign-in page, header and footer — in the 4 ECCAS languages",
+    "PDRS-CEEAC name and texts shown everywhere: header, sign-in, browser tab, e-mails — in the 4 ECCAS languages",
   "set.langNote": "You are editing contents in {lang}. Empty fields fall back to French.",
-  "set.platform_name": "Platform name (header)",
-  "set.platform_subtitle": "Platform subtitle",
+  "set.platform_name": "Platform name",
+  "set.platform_nameHelp": "Header, sign-in, browser tab, guide and e-mails",
+  "set.syncNameAllLangs": "Apply this name to all 4 languages (recommended for the acronym)",
+  "set.platform_subtitle": "Full platform name",
   "set.org_full_name": "Full organization name",
   "set.org_description": "Description (sign-in page)",
   "set.login_notice": "Sign-in page message",
@@ -387,7 +389,7 @@ export const en: Dict = {
     "Send these access codes to the Member States: each participant then creates their own account on the registration page, with their own information.",
   "sess.access.copyInvite": "Copy invitation",
   "sess.access.invite":
-    "ECCAS portal — Statutory meeting registration\n{title}\n\nMeeting ID: {code}\nAccess password: {password}\n\nCreate your account here: {url}",
+    "{platform} — Statutory meeting registration\n{title}\n\nMeeting ID: {code}\nAccess password: {password}\n\nCreate your account here: {url}",
   "sess.access.regenerate": "Regenerate",
   "sess.access.regenerateTitle": "Regenerate access",
   "sess.access.regenerateMsg":
@@ -419,7 +421,9 @@ export const en: Dict = {
   "broadcast.attachTooBig": "“{name}” exceeds {n} MB",
   "broadcast.attachTotal": "Attachments limited to {n} MB in total",
 
-  "set.groupIdentity": "Platform identity (header)",
+  "set.groupIdentity": "Platform identity",
+  "set.identityNote":
+    "The short name (e.g. PDRS-CEEAC) and the full name appear everywhere: header, sign-in, registration, guide, browser tab and invitation texts.",
   "set.groupLogin": "Login page",
   "set.groupFooter": "Contact & footer",
 
@@ -503,11 +507,16 @@ export const en: Dict = {
   "account.saved": "Account updated",
 
   "sess.organ": "Statutory organ",
+  "sess.organPh": "e.g. Conference of Heads of State and Government",
+  "sess.organHelp": "Type the title of the statutory organ convening the meeting.",
+  "sess.organSuggest": "Suggestions — click to fill, or type another title",
   "sess.organ.conference": "Conference of Heads of State and Government",
   "sess.organ.conseil": "Council of Ministers",
   "sess.organ.comite": "Committee of Ambassadors",
   "sess.organ.cts": "Specialised Technical Committee",
   "sess.organ.autre": "Other statutory meeting",
+  "sess.organ.parlement": "Community Parliament",
+  "sess.organ.cour": "ECCAS Court of Justice",
   "sess.docsOpen": "Documents",
   "sess.docsClose": "Hide documents",
   "docs.version": "Version {n}",

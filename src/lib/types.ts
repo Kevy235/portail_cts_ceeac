@@ -5,14 +5,6 @@ export type Role = "admin" | "participant" | "guest";
 export type UserStatus = "actif" | "en-attente" | "inactif";
 export type DocStatus = "publié" | "brouillon";
 export type SessionStatus = "à-venir" | "en-cours" | "terminé";
-export const MEETING_ORGANS = [
-  "conference",
-  "conseil",
-  "comite",
-  "cts",
-  "autre",
-] as const;
-export type MeetingOrgan = (typeof MEETING_ORGANS)[number];
 
 export interface User {
   id: string;
@@ -40,8 +32,8 @@ export interface CtsSession {
   startDate: string;
   endDate: string | null;
   status: SessionStatus;
-  /** Organe statutaire CEEAC qui convoque la réunion. */
-  organ: MeetingOrgan;
+  /** Organe statutaire CEEAC qui convoque la réunion (saisie libre). */
+  organ: string;
   reference: string;
   description: string;
   expectedParticipants: number;
@@ -83,7 +75,7 @@ export interface Doc {
   sessionTitle: string | null;
   sessionReference: string | null;
   sessionStatus: SessionStatus | null;
-  sessionOrgan: MeetingOrgan | null;
+  sessionOrgan: string | null;
   files: DocFile[];
   downloads: number;
 }

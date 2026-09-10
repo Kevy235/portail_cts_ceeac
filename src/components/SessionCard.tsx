@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import type { CtsSession } from "@/lib/types";
 import { formatDateRange } from "@/lib/format";
 import { useI18n } from "@/i18n";
-import type { Dict } from "@/i18n/fr";
+import { displayOrgan } from "@/lib/organ";
 import { Discussion } from "@/components/Discussion";
 import { StatusBadge } from "@/components/ui";
 
@@ -69,7 +69,7 @@ export function SessionCard({
               </h3>
               {session.organ && (
                 <p className="text-xs text-brand-dark font-medium mt-0.5">
-                  {t(`sess.organ.${session.organ}` as keyof Dict)}
+                  {displayOrgan(session.organ, t)}
                 </p>
               )}
               <p className="text-slate2/80 text-sm mt-0.5 flex items-center gap-3 flex-wrap">

@@ -24,6 +24,7 @@ import {
 interface SettingField {
   key: string;
   labelKey: keyof Dict;
+  hintKey?: keyof Dict;
   textarea?: boolean;
 }
 
@@ -40,10 +41,11 @@ const GROUPS: {
   {
     key: "identity",
     labelKey: "set.groupIdentity",
+    noteKey: "set.identityNote",
     icon: <Landmark size={15} className="text-white" />,
     tile: "bg-gradient-to-br from-brand to-brand-deep",
     fields: [
-      { key: "platform_name", labelKey: "set.platform_name" },
+      { key: "platform_name", labelKey: "set.platform_name", hintKey: "set.platform_nameHelp" },
       { key: "platform_subtitle", labelKey: "set.platform_subtitle" },
       { key: "org_full_name", labelKey: "set.org_full_name", textarea: true },
     ],
@@ -115,6 +117,7 @@ export function AdminSettings() {
   const [pwdNew, setPwdNew] = useState("");
   const [pwdConfirm, setPwdConfirm] = useState("");
   const [pwdBusy, setPwdBusy] = useState(false);
+  const [syncNameAllLangs, setSyncNameAllLangs] = useState(true);
 
   const load = () => {
     setLoadError(null);
@@ -143,7 +146,19 @@ export function AdminSettings() {
     if (!form || busy) return;
     setBusy(true);
     try {
-      await api.put("/settings/admin", { settings: form });
+      let payload = form;
+      if (syncNameAllLangs) {
+        const name = (form[editLang]?.platform_name ?? form.fr?.platform_name ?? "").trim();
+        payload = {
+          ...form,
+          fr: { ...(form.fr ?? {}), platform_name: name },
+          en: { ...(form.en ?? {}), platform_name: name },
+          pt: { ...(form.pt ?? {}), platform_name: name },
+          es: { ...(form.es ?? {}), platform_name: name },
+        };
+        setForm(payload);
+      }
+      await api.put("/settings/admin", { settings: payload });
       await refresh();
       toast.success(t("set.saved"));
     } catch (err) {
@@ -322,33 +337,46 @@ export function AdminSettings() {
                 <span className="text-sm font-bold text-ink">{t(labelKey)}</span>
               </legend>
               {noteKey && <p className="text-[11px] text-slate2/80 -mt-1">{t(noteKey)}</p>}
-              {fields.map(({ key, labelKey: fieldLabelKey, textarea }) => (
-                <Field key={`${editLang}-${key}`} label={t(fieldLabelKey)}>
-                  {textarea ? (
-                    <textarea
-                      rows={2}
-                      value={values[key] ?? ""}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          [editLang]: { ...values, [key]: e.target.value },
-                        })
-                      }
-                      className={inputClass}
-                    />
-                  ) : (
-                    <input
-                      value={values[key] ?? ""}
-                      onChange={(e) =>
-                        setForm({
-                          ...form,
-                          [editLang]: { ...values, [key]: e.target.value },
-                        })
-                      }
-                      className={inputClass}
-                    />
+              {fields.map(({ key, labelKey: fieldLabelKey, hintKey, textarea }) => (
+                <div key={`${editLang}-${key}`}>
+                  <Field label={t(fieldLabelKey)} hint={hintKey ? t(hintKey) : undefined}>
+                    {textarea ? (
+                      <textarea
+                        rows={2}
+                        value={values[key] ?? ""}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            [editLang]: { ...values, [key]: e.target.value },
+                          })
+                        }
+                        className={inputClass}
+                      />
+                    ) : (
+                      <input
+                        value={values[key] ?? ""}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            [editLang]: { ...values, [key]: e.target.value },
+                          })
+                        }
+                        className={inputClass}
+                      />
+                    )}
+                  </Field>
+                  {key === "platform_name" && (
+                    <label className="mt-2 flex items-start gap-2 text-xs text-slate2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={syncNameAllLangs}
+                        onChange={(e) => setSyncNameAllLangs(e.target.checked)}
+                        className="mt-0.5 accent-brand"
+                      />
+                      <span>{t("set.syncNameAllLangs")}</span>
+                    </label>
                   )}
-                </Field>
+                </div>
               ))}
             </fieldset>
           ))}

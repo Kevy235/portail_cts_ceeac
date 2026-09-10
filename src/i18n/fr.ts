@@ -171,7 +171,7 @@ export const fr = {
   "part.copied": "Identifiants copiés",
   "part.pwdReset": "Mot de passe réinitialisé",
   "part.copyText":
-    "Portail CEEAC — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
+    "{platform} — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
 
   // ─── Documents (admin) ────────────────────────────────────────────────
   "docs.title": "Gestion documentaire",
@@ -265,10 +265,12 @@ export const fr = {
   // ─── Contenus du portail (admin) ──────────────────────────────────────
   "set.title": "Contenus du portail",
   "set.subtitle":
-    "Textes de la page de connexion, de l'en-tête et du pied de page — dans les 4 langues de la CEEAC",
+    "Nom PDRS-CEEAC et textes visibles partout : en-tête, connexion, onglet du navigateur, e-mails — dans les 4 langues de la CEEAC",
   "set.langNote": "Vous éditez les contenus en {lang}. Les champs vides utilisent le français.",
-  "set.platform_name": "Nom de la plateforme (en-tête)",
-  "set.platform_subtitle": "Sous-titre de la plateforme",
+  "set.platform_name": "Nom de la plateforme",
+  "set.platform_nameHelp": "En-tête, connexion, onglet du navigateur, guide et e-mails",
+  "set.syncNameAllLangs": "Appliquer ce nom aux 4 langues (recommandé pour le sigle)",
+  "set.platform_subtitle": "Nom développé de la plateforme",
   "set.org_full_name": "Nom complet de l'organisation",
   "set.org_description": "Description (page de connexion)",
   "set.login_notice": "Message de la page de connexion",
@@ -402,7 +404,7 @@ export const fr = {
     "Transmettez ces accès aux États membres : chaque participant crée ensuite son compte lui-même sur la page d'inscription, avec ses propres informations.",
   "sess.access.copyInvite": "Copier l'invitation",
   "sess.access.invite":
-    "Portail CEEAC — Inscription à la réunion statutaire\n{title}\n\nIdentifiant de réunion : {code}\nMot de passe d'accès : {password}\n\nCréez votre compte ici : {url}",
+    "{platform} — Inscription à la réunion statutaire\n{title}\n\nIdentifiant de réunion : {code}\nMot de passe d'accès : {password}\n\nCréez votre compte ici : {url}",
   "sess.access.regenerate": "Régénérer",
   "sess.access.regenerateTitle": "Régénérer les accès",
   "sess.access.regenerateMsg":
@@ -435,7 +437,9 @@ export const fr = {
   "broadcast.attachTotal": "Total des pièces jointes limité à {n} Mo",
 
   // ─── Contenus du portail (groupes) ────────────────────────────────────
-  "set.groupIdentity": "Identité de la plateforme (en-tête)",
+  "set.groupIdentity": "Identité de la plateforme",
+  "set.identityNote":
+    "Le nom court (ex. PDRS-CEEAC) et le nom développé s'affichent partout : en-tête, page de connexion, inscription, guide, onglet du navigateur et textes d'invitation.",
   "set.groupLogin": "Page de connexion",
   "set.groupFooter": "Contact & pied de page",
 
@@ -527,11 +531,16 @@ export const fr = {
 
   // ─── Réunions statutaires & versions documentaires ───────────────────
   "sess.organ": "Organe statutaire",
+  "sess.organPh": "Ex. Conférence des Chefs d'État et de Gouvernement",
+  "sess.organHelp": "Saisissez librement l'intitulé de l'organe statutaire qui convoque la réunion.",
+  "sess.organSuggest": "Suggestions — cliquez pour remplir, ou saisissez un autre intitulé",
   "sess.organ.conference": "Conférence des Chefs d'État et de Gouvernement",
   "sess.organ.conseil": "Conseil des Ministres",
   "sess.organ.comite": "Comité des Ambassadeurs",
   "sess.organ.cts": "Comité Technique Spécialisé",
   "sess.organ.autre": "Autre réunion statutaire",
+  "sess.organ.parlement": "Parlement communautaire",
+  "sess.organ.cour": "Cour de Justice de la CEEAC",
   "sess.docsOpen": "Documents",
   "sess.docsClose": "Masquer les documents",
   "docs.version": "Version {n}",

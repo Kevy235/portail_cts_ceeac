@@ -7,7 +7,6 @@ import { config, isMailConfigured } from "../config.js";
 import { requireAccount, requireAdmin } from "../auth.js";
 import { ah, uuidParams } from "../http.js";
 import { generateAccessCode, generateAccessPassword } from "../codes.js";
-import { MEETING_ORGANS } from "../meetings.js";
 import { buildReportMail, sendBroadcast, type MailAttachment } from "../mailer.js";
 import { logActivity } from "../activity.js";
 
@@ -24,7 +23,7 @@ const sessionSchema = z
       .nullable()
       .optional(),
     status: z.enum(["à-venir", "en-cours", "terminé"]).default("à-venir"),
-    organ: z.enum(MEETING_ORGANS).default("cts"),
+    organ: z.string().trim().max(200, "Organe trop long").default(""),
     reference: z.string().trim().default(""),
     description: z.string().trim().default(""),
     expectedParticipants: z.number().int().min(0).default(0),
@@ -303,7 +302,7 @@ sessionsRouter.post(
     );
 
     const mail = buildReportMail({
-      platformName: platform.rows[0]?.value ?? "CEEAC · Réunions statutaires",
+      platformName: platform.rows[0]?.value ?? "PDRS-CEEAC",
       sessionTitle: session.rows[0].title,
       subject: d.subject,
       message: d.message,

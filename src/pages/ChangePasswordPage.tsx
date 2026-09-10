@@ -4,12 +4,14 @@ import { KeyRound, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useSettings } from "@/context/SettingsContext";
 import { useI18n } from "@/i18n";
 import { FontSizeControl, LangSelector, LoadingBlock, PasswordInput, PrimaryButton } from "@/components/ui";
 import logoCeeac from "@/assets/logo_ceeac.png";
 
 export function ChangePasswordPage() {
   const { user, loading, refresh } = useAuth();
+  const { settings } = useSettings();
   const { t } = useI18n();
   const navigate = useNavigate();
 
@@ -51,6 +53,9 @@ export function ChangePasswordPage() {
             className="w-14 h-14 rounded-full object-contain bg-white shadow"
           />
           <div>
+            <p className="text-[11px] font-semibold text-brand-dark tracking-wide">
+              {settings.platform_name}
+            </p>
             <h1 className="text-ink font-bold font-title">
               {user.mustChangePassword ? t("pwd.firstTitle") : t("pwd.changeTitle")}
             </h1>

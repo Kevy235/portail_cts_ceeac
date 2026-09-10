@@ -163,7 +163,7 @@ export const pt: Dict = {
   "part.copied": "Credenciais copiadas",
   "part.pwdReset": "Palavra-passe reposta",
   "part.copyText":
-    "Portal CEEAC — credenciais provisórias\nE-mail: {email}\nPalavra-passe: {password}",
+    "{platform} — credenciais provisórias\nE-mail: {email}\nPalavra-passe: {password}",
 
   "docs.title": "Gestão documental",
   "docs.subtitle": "Documentos oficiais publicados e rascunhos pendentes",
@@ -253,10 +253,12 @@ export const pt: Dict = {
 
   "set.title": "Conteúdos do portal",
   "set.subtitle":
-    "Textos da página de início de sessão, do cabeçalho e do rodapé — nas 4 línguas da CEEAC",
+    "Nome PDRS-CEEAC e textos visíveis em todo o lado: cabeçalho, início de sessão, separador do navegador, e-mails — nas 4 línguas da CEEAC",
   "set.langNote": "Está a editar os conteúdos em {lang}. Os campos vazios utilizam o francês.",
-  "set.platform_name": "Nome da plataforma (cabeçalho)",
-  "set.platform_subtitle": "Subtítulo da plataforma",
+  "set.platform_name": "Nome da plataforma",
+  "set.platform_nameHelp": "Cabeçalho, início de sessão, separador do navegador, guia e e-mails",
+  "set.syncNameAllLangs": "Aplicar este nome às 4 línguas (recomendado para o acrónimo)",
+  "set.platform_subtitle": "Nome desenvolvido da plataforma",
   "set.org_full_name": "Nome completo da organização",
   "set.org_description": "Descrição (página de início de sessão)",
   "set.login_notice": "Mensagem da página de início de sessão",
@@ -388,7 +390,7 @@ export const pt: Dict = {
     "Transmita estes acessos aos Estados-Membros: cada participante cria depois a sua própria conta na página de inscrição, com as suas próprias informações.",
   "sess.access.copyInvite": "Copiar o convite",
   "sess.access.invite":
-    "Portal CEEAC — Inscrição na reunião estatutária\n{title}\n\nIdentificador da reunião: {code}\nPalavra-passe de acesso: {password}\n\nCrie a sua conta aqui: {url}",
+    "{platform} — Inscrição na reunião estatutária\n{title}\n\nIdentificador da reunião: {code}\nPalavra-passe de acesso: {password}\n\nCrie a sua conta aqui: {url}",
   "sess.access.regenerate": "Regenerar",
   "sess.access.regenerateTitle": "Regenerar os acessos",
   "sess.access.regenerateMsg":
@@ -420,7 +422,9 @@ export const pt: Dict = {
   "broadcast.attachTooBig": "« {name} » excede {n} MB",
   "broadcast.attachTotal": "Total de anexos limitado a {n} MB",
 
-  "set.groupIdentity": "Identidade da plataforma (cabeçalho)",
+  "set.groupIdentity": "Identidade da plataforma",
+  "set.identityNote":
+    "O nome curto (ex. PDRS-CEEAC) e o nome desenvolvido aparecem em todo o lado: cabeçalho, início de sessão, inscrição, guia, separador do navegador e textos de convite.",
   "set.groupLogin": "Página de início de sessão",
   "set.groupFooter": "Contacto e rodapé",
 
@@ -504,11 +508,16 @@ export const pt: Dict = {
   "account.saved": "Conta atualizada",
 
   "sess.organ": "Órgão estatutário",
+  "sess.organPh": "Ex. Conferência dos Chefes de Estado e de Governo",
+  "sess.organHelp": "Introduza livremente o título do órgão estatutário que convoca a reunião.",
+  "sess.organSuggest": "Sugestões — clique para preencher, ou introduza outro título",
   "sess.organ.conference": "Conferência dos Chefes de Estado e de Governo",
   "sess.organ.conseil": "Conselho de Ministros",
   "sess.organ.comite": "Comité dos Embaixadores",
   "sess.organ.cts": "Comité Técnico Especializado",
   "sess.organ.autre": "Outra reunião estatutária",
+  "sess.organ.parlement": "Parlamento comunitário",
+  "sess.organ.cour": "Tribunal de Justiça da CEEAC",
   "sess.docsOpen": "Documentos",
   "sess.docsClose": "Ocultar os documentos",
   "docs.version": "Versão {n}",

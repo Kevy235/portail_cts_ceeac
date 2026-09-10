@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
+import clsx from "clsx";
 import { Calendar, Edit3, FileText, KeyRound, Mail, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { Category, CtsSession, Doc, MeetingOrgan, SessionStatus } from "@/lib/types";
-import { MEETING_ORGANS } from "@/lib/types";
+import type { Category, CtsSession, Doc, SessionStatus } from "@/lib/types";
+import { displayOrgan, ORGAN_SUGGESTION_KEYS } from "@/lib/organ";
 import { useApiResource } from "@/lib/useApiResource";
 import { useI18n } from "@/i18n";
-import type { Dict } from "@/i18n/fr";
+import { useSettings } from "@/context/SettingsContext";
 import { SessionCard } from "@/components/SessionCard";
 import { BroadcastModal } from "@/components/BroadcastModal";
 import { DocumentFormModal } from "@/components/DocumentFormModal";
@@ -31,7 +32,7 @@ interface FormState {
   startDate: string;
   endDate: string;
   status: SessionStatus;
-  organ: MeetingOrgan;
+  organ: string;
   reference: string;
   description: string;
   // Chaîne (et non nombre) pour permettre un champ vide sans « 0 » collant.
@@ -44,7 +45,7 @@ const EMPTY_FORM: FormState = {
   startDate: "",
   endDate: "",
   status: "à-venir",
-  organ: "cts",
+  organ: "",
   reference: "",
   description: "",
   expectedParticipants: "",
@@ -59,9 +60,11 @@ function AccessPanel({
   onRegenerate: () => void;
 }) {
   const { t } = useI18n();
+  const { settings } = useSettings();
   if (!session.accessCode) return null;
 
   const inviteText = t("sess.access.invite", {
+    platform: settings.platform_name,
     title: session.title,
     code: session.accessCode,
     password: session.accessPassword ?? "",
@@ -152,7 +155,7 @@ export function AdminSessions() {
       startDate: s.startDate.slice(0, 10),
       endDate: s.endDate ? s.endDate.slice(0, 10) : "",
       status: s.status,
-      organ: s.organ ?? "cts",
+      organ: displayOrgan(s.organ, t),
       reference: s.reference,
       description: s.description,
       expectedParticipants: s.expectedParticipants ? String(s.expectedParticipants) : "",
@@ -171,6 +174,7 @@ export function AdminSessions() {
     setBusy(true);
     const payload = {
       ...form,
+      organ: form.organ.trim(),
       endDate: form.endDate || null,
       expectedParticipants: Number(form.expectedParticipants) || 0,
     };
@@ -378,19 +382,48 @@ export function AdminSessions() {
                 />
               </Field>
             </div>
-            <Field label={t("sess.organ")}>
-              <select
-                value={form.organ}
-                onChange={(e) => setForm({ ...form, organ: e.target.value as MeetingOrgan })}
-                className={inputClass}
-              >
-                {MEETING_ORGANS.map((organ) => (
-                  <option key={organ} value={organ}>
-                    {t(`sess.organ.${organ}` as keyof Dict)}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <div>
+              <label className="block">
+                <span className="block text-sm font-semibold text-ink mb-1.5">
+                  {t("sess.organ")}
+                </span>
+                <input
+                  type="text"
+                  value={form.organ}
+                  onChange={(e) => setForm({ ...form, organ: e.target.value })}
+                  placeholder={t("sess.organPh")}
+                  maxLength={200}
+                  autoComplete="off"
+                  className={inputClass}
+                />
+              </label>
+              <p className="mt-1.5 text-xs text-slate2/70">{t("sess.organHelp")}</p>
+              <p className="mt-2.5 mb-1.5 text-[11px] font-medium uppercase tracking-wide text-slate2/55">
+                {t("sess.organSuggest")}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {ORGAN_SUGGESTION_KEYS.map((key) => {
+                  const label = t(key);
+                  const active = form.organ.trim() === label;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setForm({ ...form, organ: label })}
+                      aria-pressed={active}
+                      className={clsx(
+                        "px-2.5 py-1 rounded-full text-xs font-medium transition-all",
+                        active
+                          ? "bg-gradient-to-b from-brand to-brand-dark text-white shadow-sm shadow-brand/30"
+                          : "bg-white border border-line text-slate2 hover:bg-mist hover:border-brand/40"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("sess.status")}>
                 <select

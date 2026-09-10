@@ -109,7 +109,8 @@ export function LoginPage() {
           <div className="hidden sm:flex items-center gap-2">
             <Globe size={14} className="text-white/40" aria-hidden />
             <span className="text-white/40 text-xs">
-              ceeac-eccas.org · {settings.platform_subtitle}
+              {settings.platform_name}
+              {settings.platform_subtitle ? ` · ${settings.platform_subtitle}` : ""}
             </span>
           </div>
           <div className="flex items-center gap-2 ml-auto">
@@ -129,12 +130,17 @@ export function LoginPage() {
                 alt="Logo CEEAC-ECCAS"
                 className="w-14 h-14 lg:w-20 lg:h-20 rounded-full bg-white object-contain shadow-lg mb-2.5 lg:mb-6"
               />
-              <h1 className="text-white text-sm lg:text-2xl font-bold leading-snug lg:mb-3 font-title">
-                {settings.org_full_name}
+              <h1 className="text-white text-sm lg:text-2xl font-bold leading-snug font-title">
+                {settings.platform_name}
               </h1>
+              {settings.platform_subtitle && (
+                <p className="text-white/70 text-[11px] lg:text-sm leading-snug mt-1 lg:mt-2">
+                  {settings.platform_subtitle}
+                </p>
+              )}
               {/* Description et pied de page : masqués sur mobile pour que le
                   formulaire de connexion apparaisse sans défilement. */}
-              <p className="hidden lg:block text-white/50 text-sm leading-relaxed">
+              <p className="hidden lg:block text-white/50 text-sm leading-relaxed mt-3">
                 {settings.org_description}
               </p>
             </div>

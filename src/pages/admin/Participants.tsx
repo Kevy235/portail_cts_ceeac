@@ -17,6 +17,7 @@ import { CountryFlag } from "@/components/CountryFlag";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDate, initials } from "@/lib/format";
 import { useI18n } from "@/i18n";
+import { useSettings } from "@/context/SettingsContext";
 import {
   ConfirmDialog,
   copyToClipboard,
@@ -52,6 +53,7 @@ const EMPTY_FORM: FormState = {
 
 export function AdminParticipants() {
   const { t } = useI18n();
+  const { settings } = useSettings();
   const resource = useApiResource<{ participants: User[] }>("/participants");
   const participants = resource.data?.participants ?? null;
   const load = resource.reload;
@@ -469,6 +471,7 @@ export function AdminParticipants() {
               onClick={async () => {
                 const ok = await copyToClipboard(
                   t("part.copyText", {
+                    platform: settings.platform_name,
                     email: tempPassword.email,
                     password: tempPassword.password,
                   })
