@@ -172,6 +172,55 @@ async function main() {
     });
     check("e-mail en double refusé (409)", r.status === 409);
 
+    // ─── Administrateurs ────────────────────────────────────────────
+    r = await admin("GET", "/admins");
+    check("liste des administrateurs", r.status === 200 && r.data.admins.length >= 1);
+    const selfAdminId = r.data.admins[0].id;
+
+    r = await admin("POST", "/admins", {
+      json: {
+        name: "Admin Secondaire",
+        email: "admin2@test.org",
+        functionTitle: "Secrétariat",
+        institution: "CEEAC",
+      },
+    });
+    check(
+      "création administrateur + mot de passe provisoire",
+      r.status === 201 &&
+        r.data.admin.role === "admin" &&
+        typeof r.data.temporaryPassword === "string"
+    );
+    const admin2Id = r.data.admin.id;
+
+    r = await admin("POST", "/admins", {
+      json: { name: "Doublon admin", email: "admin@test.org" },
+    });
+    check("e-mail administrateur en double refusé (409)", r.status === 409);
+
+    r = await admin("PUT", `/admins/${admin2Id}`, {
+      json: {
+        name: "Admin Secondaire modifié",
+        email: "admin2@test.org",
+        functionTitle: "DSI",
+        institution: "CEEAC",
+        status: "actif",
+      },
+    });
+    check(
+      "modification administrateur",
+      r.status === 200 && r.data.admin.name === "Admin Secondaire modifié"
+    );
+
+    r = await admin("DELETE", `/admins/${selfAdminId}`);
+    check("auto-suppression administrateur refusée (403)", r.status === 403);
+
+    r = await admin("POST", `/admins/${selfAdminId}/reset-password`);
+    check("auto-réinitialisation administrateur refusée (403)", r.status === 403);
+
+    r = await admin("DELETE", `/admins/${admin2Id}`);
+    check("suppression administrateur", r.status === 200);
+
     // ─── Sessions ───────────────────────────────────────────────────
     r = await admin("POST", "/sessions", {
       json: {
@@ -416,6 +465,9 @@ async function main() {
       json: { name: "X", email: "x@x.x", country: "RDC", functionTitle: "X" },
     });
     check("un participant ne peut pas gérer les comptes (403)", r.status === 403);
+
+    r = await participant("GET", "/admins");
+    check("un participant n'accède pas aux administrateurs (403)", r.status === 403);
 
     // ─── Statistiques et contenus ───────────────────────────────────
     r = await admin("GET", "/stats");

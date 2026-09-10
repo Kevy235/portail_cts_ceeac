@@ -10,6 +10,7 @@ import {
   LogOut,
   MessagesSquare,
   Settings,
+  Shield,
   UserCircle,
   UserPlus,
   Users,
@@ -35,6 +36,7 @@ interface NavItem {
 const ADMIN_NAV: NavItem[] = [
   { to: "/admin", icon: <LayoutDashboard size={16} />, labelKey: "nav.dashboard" },
   { to: "/admin/participants", icon: <Users size={16} />, labelKey: "nav.participants" },
+  { to: "/admin/administrateurs", icon: <Shield size={16} />, labelKey: "nav.admins" },
   { to: "/admin/documents", icon: <FileText size={16} />, labelKey: "nav.documents" },
   { to: "/admin/reunions", icon: <Calendar size={16} />, labelKey: "nav.sessions" },
   { to: "/admin/parametres", icon: <Settings size={16} />, labelKey: "nav.settings" },

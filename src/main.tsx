@@ -14,6 +14,7 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { ChangePasswordPage } from "@/pages/ChangePasswordPage";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
 import { AdminParticipants } from "@/pages/admin/Participants";
+import { AdminAdmins } from "@/pages/admin/Admins";
 import { AdminDocuments } from "@/pages/admin/Documents";
 import { AdminSessions } from "@/pages/admin/Sessions";
 import { AdminSettings } from "@/pages/admin/Settings";
@@ -75,6 +76,7 @@ function App() {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="participants" element={<AdminParticipants />} />
+          <Route path="administrateurs" element={<AdminAdmins />} />
           <Route path="documents" element={<AdminDocuments />} />
           <Route path="reunions" element={<AdminSessions />} />
           <Route path="sessions" element={<Navigate to="/admin/reunions" replace />} />

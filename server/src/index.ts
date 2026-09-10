@@ -12,6 +12,7 @@ import { seedAdmin } from "./seed.js";
 import { requireAdmin, requireAuth } from "./auth.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { participantsRouter } from "./routes/participants.routes.js";
+import { adminsRouter } from "./routes/admins.routes.js";
 import { sessionsRouter } from "./routes/sessions.routes.js";
 import { categoriesRouter, documentsRouter } from "./routes/documents.routes.js";
 import { guideRouter } from "./routes/guide.routes.js";
@@ -75,6 +76,7 @@ async function main() {
   api.use("/auth/register", registerLimiter);
   api.use("/auth", authRouter);
   api.use("/participants", requireAuth, requireAdmin, participantsRouter);
+  api.use("/admins", requireAuth, requireAdmin, adminsRouter);
   api.use("/sessions", requireAuth, sessionsRouter);
   api.use("/documents", requireAuth, documentsRouter);
   api.use("/categories", requireAuth, categoriesRouter);
