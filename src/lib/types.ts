@@ -5,6 +5,14 @@ export type Role = "admin" | "participant" | "guest";
 export type UserStatus = "actif" | "en-attente" | "inactif";
 export type DocStatus = "publié" | "brouillon";
 export type SessionStatus = "à-venir" | "en-cours" | "terminé";
+export const MEETING_ORGANS = [
+  "conference",
+  "conseil",
+  "comite",
+  "cts",
+  "autre",
+] as const;
+export type MeetingOrgan = (typeof MEETING_ORGANS)[number];
 
 export interface User {
   id: string;
@@ -20,7 +28,7 @@ export interface User {
   lastLoginAt?: string | null;
   uiLang: Lang;
   docLangs: Lang[];
-  /** Session CTS via laquelle le participant s'est auto-inscrit (le cas échéant). */
+  /** Réunion via laquelle le participant s'est auto-inscrit (le cas échéant). */
   originSessionId?: string | null;
   originSessionTitle?: string | null;
 }
@@ -32,6 +40,8 @@ export interface CtsSession {
   startDate: string;
   endDate: string | null;
   status: SessionStatus;
+  /** Organe statutaire CEEAC qui convoque la réunion. */
+  organ: MeetingOrgan;
   reference: string;
   description: string;
   expectedParticipants: number;
@@ -61,6 +71,8 @@ export interface Doc {
   id: string;
   title: string;
   status: DocStatus;
+  /** Incrémenté à chaque remplacement de fichier(s). */
+  version: number;
   /** Document chiffré/codé par l'administrateur avant téléversement. */
   isCoded: boolean;
   createdAt: string;
@@ -70,6 +82,8 @@ export interface Doc {
   sessionId: string | null;
   sessionTitle: string | null;
   sessionReference: string | null;
+  sessionStatus: SessionStatus | null;
+  sessionOrgan: MeetingOrgan | null;
   files: DocFile[];
   downloads: number;
 }

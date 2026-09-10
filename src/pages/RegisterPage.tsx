@@ -13,7 +13,7 @@ import logoCeeac from "@/assets/logo_ceeac.png";
 
 /**
  * Auto-inscription des participants : les États membres reçoivent l'identifiant
- * et le mot de passe d'accès générés pour chaque session CTS ; chaque expert
+ * et le mot de passe d'accès générés pour chaque réunion statutaire ; chaque expert
  * crée ensuite son compte lui-même avec ses propres informations.
  */
 export function RegisterPage() {
@@ -143,7 +143,7 @@ export function RegisterPage() {
                     required
                     value={form.accessCode}
                     onChange={(e) => set("accessCode")(e.target.value.toUpperCase())}
-                    placeholder="CTS-XXXXXX"
+                    placeholder="CEEAC-XXXXXX"
                     autoComplete="off"
                     className={`${inputClass} font-mono tracking-wide uppercase`}
                   />

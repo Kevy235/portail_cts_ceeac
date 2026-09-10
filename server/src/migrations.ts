@@ -277,6 +277,58 @@ export const MIGRATIONS: Migration[] = [
       );
     `,
   },
+  {
+    id: 7,
+    name: "réunions statutaires CEEAC et versions de documents",
+    sql: `
+      -- Organe statutaire de la réunion (la table cts_sessions est conservée
+      -- pour ne pas casser les clés étrangères existantes).
+      ALTER TABLE cts_sessions
+        ADD COLUMN organ TEXT NOT NULL DEFAULT 'cts'
+        CHECK (organ IN ('conference','conseil','comite','cts','autre'));
+
+      -- Numéro de version du document (incrémenté à chaque remplacement de fichier).
+      ALTER TABLE documents
+        ADD COLUMN version INTEGER NOT NULL DEFAULT 1;
+
+      -- Identité du portail : réunions statutaires de la CEEAC
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'CEEAC · Réunions statutaires'
+        WHEN 'platform_subtitle' THEN 'Portail documentaire'
+        WHEN 'org_full_name' THEN 'Communauté Économique des États de l''Afrique Centrale'
+        WHEN 'org_description' THEN 'Plateforme d''accès aux documents des réunions statutaires de la CEEAC'
+        WHEN 'footer_text' THEN '© 2026 CEEAC-ECCAS · Réunions statutaires'
+      END
+      WHERE lang = 'fr' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'ECCAS · Statutory meetings'
+        WHEN 'platform_subtitle' THEN 'Document portal'
+        WHEN 'org_full_name' THEN 'Economic Community of Central African States'
+        WHEN 'org_description' THEN 'Document access platform for ECCAS statutory meetings'
+        WHEN 'footer_text' THEN '© 2026 ECCAS-CEEAC · Statutory meetings'
+      END
+      WHERE lang = 'en' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'CEEAC · Reuniões estatutárias'
+        WHEN 'platform_subtitle' THEN 'Portal documental'
+        WHEN 'org_full_name' THEN 'Comunidade Económica dos Estados da África Central'
+        WHEN 'org_description' THEN 'Plataforma de acesso aos documentos das reuniões estatutárias da CEEAC'
+        WHEN 'footer_text' THEN '© 2026 CEEAC-ECCAS · Reuniões estatutárias'
+      END
+      WHERE lang = 'pt' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+
+      UPDATE settings SET value = CASE key
+        WHEN 'platform_name' THEN 'CEEAC · Reuniones estatutarias'
+        WHEN 'platform_subtitle' THEN 'Portal documental'
+        WHEN 'org_full_name' THEN 'Comunidad Económica de los Estados de África Central'
+        WHEN 'org_description' THEN 'Plataforma de acceso a los documentos de las reuniones estatutarias de la CEEAC'
+        WHEN 'footer_text' THEN '© 2026 CEEAC-ECCAS · Reuniones estatutarias'
+      END
+      WHERE lang = 'es' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
+    `,
+  },
 ];
 
 export const LANGS = ["fr", "en", "pt", "es"] as const;

@@ -15,7 +15,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  /** Accès invité : consultation des documents avec les codes d'une session CTS. */
+  /** Accès invité : consultation des documents avec les codes d'une réunion. */
   sessionLogin: (accessCode: string, accessPassword: string) => Promise<User>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;

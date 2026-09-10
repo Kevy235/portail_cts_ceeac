@@ -1,46 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Edit3, FileText, RotateCcw, Search, Trash2, Upload, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Download, Edit3, FileText, RotateCcw, Search, Trash2, Upload } from "lucide-react";
 import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { Category, CtsSession, Doc, DocStatus } from "@/lib/types";
-import { formatDate, formatSize } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import {
   CodedBadge,
   ConfirmDialog,
   EmptyState,
   ErrorBlock,
-  Field,
   FlagIcon,
   inputClass,
-  LangChip,
   LoadingBlock,
-  Modal,
   PageHeader,
   PrimaryButton,
-  SecondaryButton,
   StatusBadge,
 } from "@/components/ui";
 import { DownloadButton, ViewButton } from "@/components/DownloadButton";
-
-interface FormState {
-  title: string;
-  categoryId: string;
-  sessionId: string;
-  status: DocStatus;
-  isCoded: boolean;
-}
-
-const EMPTY_FORM: FormState = {
-  title: "",
-  categoryId: "",
-  sessionId: "",
-  status: "publié",
-  isCoded: false,
-};
-
-type FileMap = Partial<Record<Lang, File>>;
+import { DocumentFormModal } from "@/components/DocumentFormModal";
 
 export function AdminDocuments() {
   const { t } = useI18n();
@@ -54,14 +33,9 @@ export function AdminDocuments() {
   const [sessionFilter, setSessionFilter] = useState("tous");
   const [langFilter, setLangFilter] = useState<"tous" | Lang>("tous");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [files, setFiles] = useState<FileMap>({});
   const [editing, setEditing] = useState<Doc | null>(null);
   const [deleting, setDeleting] = useState<Doc | null>(null);
   const [busy, setBusy] = useState(false);
-  // Pourcentage d'envoi en cours (null = aucun envoi)
-  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
-  const fileInputs = useRef<Partial<Record<Lang, HTMLInputElement | null>>>({});
 
   const load = () => {
     setLoadError(null);
@@ -117,113 +91,13 @@ export function AdminDocuments() {
   };
 
   const openCreate = () => {
-    setForm(EMPTY_FORM);
-    setFiles({});
     setEditing(null);
     setModal("create");
   };
 
   const openEdit = (doc: Doc) => {
-    setForm({
-      title: doc.title,
-      categoryId: doc.categoryId ?? "",
-      sessionId: doc.sessionId ?? "",
-      status: doc.status,
-      isCoded: doc.isCoded,
-    });
-    setFiles({});
     setEditing(doc);
     setModal("edit");
-  };
-
-  const acceptFile = (lang: Lang, f: File | undefined) => {
-    if (!f) return;
-    setFiles((prev) => ({ ...prev, [lang]: f }));
-    if (!form.title) {
-      setForm((prev) => ({ ...prev, title: f.name.replace(/\.[^.]+$/, "") }));
-    }
-  };
-
-  const submit = async (status: DocStatus) => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      if (modal === "create") {
-        const provided = LANGS.filter((l) => files[l]);
-        if (provided.length === 0) {
-          toast.error(t("docs.needFile"));
-          return;
-        }
-        const fd = new FormData();
-        fd.append("title", form.title);
-        // Même convention que l'édition : champ omis = null côté serveur.
-        if (form.categoryId) fd.append("categoryId", form.categoryId);
-        if (form.sessionId) fd.append("sessionId", form.sessionId);
-        fd.append("status", status);
-        fd.append("isCoded", String(form.isCoded));
-        for (const lang of provided) fd.append(`file_${lang}`, files[lang]!);
-        setUploadPercent(0);
-        await api.postFormWithProgress("/documents", fd, setUploadPercent);
-        toast.success(status === "publié" ? t("docs.published") : t("docs.draftSaved"));
-      } else if (editing) {
-        await api.put(`/documents/${editing.id}`, {
-          title: form.title,
-          categoryId: form.categoryId || null,
-          sessionId: form.sessionId || null,
-          status,
-          isCoded: form.isCoded,
-        });
-        toast.success(t("docs.updated"));
-      }
-      setModal(null);
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setBusy(false);
-      setUploadPercent(null);
-    }
-  };
-
-  // Ajout/remplacement immédiat d'une version linguistique en mode édition
-  const uploadVersion = async (lang: Lang, f: File | undefined) => {
-    if (!f || !editing) return;
-    setBusy(true);
-    setUploadPercent(0);
-    try {
-      const fd = new FormData();
-      fd.append("file", f);
-      const { document } = await api.postFormWithProgress<{ document: Doc }>(
-        `/documents/${editing.id}/files/${lang}`,
-        fd,
-        setUploadPercent
-      );
-      setEditing(document);
-      toast.success(t("docs.fileAdded", { lang: LANG_LABELS[lang] }));
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setBusy(false);
-      setUploadPercent(null);
-    }
-  };
-
-  const deleteVersion = async (lang: Lang) => {
-    if (!editing) return;
-    setBusy(true);
-    try {
-      const { document } = await api.delete<{ document: Doc }>(
-        `/documents/${editing.id}/files/${lang}`
-      );
-      setEditing(document);
-      toast.success(t("docs.fileDeleted"));
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setBusy(false);
-    }
   };
 
   const handleDelete = async () => {
@@ -412,6 +286,11 @@ export function AdminDocuments() {
                       <div className="min-w-0">
                         <p className="text-sm text-ink leading-snug line-clamp-2">
                           {doc.title}
+                          {doc.version > 1 && (
+                            <span className="ml-2 text-[10px] font-semibold text-brand align-middle">
+                              {t("docs.version", { n: doc.version })}
+                            </span>
+                          )}
                           {doc.isCoded && (
                             <span className="ml-2 align-middle">
                               <CodedBadge compact />
@@ -496,213 +375,18 @@ export function AdminDocuments() {
         </div>
       </div>
 
-      {/* ─── Modale publication / édition ──────────────────────────── */}
       {modal && (
-        <Modal
-          title={modal === "create" ? t("docs.publishTitle") : t("docs.editTitle")}
-          subtitle={modal === "create" ? t("docs.publishSubtitle") : editing?.title}
+        <DocumentFormModal
+          mode={modal}
+          categories={categories}
+          sessions={sessions}
+          editing={modal === "edit" ? editing : null}
           onClose={() => setModal(null)}
-          wide
-        >
-          <form
-            className="p-6 space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              submit(form.status);
-            }}
-          >
-            <Field label={t("docs.docTitle")} required>
-              <input
-                required
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder={t("docs.docTitlePh")}
-                className={inputClass}
-              />
-            </Field>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label={t("docs.category")}>
-                <select
-                  value={form.categoryId}
-                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                  className={inputClass}
-                >
-                  <option value="">{t("common.none")}</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label={t("docs.linkedSession")}>
-                <select
-                  value={form.sessionId}
-                  onChange={(e) => setForm({ ...form, sessionId: e.target.value })}
-                  className={inputClass}
-                >
-                  <option value="">{t("common.none")}</option>
-                  {sessions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.title.length > 40 ? `${s.title.slice(0, 40)}…` : s.title}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </div>
-
-            <label className="flex items-start gap-3 px-3 py-3 rounded-lg border border-line-soft hover:bg-mist cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.isCoded}
-                onChange={(e) => setForm({ ...form, isCoded: e.target.checked })}
-                className="w-4 h-4 mt-0.5 accent-brand"
-              />
-              <span>
-                <span className="block text-sm font-medium text-ink">{t("docs.codedLabel")}</span>
-                <span className="block text-xs text-slate2/80 mt-0.5">{t("docs.codedHelp")}</span>
-              </span>
-            </label>
-
-            {/* ─── Versions linguistiques ─────────────────────────── */}
-            <div>
-              <p className="text-xs font-medium text-ink mb-1.5">{t("docs.filesByLang")}</p>
-              <p className="text-[11px] text-slate2/70 mb-3">
-                {t("docs.filesNote", { n: 50 })}
-              </p>
-              <div className="space-y-2">
-                {LANGS.map((lang) => {
-                  const existing = editing?.files.find((f) => f.lang === lang);
-                  const pending = files[lang];
-                  return (
-                    <div
-                      key={lang}
-                      className="flex items-center gap-3 border border-line-soft rounded-lg px-3 py-2.5"
-                    >
-                      <LangChip lang={lang} muted={!existing && !pending} />
-                      <span className="text-xs text-slate2 w-20 flex-shrink-0 hidden sm:inline">
-                        {LANG_LABELS[lang]}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        {modal === "create" ? (
-                          pending ? (
-                            <p className="text-xs text-ink truncate">
-                              {pending.name}{" "}
-                              <span className="text-slate2/60">({formatSize(pending.size)})</span>
-                            </p>
-                          ) : (
-                            <p className="text-xs text-slate2/50">{t("docs.noFile")}</p>
-                          )
-                        ) : existing ? (
-                          <p className="text-xs text-ink truncate">
-                            {existing.fileName}{" "}
-                            <span className="text-slate2/60">
-                              ({formatSize(existing.fileSize)})
-                            </span>
-                          </p>
-                        ) : (
-                          <p className="text-xs text-slate2/50">{t("docs.noFile")}</p>
-                        )}
-                      </div>
-                      <input
-                        ref={(el) => {
-                          fileInputs.current[lang] = el;
-                        }}
-                        type="file"
-                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          e.target.value = "";
-                          if (modal === "create") acceptFile(lang, f);
-                          else uploadVersion(lang, f);
-                        }}
-                      />
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => fileInputs.current[lang]?.click()}
-                          className="text-xs text-brand hover:underline px-2 py-1 disabled:opacity-50"
-                        >
-                          {existing || pending ? t("docs.replaceFile") : t("docs.chooseFile")}
-                        </button>
-                        {modal === "create" && pending && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setFiles((prev) => {
-                                const next = { ...prev };
-                                delete next[lang];
-                                return next;
-                              })
-                            }
-                            className="p-1 text-slate2/50 hover:text-danger transition-colors"
-                            title={t("docs.deleteFile")}
-                          >
-                            <X size={13} />
-                          </button>
-                        )}
-                        {modal === "edit" && existing && (editing?.files.length ?? 0) > 1 && (
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => deleteVersion(lang)}
-                            className="p-1 text-slate2/50 hover:text-danger transition-colors disabled:opacity-50"
-                            title={t("docs.deleteFile")}
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Barre de progression de l'envoi */}
-            {uploadPercent !== null && (
-              <div aria-live="polite">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-slate2">{t("docs.uploading")}</span>
-                  <span className="text-xs font-mono font-semibold text-brand tabular-nums">
-                    {uploadPercent}%
-                  </span>
-                </div>
-                <div className="h-2 bg-mist rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-brand rounded-full transition-[width] duration-200 ease-out"
-                    style={{ width: `${uploadPercent}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 pt-1">
-              <SecondaryButton
-                type="button"
-                className="flex-1"
-                disabled={busy}
-                onClick={() => submit("brouillon")}
-              >
-                {t("docs.saveDraft")}
-              </SecondaryButton>
-              <PrimaryButton
-                type="button"
-                className="flex-1"
-                disabled={busy}
-                onClick={() => submit("publié")}
-              >
-                {uploadPercent !== null
-                  ? `${t("docs.uploading")} ${uploadPercent}%`
-                  : busy
-                    ? t("docs.uploading")
-                    : t("docs.publishNow")}
-              </PrimaryButton>
-            </div>
-          </form>
-        </Modal>
+          onSaved={async () => {
+            setModal(null);
+            await load();
+          }}
+        />
       )}
 
       {deleting && (

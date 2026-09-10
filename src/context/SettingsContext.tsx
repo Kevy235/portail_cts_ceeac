@@ -12,15 +12,13 @@ import type { Settings } from "@/lib/types";
 import { useI18n } from "@/i18n";
 
 const DEFAULTS: Settings = {
-  platform_name: "CEEAC · CTS-DSS",
-  platform_subtitle: "Plateforme CTS-DSS",
-  org_full_name:
-    "Comité Technique Spécialisé Défense, Sûreté et Sécurité",
+  platform_name: "CEEAC · Réunions statutaires",
+  platform_subtitle: "Portail documentaire",
+  org_full_name: "Communauté Économique des États de l'Afrique Centrale",
   org_description:
-    "Plateforme d'accès aux documents et ressources du CTS-DSS — CEEAC",
+    "Plateforme d'accès aux documents des réunions statutaires de la CEEAC",
   contact_email: "dapps@ceeac-eccas.org",
-  footer_text:
-    "© 2025 CEEAC-ECCAS · Comité Technique Spécialisé Défense, Sûreté et Sécurité",
+  footer_text: "© 2026 CEEAC-ECCAS · Réunions statutaires",
   login_notice: "Accès réservé aux experts accrédités et aux administrateurs",
 };
 

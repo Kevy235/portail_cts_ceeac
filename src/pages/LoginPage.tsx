@@ -13,7 +13,7 @@ import logoCeeac from "@/assets/logo_ceeac.png";
  * Connexion à deux modes :
  *  - « J'ai un compte » : e-mail + mot de passe (participants inscrits, admin) ;
  *  - « Codes de session » : les représentants des États membres saisissent les
- *    accès transmis pour la session CTS et consultent directement les documents
+ *    accès transmis pour la réunion et consultent directement les documents
  *    en invité — l'inscription (création de compte) est facultative.
  */
 export function LoginPage() {
@@ -261,7 +261,7 @@ export function LoginPage() {
                             setAccessCode(e.target.value.toUpperCase());
                             setError("");
                           }}
-                          placeholder="CTS-XXXXXX"
+                          placeholder="CEEAC-XXXXXX"
                           autoComplete="off"
                           className={`${inputClass} pl-9 font-mono tracking-wide uppercase`}
                         />

@@ -37,10 +37,10 @@ export const fr = {
   "nav.dashboard": "Tableau de bord",
   "nav.participants": "Participants",
   "nav.documents": "Documents",
-  "nav.sessions": "Sessions CTS",
+  "nav.sessions": "Réunions statutaires",
   "nav.settings": "Contenus du portail",
   "nav.library": "Bibliothèque documentaire",
-  "nav.psessions": "Sessions & échanges",
+  "nav.psessions": "Réunions & échanges",
   "nav.profile": "Mon profil",
   "header.logout": "Déconnexion",
   "header.admin": "Administrateur",
@@ -57,9 +57,9 @@ export const fr = {
   "login.submitting": "Connexion…",
   "login.failed": "Connexion impossible",
   "login.invalidCredentials": "Identifiants incorrects. Veuillez réessayer.",
-  "login.accountDisabled": "Votre compte est désactivé. Contactez le Secrétariat CTS-DSS.",
+  "login.accountDisabled": "Votre compte est désactivé. Contactez le Secrétariat de la CEEAC.",
   "login.noAccount":
-    "Vous n'avez pas de compte ? Contactez le Secrétariat CTS-DSS ({email}) pour une accréditation.",
+    "Vous n'avez pas de compte ? Contactez le Secrétariat de la CEEAC ({email}) pour une accréditation.",
 
   // ─── Mot de passe ─────────────────────────────────────────────────────
   "pwd.firstTitle": "Première connexion",
@@ -83,20 +83,20 @@ export const fr = {
   "dash.totalAccounts": "{n} compte(s) au total",
   "dash.publishedDocs": "Documents publiés",
   "dash.pendingDrafts": "{n} brouillon(s) en attente",
-  "dash.plannedSessions": "Sessions planifiées",
+  "dash.plannedSessions": "Réunions planifiées",
   "dash.nextOn": "prochaine : {date}",
-  "dash.noUpcoming": "aucune session à venir",
+  "dash.noUpcoming": "aucune réunion à venir",
   "dash.downloads": "Téléchargements",
   "dash.totalDownloads": "{n} au total",
   "dash.recentActivity": "Activité récente",
   "dash.noActivity": "Aucune activité enregistrée pour le moment",
-  "dash.nextSession": "Prochaine session",
+  "dash.nextSession": "Prochaine réunion",
   "dash.locationTbd": "Lieu à confirmer",
   "dash.nParticipants": "{n} participants",
   "dash.nDocuments": "{n} documents",
-  "dash.manageSessions": "Gérer les sessions",
-  "dash.noSessionPlanned": "Aucune session planifiée",
-  "dash.createSession": "Créer une session",
+  "dash.manageSessions": "Gérer les réunions",
+  "dash.noSessionPlanned": "Aucune réunion planifiée",
+  "dash.createSession": "Créer une réunion",
   "dash.quickActions": "Actions rapides",
   "dash.addParticipant": "Ajouter un participant",
   "dash.publishDocument": "Publier un document",
@@ -112,9 +112,9 @@ export const fr = {
   "activity.document_updated": "Document mis à jour",
   "activity.document_deleted": "Document supprimé",
   "activity.document_downloaded": "Document téléchargé",
-  "activity.session_created": "Session programmée",
-  "activity.session_updated": "Session mise à jour",
-  "activity.session_deleted": "Session supprimée",
+  "activity.session_created": "Réunion programmée",
+  "activity.session_updated": "Réunion mise à jour",
+  "activity.session_deleted": "Réunion supprimée",
   "activity.settings_updated": "Contenus du portail mis à jour",
   "activity.guide_updated": "Guide utilisateur mis à jour",
   "activity.guide_deleted": "Guide utilisateur supprimé",
@@ -171,7 +171,7 @@ export const fr = {
   "part.copied": "Identifiants copiés",
   "part.pwdReset": "Mot de passe réinitialisé",
   "part.copyText":
-    "Plateforme CTS-DSS — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
+    "Portail CEEAC — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
 
   // ─── Documents (admin) ────────────────────────────────────────────────
   "docs.title": "Gestion documentaire",
@@ -182,7 +182,7 @@ export const fr = {
   "docs.filterDrafts": "Brouillons",
   "docs.colDocument": "Document",
   "docs.colCategory": "Catégorie",
-  "docs.colSession": "Session",
+  "docs.colSession": "Réunion",
   "docs.colDate": "Date",
   "docs.colLangs": "Langues",
   "docs.colDl": "Téléch.",
@@ -198,7 +198,7 @@ export const fr = {
   "docs.docTitle": "Titre du document",
   "docs.docTitlePh": "Titre officiel du document",
   "docs.category": "Catégorie",
-  "docs.linkedSession": "Session liée",
+  "docs.linkedSession": "Réunion liée",
   "docs.filesByLang": "Versions linguistiques",
   "docs.filesNote":
     "Fournissez le fichier du document dans chaque langue disponible (au moins une). PDF, Word, Excel, PowerPoint — max. {n} Mo.",
@@ -220,37 +220,37 @@ export const fr = {
   "docs.fileAdded": "Version {lang} enregistrée",
   "docs.fileDeleted": "Version supprimée",
 
-  // ─── Sessions ─────────────────────────────────────────────────────────
-  "sess.title": "Sessions CTS-DSS",
-  "sess.subtitle": "Calendrier des sessions ordinaires et extraordinaires",
-  "sess.psubtitle": "Calendrier des sessions et fils de discussion",
-  "sess.new": "Nouvelle session",
-  "sess.empty": "Aucune session — créez la première session CTS",
-  "sess.pempty": "Aucune session n'est programmée pour le moment",
+  // ─── Réunions statutaires ─────────────────────────────────────────────
+  "sess.title": "Réunions statutaires",
+  "sess.subtitle": "Calendrier des réunions statutaires de la CEEAC",
+  "sess.psubtitle": "Calendrier des réunions et fils de discussion",
+  "sess.new": "Nouvelle réunion",
+  "sess.empty": "Aucune réunion — créez la première réunion statutaire",
+  "sess.pempty": "Aucune réunion n'est programmée pour le moment",
   "sess.expected": "{n} participants attendus",
   "sess.nDocs": "{n} document(s)",
   "sess.discussion": "Discussion",
-  "sess.newTitle": "Nouvelle session CTS",
-  "sess.editTitle": "Modifier la session",
-  "sess.fieldTitle": "Titre de la session",
-  "sess.fieldTitlePh": "3ème Session Ordinaire CTS-DSS 2025",
+  "sess.newTitle": "Nouvelle réunion statutaire",
+  "sess.editTitle": "Modifier la réunion",
+  "sess.fieldTitle": "Titre de la réunion",
+  "sess.fieldTitlePh": "33ème Session ordinaire de la Conférence des Chefs d'État",
   "sess.reference": "Référence",
-  "sess.referencePh": "CTS-DSS/2025/03",
+  "sess.referencePh": "CEEAC/2026/01",
   "sess.location": "Lieu",
-  "sess.locationPh": "Brazzaville, Congo",
+  "sess.locationPh": "Malabo, Guinée Équatoriale",
   "sess.startDate": "Date de début",
   "sess.endDate": "Date de fin",
   "sess.status": "Statut",
   "sess.expectedLbl": "Participants attendus",
   "sess.description": "Description",
   "sess.descriptionPh": "Ordre du jour, contexte, objectifs…",
-  "sess.createBtn": "Créer la session",
-  "sess.created": "Session créée",
-  "sess.updated": "Session mise à jour",
-  "sess.deleted": "Session supprimée",
-  "sess.deleteTitle": "Supprimer la session",
+  "sess.createBtn": "Créer la réunion",
+  "sess.created": "Réunion créée",
+  "sess.updated": "Réunion mise à jour",
+  "sess.deleted": "Réunion supprimée",
+  "sess.deleteTitle": "Supprimer la réunion",
   "sess.deleteMsg":
-    "« {title} » sera supprimée, ainsi que son fil de discussion. Les documents liés seront conservés mais détachés de la session.",
+    "« {title} » sera supprimée, ainsi que son fil de discussion. Les documents liés seront conservés mais détachés de la réunion.",
 
   // ─── Discussion ───────────────────────────────────────────────────────
   "chat.title": "Fil de discussion",
@@ -309,7 +309,7 @@ export const fr = {
 
   // ─── Profil (participant) ─────────────────────────────────────────────
   "prof.title": "Mon profil",
-  "prof.subtitle": "Informations de votre accréditation CTS-DSS",
+  "prof.subtitle": "Informations de votre accréditation CEEAC",
   "prof.email": "Adresse e-mail",
   "prof.institution": "Institution",
   "prof.country": "Pays représenté",
@@ -325,10 +325,10 @@ export const fr = {
   "prof.prefsFailed": "Enregistrement impossible",
   "prof.changePwd": "Changer mon mot de passe",
   "prof.update": "Mettre à jour",
-  "prof.accredTitle": "Accréditation CTS-DSS",
+  "prof.accredTitle": "Accréditation CEEAC",
   "prof.accredText":
-    "Votre accès à cette plateforme a été accordé par le Secrétariat du CTS-DSS-CEEAC. Pour toute modification de vos informations, veuillez contacter {email}.",
-  "prof.originSession": "Session d'inscription",
+    "Votre accès à cette plateforme a été accordé par le Secrétariat de la CEEAC. Pour toute modification de vos informations, veuillez contacter {email}.",
+  "prof.originSession": "Réunion d'inscription",
 
   // ─── Commun (compléments) ─────────────────────────────────────────────
   "common.retry": "Réessayer",
@@ -347,15 +347,15 @@ export const fr = {
   "common.optional": "(facultatif)",
 
   // ─── Auto-inscription par session ─────────────────────────────────────
-  "login.registerPrompt": "Vous avez reçu les accès d'une session CTS ?",
+  "login.registerPrompt": "Vous avez reçu les accès d'une réunion statutaire ?",
   "login.registerLink": "Inscrivez-vous ici",
-  "register.title": "Inscription à une session CTS",
+  "register.title": "Inscription à une réunion statutaire",
   "register.subtitle": "Créez votre compte avec les accès transmis à votre État membre",
-  "register.accessSection": "Accès de la session",
+  "register.accessSection": "Accès de la réunion",
   "register.accessHint":
-    "L'identifiant et le mot de passe de session vous ont été transmis par votre État membre ou le Secrétariat CTS-DSS.",
-  "register.accessCode": "Identifiant de session",
-  "register.accessPassword": "Mot de passe de session",
+    "L'identifiant et le mot de passe de réunion vous ont été transmis par votre État membre ou le Secrétariat de la CEEAC.",
+  "register.accessCode": "Identifiant de réunion",
+  "register.accessPassword": "Mot de passe de réunion",
   "register.personalSection": "Vos informations",
   "register.password": "Votre mot de passe (8 caractères min.)",
   "register.confirmPassword": "Confirmer le mot de passe",
@@ -364,8 +364,8 @@ export const fr = {
   "register.submit": "Créer mon compte",
   "register.submitting": "Création du compte…",
   "register.mismatch": "Les deux mots de passe ne correspondent pas",
-  "register.invalidAccess": "Identifiant ou mot de passe de session incorrect",
-  "register.sessionClosed": "Les inscriptions pour cette session sont closes",
+  "register.invalidAccess": "Identifiant ou mot de passe de réunion incorrect",
+  "register.sessionClosed": "Les inscriptions pour cette réunion sont closes",
   "register.emailTaken": "Un compte existe déjà avec cet e-mail. Connectez-vous directement.",
   "register.haveAccount": "Vous avez déjà un compte ?",
   "register.loginLink": "Se connecter",
@@ -391,18 +391,18 @@ export const fr = {
     "Cochez si le fichier a été chiffré/codé avant le téléversement. Un badge « Codé » sera affiché aux participants.",
 
   // ─── Accès de session & diffusion ─────────────────────────────────────
-  "sess.referenceAuto": "Générée automatiquement (ex. CTS-DSS/2026/01)",
+  "sess.referenceAuto": "Générée automatiquement (ex. CEEAC/2026/01)",
   "sess.registered": "{n} inscrit(s)",
   "sess.endBeforeStart": "La date de fin doit être postérieure à la date de début",
   "sess.broadcast": "Diffuser",
   "sess.access.title": "Accès d'inscription des participants",
-  "sess.access.code": "Identifiant de session",
+  "sess.access.code": "Identifiant de réunion",
   "sess.access.password": "Mot de passe d'accès",
   "sess.access.hint":
     "Transmettez ces accès aux États membres : chaque participant crée ensuite son compte lui-même sur la page d'inscription, avec ses propres informations.",
   "sess.access.copyInvite": "Copier l'invitation",
   "sess.access.invite":
-    "Plateforme CTS-DSS — Inscription à la session\n{title}\n\nIdentifiant de session : {code}\nMot de passe d'accès : {password}\n\nCréez votre compte ici : {url}",
+    "Portail CEEAC — Inscription à la réunion statutaire\n{title}\n\nIdentifiant de réunion : {code}\nMot de passe d'accès : {password}\n\nCréez votre compte ici : {url}",
   "sess.access.regenerate": "Régénérer",
   "sess.access.regenerateTitle": "Régénérer les accès",
   "sess.access.regenerateMsg":
@@ -411,14 +411,14 @@ export const fr = {
   "sess.access.willGenerate":
     "Un identifiant et un mot de passe d'accès seront générés automatiquement pour l'inscription des participants.",
   "sess.access.createdInfo":
-    "Accès générés : {code} — retrouvez-les sur la carte de la session.",
+    "Accès générés : {code} — retrouvez-les sur la carte de la réunion.",
   "broadcast.title": "Diffuser un rapport par e-mail",
   "broadcast.subject": "Objet",
   "broadcast.message": "Message",
   "broadcast.messagePh": "Texte de l'e-mail envoyé aux participants…",
   "broadcast.recipients": "Destinataires",
   "broadcast.scopeAll": "Tous les participants actifs",
-  "broadcast.scopeSession": "Participants inscrits via cette session ({n})",
+  "broadcast.scopeSession": "Participants inscrits via cette réunion ({n})",
   "broadcast.docs": "Documents joints (liens de téléchargement)",
   "broadcast.otherDocs": "Autres documents publiés",
   "broadcast.noDocs": "Aucun document publié à joindre",
@@ -447,35 +447,35 @@ export const fr = {
   "login.guideLink": "Guide utilisateur",
   "nav.guide": "Guide",
   "guide.title": "Guide utilisateur",
-  "guide.subtitle": "L'essentiel pour bien utiliser la plateforme CTS-DSS",
+  "guide.subtitle": "L'essentiel pour bien utiliser le portail des réunions statutaires",
   "guide.intro":
-    "La plateforme CTS-DSS donne accès aux documents officiels du Comité Technique Spécialisé Défense, Sûreté et Sécurité de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès du Secrétariat CTS-DSS.",
+    "Ce portail donne accès aux documents officiels des réunions statutaires de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès du Secrétariat de la CEEAC.",
   "guide.backToLogin": "Retour à la connexion",
-  "guide.s1.title": "Accéder avec les codes de session (invité)",
+  "guide.s1.title": "Accéder avec les codes de réunion (invité)",
   "guide.s1.p":
-    "Vous avez reçu un identifiant de session (CTS-XXXXXX) et un mot de passe d'accès ? Vous pouvez consulter les documents immédiatement, sans créer de compte.",
-  "guide.s1.1": "Sur la page de connexion, ouvrez l'onglet « Codes de session ».",
-  "guide.s1.2": "Saisissez l'identifiant de session et le mot de passe d'accès reçus.",
+    "Vous avez reçu un identifiant de réunion (CEEAC-XXXXXX) et un mot de passe d'accès ? Vous pouvez consulter les documents immédiatement, sans créer de compte — avant, pendant et après la réunion.",
+  "guide.s1.1": "Sur la page de connexion, ouvrez l'onglet « Codes de réunion ».",
+  "guide.s1.2": "Saisissez l'identifiant de réunion et le mot de passe d'accès reçus.",
   "guide.s1.3": "Cliquez sur « Accéder aux documents » : la bibliothèque s'ouvre immédiatement.",
   "guide.s1.note":
     "L'accès invité est valable 24 heures ; saisissez à nouveau les codes pour le renouveler.",
   "guide.s2.title": "Créer votre compte participant (facultatif)",
   "guide.s2.p":
-    "Le compte permet de participer aux fils de discussion et de recevoir les rapports par e-mail. Les mêmes codes de session servent à l'inscription.",
+    "Le compte permet de participer aux fils de discussion et de recevoir les rapports par e-mail. Les mêmes codes de réunion servent à l'inscription.",
   "guide.s2.1": "Ouvrez la page d'inscription via « Inscrivez-vous ici » ou « Créer mon compte ».",
   "guide.s2.2": "Saisissez les codes de session, puis vos informations (nom, e-mail institutionnel, pays).",
   "guide.s2.3": "Choisissez votre mot de passe personnel (8 caractères minimum) et validez.",
   "guide.s2.note":
     "Par la suite, connectez-vous toujours avec votre adresse e-mail et votre mot de passe personnel (onglet « J'ai un compte »).",
   "guide.s3.title": "La bibliothèque documentaire",
-  "guide.s3.1": "Recherchez un document par les mots de son titre ; filtrez par catégorie ou par session.",
+  "guide.s3.1": "Recherchez un document par les mots de son titre ; filtrez par catégorie ou par réunion.",
   "guide.s3.2":
     "Consultez un PDF en ligne avec le bouton « œil », ou téléchargez la version souhaitée (FR, EN, PT, ES).",
   "guide.s3.3":
     "Les documents portant le badge « Document codé » nécessitent une clé de lecture transmise séparément par le Secrétariat.",
-  "guide.s4.title": "Sessions & discussions (compte requis)",
+  "guide.s4.title": "Réunions & discussions (compte requis)",
   "guide.s4.1":
-    "La page « Sessions & échanges » présente le calendrier des sessions du CTS : dates, lieu, statut et documents rattachés.",
+    "La page « Réunions & échanges » présente le calendrier des réunions statutaires : dates, lieu, statut et documents rattachés.",
   "guide.s4.2":
     "Ouvrez « Discussion » sur une session pour échanger avec les autres participants et le Secrétariat (2 000 caractères par message).",
   "guide.s5.title": "Confort de lecture",
@@ -483,19 +483,19 @@ export const fr = {
   "guide.s5.2": "Les boutons drapeaux changent immédiatement la langue de l'interface (FR, EN, PT, ES).",
   "guide.s6.title": "Votre profil",
   "guide.s6.1":
-    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous au Secrétariat CTS-DSS.",
+    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous au Secrétariat de la CEEAC.",
   "guide.assistTitle": "Assistance",
   "guide.assist":
-    "Pour toute difficulté (accès, mot de passe, accréditation), le Secrétariat CTS-DSS demeure à votre disposition :",
+    "Pour toute difficulté (accès, mot de passe, accréditation), le Secrétariat de la CEEAC demeure à votre disposition :",
   "guide.dl.title": "Guide officiel à télécharger",
   "guide.dl.desc":
     "Téléchargez le guide utilisateur complet publié par le Secrétariat, dans la langue de votre choix.",
 
   // ─── Accès invité par codes de session ────────────────────────────────
   "login.tabAccount": "J'ai un compte",
-  "login.tabCodes": "Codes de session",
+  "login.tabCodes": "Codes de réunion",
   "login.codesHint":
-    "Saisissez les accès transmis à votre État membre pour consulter directement les documents de la session — sans créer de compte.",
+    "Saisissez les accès transmis à votre État membre pour consulter directement les documents de la réunion — sans créer de compte.",
   "login.codesSubmit": "Accéder aux documents",
   "login.codesOptional": "Facultatif : créez un compte participant pour prendre part aux échanges.",
   "guest.name": "Invité",
@@ -505,7 +505,7 @@ export const fr = {
 
   // ─── Filtres & consultation ───────────────────────────────────────────
   "docs.view": "Consulter dans le navigateur",
-  "docs.allSessions": "Toutes les sessions",
+  "docs.allSessions": "Toutes les réunions",
   "part.allStatuses": "Tous les statuts",
   "part.allCountries": "Tous les pays",
 
@@ -514,7 +514,7 @@ export const fr = {
   "set.participantNote":
     "Laissez un champ vide pour conserver le texte standard traduit de la plateforme.",
   "set.nav_library": "Libellé du menu « Bibliothèque documentaire »",
-  "set.nav_psessions": "Libellé du menu « Sessions & échanges »",
+  "set.nav_psessions": "Libellé du menu « Réunions & échanges »",
   "set.nav_profile": "Libellé du menu « Mon profil »",
   "set.library_title": "Bannière de la bibliothèque — titre",
   "set.library_notice": "Bannière de la bibliothèque — sous-texte",
@@ -524,6 +524,31 @@ export const fr = {
   "account.hint": "Identifiants utilisés pour vous connecter à la plateforme.",
   "account.nameLbl": "Nom d'utilisateur",
   "account.saved": "Compte mis à jour",
+
+  // ─── Réunions statutaires & versions documentaires ───────────────────
+  "sess.organ": "Organe statutaire",
+  "sess.organ.conference": "Conférence des Chefs d'État et de Gouvernement",
+  "sess.organ.conseil": "Conseil des Ministres",
+  "sess.organ.comite": "Comité des Ambassadeurs",
+  "sess.organ.cts": "Comité Technique Spécialisé",
+  "sess.organ.autre": "Autre réunion statutaire",
+  "sess.docsOpen": "Documents",
+  "sess.docsClose": "Masquer les documents",
+  "docs.version": "Version {n}",
+  "docs.replaceAllHelp":
+    "Remplacez les fichiers déjà publiés par une nouvelle version, dans chaque langue. Les participants voient immédiatement la version à jour — avant, pendant et après la réunion.",
+  "docs.replaceAllBtn": "Publier la nouvelle version",
+  "docs.versionPublished": "Nouvelle version publiée (v{n})",
+  "docs.addToMeeting": "Ajouter un document",
+  "docs.meetingDocs": "Documents de la réunion",
+  "docs.meetingDocsEmpty":
+    "Aucun document rattaché — vous pouvez en ajouter, y compris pour une réunion planifiée ou en cours.",
+  "docs.lifecycleNote":
+    "Les documents publiés restent accessibles aux participants avant, pendant et après la réunion. Vous pouvez les modifier ou les remplacer à tout moment.",
+  "lib.groupOngoing": "Réunion en cours",
+  "lib.groupUpcoming": "Réunions à venir",
+  "lib.groupPast": "Réunions terminées",
+  "lib.groupUnlinked": "Autres documents",
 } as const;
 
 export type Dict = Record<keyof typeof fr, string>;

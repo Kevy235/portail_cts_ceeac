@@ -175,18 +175,20 @@ async function main() {
     // ─── Sessions ───────────────────────────────────────────────────
     r = await admin("POST", "/sessions", {
       json: {
-        title: "3ème Session Ordinaire CTS-DSS 2026",
-        location: "Brazzaville, Congo",
+        title: "33ème Session de la Conférence des Chefs d'État",
+        location: "Malabo, Guinée Équatoriale",
         startDate: "2026-09-25",
         endDate: "2026-09-27",
-        reference: "CTS-DSS/2026/03",
+        organ: "conference",
+        reference: "CEEAC/2026/03",
         expectedParticipants: 38,
       },
     });
     check("création session", r.status === 201);
     check(
       "accès d'inscription générés (identifiant + mot de passe)",
-      /^CTS-[A-Z0-9]{6}$/.test(r.data.session.accessCode) &&
+      /^CEEAC-[A-Z0-9]{6}$/.test(r.data.session.accessCode) &&
+        r.data.session.organ === "conference" &&
         typeof r.data.session.accessPassword === "string" &&
         r.data.session.accessPassword.length >= 8
     );
@@ -223,6 +225,7 @@ async function main() {
       r.status === 201 && r.data.document.files.length === 2
     );
     check("le document est marqué « codé »", r.data.document.isCoded === true);
+    check("le document démarre en version 1", r.data.document.version === 1);
     const docId = r.data.document.id;
 
     const ptForm = new FormData();
@@ -235,6 +238,42 @@ async function main() {
 
     r = await admin("DELETE", `/documents/${docId}/files/pt`);
     check("suppression d'une version linguistique", r.status === 200);
+
+    const newVersion = new FormData();
+    newVersion.append("file_fr", new Blob([pdfBytes], { type: "application/pdf" }), "rapport-v2-fr.pdf");
+    newVersion.append("file_en", new Blob([pdfBytes], { type: "application/pdf" }), "report-v2-en.pdf");
+    r = await admin("POST", `/documents/${docId}/versions`, { form: newVersion });
+    check(
+      "remplacement coordonné des versions linguistiques",
+      r.status === 200 && r.data.document.version === 3
+    );
+
+    r = await admin("PUT", `/sessions/${sessionId}`, {
+      json: {
+        title: "33ème Session de la Conférence des Chefs d'État",
+        location: "Malabo, Guinée Équatoriale",
+        startDate: "2026-09-25",
+        endDate: "2026-09-27",
+        status: "en-cours",
+        organ: "conference",
+        reference: "CEEAC/2026/03",
+        expectedParticipants: 38,
+      },
+    });
+    check("passage de la réunion en cours", r.status === 200 && r.data.session.status === "en-cours");
+
+    const midMeetingDoc = new FormData();
+    midMeetingDoc.append("file_fr", new Blob([pdfBytes], { type: "application/pdf" }), "odj-fr.pdf");
+    midMeetingDoc.append("title", "Ordre du jour révisé");
+    midMeetingDoc.append("sessionId", sessionId);
+    midMeetingDoc.append("status", "publié");
+    midMeetingDoc.append("isCoded", "false");
+    r = await admin("POST", "/documents", { form: midMeetingDoc });
+    check(
+      "ajout d'un document à une réunion en cours",
+      r.status === 201 && r.data.document.sessionId === sessionId
+    );
+    const midDocId = r.data.document.id;
 
     const noFileForm = new FormData();
     noFileForm.append("title", "Document sans fichier");
@@ -299,7 +338,7 @@ async function main() {
     r = await participant("GET", "/documents");
     check(
       "le participant voit uniquement les documents publiés",
-      r.status === 200 && r.data.documents.length === 1
+      r.status === 200 && r.data.documents.length === 2
     );
 
     r = await participant("GET", `/documents/${docId}/download/en`);
@@ -379,7 +418,7 @@ async function main() {
     check(
       "statistiques dynamiques exactes",
       r.data.participants.total === 1 &&
-        r.data.documents.publies === 1 &&
+        r.data.documents.publies === 2 &&
         r.data.sessions.planifiees === 1 &&
         r.data.downloads.total === 1 &&
         r.data.activity.length > 0
@@ -418,7 +457,7 @@ async function main() {
     check(
       "les contenus portugais par défaut sont présents (lang=pt)",
       typeof r.data.settings.org_full_name === "string" &&
-        r.data.settings.org_full_name.includes("Comité Técnico")
+        r.data.settings.org_full_name.includes("Comunidade")
     );
 
     // ─── Robustesse : paramètres invalides ne tuent pas le serveur ──
@@ -496,7 +535,7 @@ async function main() {
     r = await registrant("GET", "/documents");
     check(
       "le flag « codé » est visible par les participants",
-      r.status === 200 && r.data.documents[0].isCoded === true
+      r.status === 200 && r.data.documents.some((d) => d.isCoded === true)
     );
 
     r = await admin("GET", "/sessions");
@@ -553,6 +592,49 @@ async function main() {
     r = await guest("GET", "/participants");
     check("l'invité n'accède pas à l'administration (403)", r.status === 403);
 
+    r = await admin("PUT", `/sessions/${sessionId}`, {
+      json: {
+        title: "33ème Session de la Conférence des Chefs d'État",
+        location: "Malabo, Guinée Équatoriale",
+        startDate: "2026-09-25",
+        endDate: "2026-09-27",
+        status: "terminé",
+        organ: "conference",
+        reference: "CEEAC/2026/03",
+        expectedParticipants: 38,
+      },
+    });
+    check("clôture de la réunion", r.status === 200 && r.data.session.status === "terminé");
+
+    r = await guest("GET", "/documents");
+    check(
+      "l'invité conserve l'accès aux documents après la réunion",
+      r.status === 200 && r.data.documents.length >= 2
+    );
+
+    const guestAfter = makeClient();
+    r = await guestAfter("POST", "/auth/session-login", {
+      json: { accessCode, accessPassword },
+    });
+    check(
+      "accès invité encore possible après la réunion",
+      r.status === 200 && r.data.user.role === "guest"
+    );
+
+    const lateReg = makeClient();
+    r = await lateReg("POST", "/auth/register", {
+      json: {
+        accessCode,
+        accessPassword,
+        name: "Trop tard",
+        email: "trop.tard@test.td",
+        country: "Tchad",
+        functionTitle: "X",
+        password: "MotDePasse#4",
+      },
+    });
+    check("inscription close après la réunion (403)", r.status === 403 && r.data.code === "session_closed");
+
     // ─── Régénération des accès ──────────────────────────────────────
     r = await admin("POST", `/sessions/${sessionId}/regenerate-access`);
     check(
@@ -584,8 +666,8 @@ async function main() {
       json: { title: "Session sans référence explicite", startDate: "2026-11-10" },
     });
     check(
-      "référence auto-générée au format CTS-DSS/AAAA/NN",
-      r.status === 201 && /^CTS-DSS\/2026\/\d{2}$/.test(r.data.session.reference)
+      "référence auto-générée au format CEEAC/AAAA/NN",
+      r.status === 201 && /^CEEAC\/2026\/\d{2}$/.test(r.data.session.reference)
     );
     await admin("DELETE", `/sessions/${r.data.session.id}`);
 
@@ -632,6 +714,8 @@ async function main() {
     // ─── Suppression ────────────────────────────────────────────────
     r = await admin("DELETE", `/documents/${docId}`);
     check("suppression document (fichier inclus)", r.status === 200);
+    r = await admin("DELETE", `/documents/${midDocId}`);
+    check("suppression du document ajouté en cours de réunion", r.status === 200);
     r = await admin("DELETE", `/participants/${participantId}`);
     check("suppression participant", r.status === 200);
     r = await admin("DELETE", `/participants/${registrantId}`);

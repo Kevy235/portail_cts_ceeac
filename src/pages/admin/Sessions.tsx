@@ -1,12 +1,15 @@
-import { useState } from "react";
-import { Calendar, Edit3, KeyRound, Mail, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Calendar, Edit3, FileText, KeyRound, Mail, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { CtsSession, SessionStatus } from "@/lib/types";
+import type { Category, CtsSession, Doc, MeetingOrgan, SessionStatus } from "@/lib/types";
+import { MEETING_ORGANS } from "@/lib/types";
 import { useApiResource } from "@/lib/useApiResource";
 import { useI18n } from "@/i18n";
+import type { Dict } from "@/i18n/fr";
 import { SessionCard } from "@/components/SessionCard";
 import { BroadcastModal } from "@/components/BroadcastModal";
+import { DocumentFormModal } from "@/components/DocumentFormModal";
 import {
   ConfirmDialog,
   CopyButton,
@@ -19,6 +22,7 @@ import {
   PageHeader,
   PrimaryButton,
   SecondaryButton,
+  StatusBadge,
 } from "@/components/ui";
 
 interface FormState {
@@ -27,6 +31,7 @@ interface FormState {
   startDate: string;
   endDate: string;
   status: SessionStatus;
+  organ: MeetingOrgan;
   reference: string;
   description: string;
   // Chaîne (et non nombre) pour permettre un champ vide sans « 0 » collant.
@@ -39,6 +44,7 @@ const EMPTY_FORM: FormState = {
   startDate: "",
   endDate: "",
   status: "à-venir",
+  organ: "cts",
   reference: "",
   description: "",
   expectedParticipants: "",
@@ -115,6 +121,23 @@ export function AdminSessions() {
   const [broadcasting, setBroadcasting] = useState<CtsSession | null>(null);
   const [busy, setBusy] = useState(false);
   const [openThread, setOpenThread] = useState<string | null>(null);
+  const [openDocs, setOpenDocs] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<Doc[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [docModal, setDocModal] = useState<{ mode: "create" | "edit"; sessionId: string; doc?: Doc } | null>(null);
+
+  const reloadDocs = () =>
+    Promise.all([
+      api.get<{ documents: Doc[] }>("/documents"),
+      api.get<{ categories: Category[] }>("/categories"),
+    ]).then(([d, c]) => {
+      setDocuments(d.documents);
+      setCategories(c.categories);
+    });
+
+  useEffect(() => {
+    reloadDocs().catch(() => {});
+  }, []);
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -129,6 +152,7 @@ export function AdminSessions() {
       startDate: s.startDate.slice(0, 10),
       endDate: s.endDate ? s.endDate.slice(0, 10) : "",
       status: s.status,
+      organ: s.organ ?? "cts",
       reference: s.reference,
       description: s.description,
       expectedParticipants: s.expectedParticipants ? String(s.expectedParticipants) : "",
@@ -236,8 +260,26 @@ export function AdminSessions() {
               onToggleDiscussion={() =>
                 setOpenThread((cur) => (cur === session.id ? null : session.id))
               }
+              extras={
+                openDocs === session.id ? (
+                  <MeetingDocuments
+                    documents={documents.filter((d) => d.sessionId === session.id)}
+                    onAdd={() => setDocModal({ mode: "create", sessionId: session.id })}
+                    onEdit={(doc) => setDocModal({ mode: "edit", sessionId: session.id, doc })}
+                  />
+                ) : null
+              }
               actions={
                 <>
+                  <button
+                    onClick={() =>
+                      setOpenDocs((cur) => (cur === session.id ? null : session.id))
+                    }
+                    className="flex items-center gap-1.5 border border-line text-slate2 px-3 py-1.5 rounded-lg text-sm hover:bg-mist transition-colors"
+                  >
+                    <FileText size={14} aria-hidden />
+                    {openDocs === session.id ? t("sess.docsClose") : t("sess.docsOpen")}
+                  </button>
                   <button
                     onClick={() => setBroadcasting(session)}
                     className="flex items-center gap-1.5 border border-line text-slate2 px-3 py-1.5 rounded-lg text-sm hover:bg-mist transition-colors"
@@ -336,6 +378,19 @@ export function AdminSessions() {
                 />
               </Field>
             </div>
+            <Field label={t("sess.organ")}>
+              <select
+                value={form.organ}
+                onChange={(e) => setForm({ ...form, organ: e.target.value as MeetingOrgan })}
+                className={inputClass}
+              >
+                {MEETING_ORGANS.map((organ) => (
+                  <option key={organ} value={organ}>
+                    {t(`sess.organ.${organ}` as keyof Dict)}
+                  </option>
+                ))}
+              </select>
+            </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label={t("sess.status")}>
                 <select
@@ -417,6 +472,84 @@ export function AdminSessions() {
 
       {broadcasting && (
         <BroadcastModal session={broadcasting} onClose={() => setBroadcasting(null)} />
+      )}
+
+      {docModal && (
+        <DocumentFormModal
+          mode={docModal.mode}
+          categories={categories}
+          sessions={sessions}
+          editing={docModal.doc ?? null}
+          defaultSessionId={docModal.sessionId}
+          lockSession
+          onClose={() => setDocModal(null)}
+          onSaved={async () => {
+            setDocModal(null);
+            await Promise.all([resource.reload(), reloadDocs()]);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function MeetingDocuments({
+  documents,
+  onAdd,
+  onEdit,
+}: {
+  documents: Doc[];
+  onAdd: () => void;
+  onEdit: (doc: Doc) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="mt-4 rounded-lg border border-line-soft bg-mist/50 p-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-2">
+        <p className="text-sm font-semibold text-ink">{t("docs.meetingDocs")}</p>
+        <PrimaryButton type="button" onClick={onAdd}>
+          <Plus size={14} aria-hidden />
+          {t("docs.addToMeeting")}
+        </PrimaryButton>
+      </div>
+      <p className="text-xs text-slate2/80 mb-3">{t("docs.lifecycleNote")}</p>
+      {documents.length === 0 ? (
+        <p className="text-sm text-slate2/70">{t("docs.meetingDocsEmpty")}</p>
+      ) : (
+        <ul className="space-y-2">
+          {documents.map((doc) => (
+            <li
+              key={doc.id}
+              className="flex items-center justify-between gap-3 bg-white border border-line-soft rounded-lg px-3 py-2"
+            >
+              <div className="min-w-0">
+                <p className="text-sm text-ink truncate">
+                  {doc.title}
+                  {doc.version > 1 && (
+                    <span className="ml-2 text-[10px] font-semibold text-brand">
+                      {t("docs.version", { n: doc.version })}
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-slate2/70">
+                  {doc.categoryName || t("common.dash")}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <StatusBadge status={doc.status} />
+                <button
+                  type="button"
+                  onClick={() => onEdit(doc)}
+                  className="p-1.5 rounded-lg text-brand hover:bg-brand-soft transition-colors"
+                  title={t("common.edit")}
+                  aria-label={t("common.edit")}
+                >
+                  <Edit3 size={13} />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

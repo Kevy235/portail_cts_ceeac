@@ -4,12 +4,14 @@ import type { ReactNode } from "react";
 import type { CtsSession } from "@/lib/types";
 import { formatDateRange } from "@/lib/format";
 import { useI18n } from "@/i18n";
+import type { Dict } from "@/i18n/fr";
 import { Discussion } from "@/components/Discussion";
 import { StatusBadge } from "@/components/ui";
 
 /**
- * Carte de session partagée entre l'espace admin et l'espace participant.
+ * Carte de réunion partagée entre l'espace admin et l'espace participant.
  * `actions` : boutons supplémentaires (édition, suppression…) ;
+ * `extras` : panneau intercalé (documents de la réunion) ;
  * `footer` : contenu additionnel sous la carte (accès d'inscription côté admin).
  */
 export function SessionCard({
@@ -17,12 +19,14 @@ export function SessionCard({
   discussionOpen,
   onToggleDiscussion,
   actions,
+  extras,
   footer,
 }: {
   session: CtsSession;
   discussionOpen: boolean;
   onToggleDiscussion: () => void;
   actions?: ReactNode;
+  extras?: ReactNode;
   footer?: ReactNode;
 }) {
   const { t } = useI18n();
@@ -63,6 +67,11 @@ export function SessionCard({
                   </span>
                 )}
               </h3>
+              {session.organ && (
+                <p className="text-xs text-brand-dark font-medium mt-0.5">
+                  {t(`sess.organ.${session.organ}` as keyof Dict)}
+                </p>
+              )}
               <p className="text-slate2/80 text-sm mt-0.5 flex items-center gap-3 flex-wrap">
                 <span className="flex items-center gap-1">
                   <Clock size={13} className="text-brand" aria-hidden />{" "}
@@ -118,6 +127,8 @@ export function SessionCard({
           <Discussion sessionId={session.id} />
         </div>
       )}
+
+      {extras}
 
       {footer}
     </div>

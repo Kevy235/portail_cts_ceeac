@@ -202,8 +202,25 @@ export function ParticipantLibrary() {
       </div>
 
       <div className="grid gap-3">
-        {filtered.map((doc) => {
+        {(["en-cours", "à-venir", "terminé", "none"] as const).map((group) => {
+          const groupDocs = filtered.filter((d) =>
+            group === "none" ? !d.sessionStatus : d.sessionStatus === group
+          );
+          if (groupDocs.length === 0) return null;
+          const titleKey =
+            group === "en-cours"
+              ? "lib.groupOngoing"
+              : group === "à-venir"
+                ? "lib.groupUpcoming"
+                : group === "terminé"
+                  ? "lib.groupPast"
+                  : "lib.groupUnlinked";
           return (
+            <div key={group} className="space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-brand-dark pt-1">
+                {t(titleKey)}
+              </h3>
+              {groupDocs.map((doc) => (
             <div
               key={doc.id}
               className="bg-white rounded-xl border border-line-soft shadow-sm p-4 hover:shadow-lg hover:border-brand/35 hover:-translate-y-0.5 transition-all duration-200"
@@ -215,6 +232,11 @@ export function ParticipantLibrary() {
                 <div className="flex-1 min-w-0 basis-full sm:basis-auto">
                   <h3 className="text-base font-semibold text-ink leading-snug mb-1.5">
                     {doc.title}
+                    {doc.version > 1 && (
+                      <span className="ml-2 text-xs font-semibold text-accent align-middle">
+                        {t("docs.version", { n: doc.version })}
+                      </span>
+                    )}
                     {doc.isCoded && (
                       <span className="ml-2 align-middle">
                         <CodedBadge />
@@ -255,6 +277,8 @@ export function ParticipantLibrary() {
                   ))}
                 </div>
               </div>
+            </div>
+              ))}
             </div>
           );
         })}

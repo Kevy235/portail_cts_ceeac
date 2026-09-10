@@ -7,6 +7,7 @@ import { config, isMailConfigured } from "../config.js";
 import { requireAccount, requireAdmin } from "../auth.js";
 import { ah, uuidParams } from "../http.js";
 import { generateAccessCode, generateAccessPassword } from "../codes.js";
+import { MEETING_ORGANS } from "../meetings.js";
 import { buildReportMail, sendBroadcast, type MailAttachment } from "../mailer.js";
 import { logActivity } from "../activity.js";
 
@@ -23,6 +24,7 @@ const sessionSchema = z
       .nullable()
       .optional(),
     status: z.enum(["à-venir", "en-cours", "terminé"]).default("à-venir"),
+    organ: z.enum(MEETING_ORGANS).default("cts"),
     reference: z.string().trim().default(""),
     description: z.string().trim().default(""),
     expectedParticipants: z.number().int().min(0).default(0),
@@ -33,7 +35,7 @@ const sessionSchema = z
 
 // Colonnes visibles par tous les utilisateurs authentifiés.
 const ROW = `s.id, s.title, s.location, s.start_date AS "startDate", s.end_date AS "endDate",
-  s.status, s.reference, s.description, s.expected_participants AS "expectedParticipants",
+  s.status, s.organ, s.reference, s.description, s.expected_participants AS "expectedParticipants",
   s.created_at AS "createdAt",
   (SELECT COUNT(*)::int FROM documents d WHERE d.session_id = s.id) AS "documentCount",
   (SELECT COUNT(*)::int FROM users u WHERE u.origin_session_id = s.id) AS "registeredCount"`;
@@ -53,7 +55,7 @@ sessionsRouter.get(
 );
 
 /**
- * Référence auto-générée : CTS-DSS/ANNÉE/NN, où NN suit la plus haute
+ * Référence auto-générée : CEEAC/ANNÉE/NN, où NN suit la plus haute
  * séquence existante pour l'année (robuste aux suppressions).
  */
 async function nextReference(startDate: string): Promise<string> {
@@ -62,9 +64,9 @@ async function nextReference(startDate: string): Promise<string> {
     `SELECT COALESCE(MAX(split_part(reference, '/', 3)::int), 0) + 1 AS next
      FROM cts_sessions
      WHERE reference LIKE $1 AND split_part(reference, '/', 3) ~ '^[0-9]+$'`,
-    [`CTS-DSS/${year}/%`]
+    [`CEEAC/${year}/%`]
   );
-  return `CTS-DSS/${year}/${String(rows[0].next).padStart(2, "0")}`;
+  return `CEEAC/${year}/${String(rows[0].next).padStart(2, "0")}`;
 }
 
 sessionsRouter.post(
@@ -87,14 +89,14 @@ sessionsRouter.post(
       try {
         const { rows } = await query(
           `WITH inserted AS (
-             INSERT INTO cts_sessions (title, location, start_date, end_date, status, reference,
+             INSERT INTO cts_sessions (title, location, start_date, end_date, status, organ, reference,
                                        description, expected_participants, access_code, access_password)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *
            ) SELECT ${ADMIN_ROW} FROM inserted s`,
-          [d.title, d.location, d.startDate, d.endDate ?? null, d.status, reference,
+          [d.title, d.location, d.startDate, d.endDate ?? null, d.status, d.organ, reference,
            d.description, d.expectedParticipants, accessCode, accessPassword]
         );
-        await logActivity("session_created", "Session programmée", d.title, req.user!.id);
+        await logActivity("session_created", "Réunion programmée", d.title, req.user!.id);
         return res.status(201).json({ session: rows[0] });
       } catch (err) {
         const isUniqueViolation =
@@ -120,14 +122,14 @@ sessionsRouter.put(
     const { rows } = await query(
       `WITH updated AS (
          UPDATE cts_sessions SET title = $1, location = $2, start_date = $3, end_date = $4,
-           status = $5, reference = $6, description = $7, expected_participants = $8, updated_at = now()
-         WHERE id = $9 RETURNING *
+           status = $5, organ = $6, reference = $7, description = $8, expected_participants = $9, updated_at = now()
+         WHERE id = $10 RETURNING *
        ) SELECT ${ADMIN_ROW} FROM updated s`,
-      [d.title, d.location, d.startDate, d.endDate ?? null, d.status, d.reference, d.description, d.expectedParticipants, req.params.id]
+      [d.title, d.location, d.startDate, d.endDate ?? null, d.status, d.organ, d.reference, d.description, d.expectedParticipants, req.params.id]
     );
-    if (!rows[0]) return res.status(404).json({ error: "Session introuvable" });
+    if (!rows[0]) return res.status(404).json({ error: "Réunion introuvable" });
 
-    await logActivity("session_updated", "Session mise à jour", d.title, req.user!.id);
+    await logActivity("session_updated", "Réunion mise à jour", d.title, req.user!.id);
     res.json({ session: rows[0] });
   })
 );
@@ -145,11 +147,11 @@ sessionsRouter.post(
        ) SELECT ${ADMIN_ROW} FROM updated s`,
       [generateAccessCode(), generateAccessPassword(), req.params.id]
     );
-    if (!rows[0]) return res.status(404).json({ error: "Session introuvable" });
+    if (!rows[0]) return res.status(404).json({ error: "Réunion introuvable" });
 
     await logActivity(
       "session_updated",
-      "Accès de session régénérés",
+      "Accès de réunion régénérés",
       (rows[0] as { title: string }).title,
       req.user!.id
     );
@@ -166,9 +168,9 @@ sessionsRouter.delete(
       "DELETE FROM cts_sessions WHERE id = $1 RETURNING title",
       [req.params.id]
     );
-    if (!rows[0]) return res.status(404).json({ error: "Session introuvable" });
+    if (!rows[0]) return res.status(404).json({ error: "Réunion introuvable" });
 
-    await logActivity("session_deleted", "Session supprimée", rows[0].title, req.user!.id);
+    await logActivity("session_deleted", "Réunion supprimée", rows[0].title, req.user!.id);
     res.json({ ok: true });
   })
 );
@@ -257,7 +259,7 @@ sessionsRouter.post(
       "SELECT title FROM cts_sessions WHERE id = $1",
       [req.params.id]
     );
-    if (!session.rows[0]) return res.status(404).json({ error: "Session introuvable" });
+    if (!session.rows[0]) return res.status(404).json({ error: "Réunion introuvable" });
 
     const recipients = await query<{ email: string }>(
       `SELECT email FROM users
@@ -270,7 +272,7 @@ sessionsRouter.post(
       return res.status(400).json({
         error:
           d.scope === "session"
-            ? "Aucun participant actif inscrit via cette session"
+            ? "Aucun participant actif inscrit via cette réunion"
             : "Aucun participant actif à notifier",
       });
     }
@@ -301,7 +303,7 @@ sessionsRouter.post(
     );
 
     const mail = buildReportMail({
-      platformName: platform.rows[0]?.value ?? "CEEAC · CTS-DSS",
+      platformName: platform.rows[0]?.value ?? "CEEAC · Réunions statutaires",
       sessionTitle: session.rows[0].title,
       subject: d.subject,
       message: d.message,
@@ -368,7 +370,7 @@ sessionsRouter.post(
     }
 
     const session = await query("SELECT id FROM cts_sessions WHERE id = $1", [req.params.id]);
-    if (!session.rows[0]) return res.status(404).json({ error: "Session introuvable" });
+    if (!session.rows[0]) return res.status(404).json({ error: "Réunion introuvable" });
 
     const { rows } = await query(
       `WITH inserted AS (

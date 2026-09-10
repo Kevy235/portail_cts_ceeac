@@ -67,10 +67,11 @@ const metaSchema = z.object({
 
 const isLang = (v: string): v is Lang => (LANGS as readonly string[]).includes(v);
 
-const ROW = `d.id, d.title, d.status, d.is_coded AS "isCoded",
+const ROW = `d.id, d.title, d.status, d.is_coded AS "isCoded", d.version,
   d.created_at AS "createdAt", d.updated_at AS "updatedAt",
   d.category_id AS "categoryId", c.name AS "categoryName",
   d.session_id AS "sessionId", s.title AS "sessionTitle", s.reference AS "sessionReference",
+  s.status AS "sessionStatus", s.organ AS "sessionOrgan",
   COALESCE((
     SELECT json_agg(json_build_object(
       'lang', f.lang, 'fileName', f.file_name, 'fileSize', f.file_size, 'mimeType', f.mime_type
@@ -259,6 +260,11 @@ documentsRouter.post("/:id/files/:lang", requireAdmin, uuidParams("id"), (req, r
           [req.params.id, lang, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype]
         );
 
+        await query(
+          `UPDATE documents SET version = version + 1, updated_at = now() WHERE id = $1`,
+          [req.params.id]
+        );
+
         if (old.rows[0]) {
           fs.promises
             .unlink(path.join(config.uploadDir, old.rows[0].stored_name))
@@ -267,13 +273,89 @@ documentsRouter.post("/:id/files/:lang", requireAdmin, uuidParams("id"), (req, r
 
         await logActivity(
           "document_updated",
-          "Version linguistique ajoutée",
+          "Version linguistique remplacée",
           `${doc.rows[0].title} (${lang.toUpperCase()})`,
           req.user!.id
         );
         res.json({ document: await fetchDocument(req.params.id) });
       } catch (dbErr) {
         fs.promises.unlink(req.file.path).catch(() => {});
+        throw dbErr;
+      }
+    };
+    handle().catch(next);
+  });
+});
+
+// Remplacement coordonné des fichiers (toutes les langues fournies) + incrément de version.
+// Autorisé quel que soit le statut de la réunion (planifiée, en cours, terminée)
+// et du document (publié ou brouillon).
+documentsRouter.post("/:id/versions", requireAdmin, uuidParams("id"), (req, res, next) => {
+  uploadByLang(req, res, (err) => {
+    const handle = async () => {
+      const fileMap = (req.files ?? {}) as Record<string, Express.Multer.File[]>;
+      const received = Object.values(fileMap).flat();
+
+      if (err) {
+        cleanupFiles(received);
+        const msg =
+          err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE"
+            ? `Fichier trop volumineux (max. ${config.maxUploadMb} Mo)`
+            : err.message;
+        return res.status(400).json({ error: msg });
+      }
+      if (received.length === 0) {
+        return res.status(400).json({ error: "Fournissez au moins un fichier dans une langue" });
+      }
+
+      const doc = await query<{ title: string }>(
+        "SELECT title FROM documents WHERE id = $1",
+        [req.params.id]
+      );
+      if (!doc.rows[0]) {
+        cleanupFiles(received);
+        return res.status(404).json({ error: "Document introuvable" });
+      }
+
+      try {
+        const langs = LANGS.filter((lang) => fileMap[`file_${lang}`]?.[0]);
+        await withTransaction(async (client) => {
+          for (const lang of langs) {
+            const file = fileMap[`file_${lang}`][0];
+            const old = await client.query<{ stored_name: string }>(
+              "SELECT stored_name FROM document_files WHERE document_id = $1 AND lang = $2",
+              [req.params.id, lang]
+            );
+            await client.query(
+              `INSERT INTO document_files (document_id, lang, file_name, stored_name, file_size, mime_type)
+               VALUES ($1, $2, $3, $4, $5, $6)
+               ON CONFLICT (document_id, lang) DO UPDATE SET
+                 file_name = EXCLUDED.file_name, stored_name = EXCLUDED.stored_name,
+                 file_size = EXCLUDED.file_size, mime_type = EXCLUDED.mime_type,
+                 created_at = now()`,
+              [req.params.id, lang, file.originalname, file.filename, file.size, file.mimetype]
+            );
+            if (old.rows[0]) {
+              fs.promises
+                .unlink(path.join(config.uploadDir, old.rows[0].stored_name))
+                .catch(() => {});
+            }
+          }
+          await client.query(
+            `UPDATE documents SET version = version + 1, updated_at = now() WHERE id = $1`,
+            [req.params.id]
+          );
+        });
+
+        await logActivity(
+          "document_updated",
+          "Nouvelle version publiée",
+          `${doc.rows[0].title} (${langs.map((l) => l.toUpperCase()).join(", ")})`,
+          req.user!.id
+        );
+        res.json({ document: await fetchDocument(req.params.id) });
+      } catch (dbErr) {
+        cleanupFiles(received);
         throw dbErr;
       }
     };

@@ -95,7 +95,7 @@ authRouter.post(
     }
     if (user.status === "inactif") {
       return res.status(403).json({
-        error: "Votre compte est désactivé. Contactez le Secrétariat CTS-DSS.",
+        error: "Votre compte est désactivé. Contactez le Secrétariat de la CEEAC.",
         code: "account_disabled",
       });
     }
@@ -163,13 +163,13 @@ authRouter.post(
       timingSafeEqualStr(d.accessPassword.trim().toUpperCase(), session.access_password);
     if (!accessOk) {
       return res.status(401).json({
-        error: "Identifiant ou mot de passe de session incorrect",
+        error: "Identifiant ou mot de passe de réunion incorrect",
         code: "invalid_session_access",
       });
     }
     if (session.status === "terminé") {
       return res.status(403).json({
-        error: "Les inscriptions pour cette session sont closes",
+        error: "Les inscriptions pour cette réunion sont closes",
         code: "session_closed",
       });
     }
@@ -263,16 +263,12 @@ authRouter.post(
       timingSafeEqualStr(d.accessPassword.trim().toUpperCase(), session.access_password);
     if (!accessOk) {
       return res.status(401).json({
-        error: "Identifiant ou mot de passe de session incorrect",
+        error: "Identifiant ou mot de passe de réunion incorrect",
         code: "invalid_session_access",
       });
     }
-    if (session.status === "terminé") {
-      return res.status(403).json({
-        error: "Cette session est terminée, ses accès ne sont plus valides",
-        code: "session_closed",
-      });
-    }
+    // Consultation autorisée avant, pendant et après la réunion.
+    // L'inscription (création de compte) reste close une fois la réunion terminée.
 
     setAuthCookie(res, signGuestToken(session.id, session.access_code));
     res.json({ user: guestUser(session.id, session.title) });
@@ -303,7 +299,7 @@ authRouter.get(
       );
       if (!rows[0]) {
         clearAuthCookie(res);
-        return res.status(401).json({ error: "Session introuvable" });
+        return res.status(401).json({ error: "Réunion introuvable" });
       }
       return res.json({ user: guestUser(rows[0].id, rows[0].title) });
     }

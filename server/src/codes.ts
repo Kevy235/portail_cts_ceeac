@@ -10,8 +10,8 @@ function randomChars(length: number): string {
   return out;
 }
 
-/** Identifiant d'accès d'une session CTS, ex. `CTS-7KM2QX`. */
-export const generateAccessCode = () => `CTS-${randomChars(6)}`;
+/** Identifiant d'accès d'une réunion statutaire, ex. `CEEAC-7KM2QX`. */
+export const generateAccessCode = () => `CEEAC-${randomChars(6)}`;
 
 /** Mot de passe d'accès d'une session, ex. `MZT4-QP8W`. */
 export const generateAccessPassword = () =>

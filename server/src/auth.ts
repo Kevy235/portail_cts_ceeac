@@ -6,7 +6,7 @@ import { query } from "./db.js";
 export interface AuthUser {
   id: string;
   role: "admin" | "participant" | "guest";
-  /** Session CTS d'un accès invité (connexion par codes de session). */
+  /** Réunion d'un accès invité (connexion par codes de réunion). */
   sessionId?: string;
 }
 
@@ -29,9 +29,10 @@ export function signToken(user: AuthUser, tokenVersion: number): string {
 }
 
 /**
- * Jeton invité : accès aux documents via les codes d'une session CTS, sans
+ * Jeton invité : accès aux documents via les codes d'une réunion, sans
  * compte. Le code d'accès est embarqué et revérifié à chaque requête :
- * régénérer les accès de la session révoque immédiatement tous les invités.
+ * régénérer les accès de la réunion révoque immédiatement tous les invités.
+ * Valide avant, pendant et après la réunion (les documents restent consultables).
  */
 export function signGuestToken(sessionId: string, accessCode: string): string {
   return jwt.sign(
@@ -106,7 +107,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   // ─── Jeton invité : le code d'accès de la session doit toujours être valide.
   if (payload.role === "guest" && typeof payload.sid === "string") {
     query<{ id: string }>(
-      "SELECT id FROM cts_sessions WHERE id = $1 AND access_code = $2 AND status <> 'terminé'",
+      "SELECT id FROM cts_sessions WHERE id = $1 AND access_code = $2",
       [payload.sid, String(payload.code ?? "")]
     )
       .then(({ rows }) => {
@@ -114,7 +115,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
           clearAuthCookie(res);
           return res
             .status(401)
-            .json({ error: "Accès invité expiré, saisissez à nouveau les codes de session" });
+            .json({ error: "Accès invité expiré, saisissez à nouveau les codes de réunion" });
         }
         req.user = { id: `guest:${payload.sid}`, role: "guest", sessionId: payload.sid as string };
         next();

@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Plateforme d'accès aux documents du CTS-DSS — CEEAC",
+  "description": "Portail documentaire des réunions statutaires de la CEEAC",
   "engines": {
     "node": ">=20"
   },
