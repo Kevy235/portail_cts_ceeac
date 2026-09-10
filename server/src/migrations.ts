@@ -329,6 +329,33 @@ export const MIGRATIONS: Migration[] = [
       WHERE lang = 'es' AND key IN ('platform_name','platform_subtitle','org_full_name','org_description','footer_text');
     `,
   },
+  {
+    id: 8,
+    name: "purge des libellés « Sessions CTS » dans les contenus",
+    sql: `
+      -- Un libellé personnalisé peut encore afficher « Sessions CTS » dans le menu.
+      -- On le vide pour retomber sur la traduction « Réunions statutaires ».
+      UPDATE settings SET value = ''
+      WHERE key IN ('nav_psessions', 'nav_library')
+        AND (
+          value ILIKE '%session%CTS%'
+          OR value ILIKE '%Sessions CTS%'
+          OR value ILIKE '%STC Session%'
+          OR value ILIKE '%Sessões CTE%'
+          OR value ILIKE '%Sesiones CTE%'
+          OR value ILIKE '%Sessions &'
+          OR value ILIKE '%Sessions et%'
+        );
+
+      UPDATE settings SET value = ''
+      WHERE key = 'nav_psessions'
+        AND (
+          value ILIKE '%session%'
+          OR value ILIKE '%sesión%'
+          OR value ILIKE '%sessão%'
+        );
+    `,
+  },
 ];
 
 export const LANGS = ["fr", "en", "pt", "es"] as const;

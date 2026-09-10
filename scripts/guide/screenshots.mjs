@@ -234,7 +234,7 @@ async function main() {
     await shot("04-bibliotheque");
 
     // 5. Sessions + fil de discussion ouvert (carte de NOTRE session de démo)
-    await page.goto(`${BASE}/espace/sessions`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/espace/reunions`, { waitUntil: "networkidle" });
     const demoCard = page
       .locator("div.bg-white.rounded-xl")
       .filter({ hasText: "3ème Session Ordinaire du CTS-DSS" })

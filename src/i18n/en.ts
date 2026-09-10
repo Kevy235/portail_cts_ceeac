@@ -38,7 +38,7 @@ export const en: Dict = {
   "nav.sessions": "Statutory meetings",
   "nav.settings": "Portal contents",
   "nav.library": "Document library",
-  "nav.psessions": "Meetings & discussions",
+  "nav.psessions": "Statutory meetings",
   "nav.profile": "My profile",
   "header.logout": "Log out",
   "header.admin": "Administrator",
@@ -212,7 +212,7 @@ export const en: Dict = {
 
   "sess.title": "Statutory meetings",
   "sess.subtitle": "Calendar of ECCAS statutory meetings",
-  "sess.psubtitle": "Meeting calendar and discussion threads",
+  "sess.psubtitle": "Statutory meetings calendar and discussion threads",
   "sess.new": "New meeting",
   "sess.empty": "No meetings — create the first statutory meeting",
   "sess.pempty": "No meeting is scheduled at the moment",
@@ -454,9 +454,9 @@ export const en: Dict = {
     "View a PDF online with the “eye” button, or download the desired version (FR, EN, PT, ES).",
   "guide.s3.3":
     "Documents bearing the “Coded document” badge require a reading key sent separately by the Secretariat.",
-  "guide.s4.title": "Meetings & discussions (account required)",
+  "guide.s4.title": "Statutory meetings & discussions (account required)",
   "guide.s4.1":
-    "The “Meetings & discussions” page presents the statutory meetings calendar: dates, venue, status and related documents.",
+    "The “Statutory meetings” page presents the calendar: dates, venue, status and related documents.",
   "guide.s4.2":
     "Open “Discussion” on a meeting to exchange with the other participants and the Secretariat (2,000 characters per message).",
   "guide.s5.title": "Reading comfort",
@@ -492,7 +492,7 @@ export const en: Dict = {
   "set.participantNote":
     "Leave a field empty to keep the platform's standard translated text.",
   "set.nav_library": "Label of the “Document library” menu",
-  "set.nav_psessions": "Label of the “Meetings & discussions” menu",
+  "set.nav_psessions": "Label of the “Statutory meetings” menu",
   "set.nav_profile": "Label of the “My profile” menu",
   "set.library_title": "Library banner — title",
   "set.library_notice": "Library banner — subtext",

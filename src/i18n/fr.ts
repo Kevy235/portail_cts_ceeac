@@ -40,7 +40,7 @@ export const fr = {
   "nav.sessions": "Réunions statutaires",
   "nav.settings": "Contenus du portail",
   "nav.library": "Bibliothèque documentaire",
-  "nav.psessions": "Réunions & échanges",
+  "nav.psessions": "Réunions statutaires",
   "nav.profile": "Mon profil",
   "header.logout": "Déconnexion",
   "header.admin": "Administrateur",
@@ -223,7 +223,7 @@ export const fr = {
   // ─── Réunions statutaires ─────────────────────────────────────────────
   "sess.title": "Réunions statutaires",
   "sess.subtitle": "Calendrier des réunions statutaires de la CEEAC",
-  "sess.psubtitle": "Calendrier des réunions et fils de discussion",
+  "sess.psubtitle": "Calendrier des réunions statutaires et fils de discussion",
   "sess.new": "Nouvelle réunion",
   "sess.empty": "Aucune réunion — créez la première réunion statutaire",
   "sess.pempty": "Aucune réunion n'est programmée pour le moment",
@@ -463,7 +463,7 @@ export const fr = {
   "guide.s2.p":
     "Le compte permet de participer aux fils de discussion et de recevoir les rapports par e-mail. Les mêmes codes de réunion servent à l'inscription.",
   "guide.s2.1": "Ouvrez la page d'inscription via « Inscrivez-vous ici » ou « Créer mon compte ».",
-  "guide.s2.2": "Saisissez les codes de session, puis vos informations (nom, e-mail institutionnel, pays).",
+  "guide.s2.2": "Saisissez les codes de réunion, puis vos informations (nom, e-mail institutionnel, pays).",
   "guide.s2.3": "Choisissez votre mot de passe personnel (8 caractères minimum) et validez.",
   "guide.s2.note":
     "Par la suite, connectez-vous toujours avec votre adresse e-mail et votre mot de passe personnel (onglet « J'ai un compte »).",
@@ -475,9 +475,9 @@ export const fr = {
     "Les documents portant le badge « Document codé » nécessitent une clé de lecture transmise séparément par le Secrétariat.",
   "guide.s4.title": "Réunions & discussions (compte requis)",
   "guide.s4.1":
-    "La page « Réunions & échanges » présente le calendrier des réunions statutaires : dates, lieu, statut et documents rattachés.",
+    "La page « Réunions statutaires » présente le calendrier : dates, lieu, statut et documents rattachés.",
   "guide.s4.2":
-    "Ouvrez « Discussion » sur une session pour échanger avec les autres participants et le Secrétariat (2 000 caractères par message).",
+    "Ouvrez « Discussion » sur une réunion pour échanger avec les autres participants et le Secrétariat (2 000 caractères par message).",
   "guide.s5.title": "Confort de lecture",
   "guide.s5.1": "Le bouton A / A+ / A++ agrandit le texte de toute la plateforme ; votre réglage est conservé.",
   "guide.s5.2": "Les boutons drapeaux changent immédiatement la langue de l'interface (FR, EN, PT, ES).",
@@ -514,7 +514,7 @@ export const fr = {
   "set.participantNote":
     "Laissez un champ vide pour conserver le texte standard traduit de la plateforme.",
   "set.nav_library": "Libellé du menu « Bibliothèque documentaire »",
-  "set.nav_psessions": "Libellé du menu « Réunions & échanges »",
+  "set.nav_psessions": "Libellé du menu « Réunions statutaires »",
   "set.nav_profile": "Libellé du menu « Mon profil »",
   "set.library_title": "Bannière de la bibliothèque — titre",
   "set.library_notice": "Bannière de la bibliothèque — sous-texte",

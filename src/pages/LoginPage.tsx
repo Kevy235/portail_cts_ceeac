@@ -12,7 +12,7 @@ import logoCeeac from "@/assets/logo_ceeac.png";
 /**
  * Connexion à deux modes :
  *  - « J'ai un compte » : e-mail + mot de passe (participants inscrits, admin) ;
- *  - « Codes de session » : les représentants des États membres saisissent les
+ *  - « Codes de réunion » : les représentants des États membres saisissent les
  *    accès transmis pour la réunion et consultent directement les documents
  *    en invité — l'inscription (création de compte) est facultative.
  */
@@ -150,7 +150,7 @@ export function LoginPage() {
               <h2 className="text-ink text-xl font-bold mb-1 font-title">{t("login.title")}</h2>
               <p className="text-slate2 text-sm mb-5">{settings.login_notice}</p>
 
-              {/* Bascule compte / codes de session */}
+              {/* Bascule compte / codes de réunion */}
               <div className="flex rounded-xl bg-mist p-1 mb-6" role="tablist">
                 {(
                   [

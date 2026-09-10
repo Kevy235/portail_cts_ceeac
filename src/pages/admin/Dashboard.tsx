@@ -205,7 +205,7 @@ export function AdminDashboard() {
                 </span>
               </div>
               <Link
-                to="/admin/sessions"
+                to="/admin/reunions"
                 className="relative mt-4 block text-center w-full bg-gradient-to-b from-accent to-accent-dark text-white text-xs font-semibold py-2.5 rounded-lg shadow-sm shadow-black/20 hover:brightness-110 transition-all"
               >
                 {t("dash.manageSessions")}
@@ -215,7 +215,7 @@ export function AdminDashboard() {
             <div className="bg-white rounded-xl border border-line-soft p-5 text-center">
               <Calendar size={22} className="mx-auto text-slate2/40 mb-2" />
               <p className="text-sm text-slate2">{t("dash.noSessionPlanned")}</p>
-              <Link to="/admin/sessions" className="text-brand text-xs hover:underline">
+              <Link to="/admin/reunions" className="text-brand text-xs hover:underline">
                 {t("dash.createSession")}
               </Link>
             </div>
@@ -228,7 +228,7 @@ export function AdminDashboard() {
               {[
                 { label: t("dash.addParticipant"), to: "/admin/participants", icon: <UserPlus size={13} /> },
                 { label: t("dash.publishDocument"), to: "/admin/documents", icon: <Upload size={13} /> },
-                { label: t("dash.createSession"), to: "/admin/sessions", icon: <Calendar size={13} /> },
+                { label: t("dash.createSession"), to: "/admin/reunions", icon: <Calendar size={13} /> },
                 { label: t("dash.editContents"), to: "/admin/parametres", icon: <Settings size={13} /> },
               ].map(({ label, to, icon }) => (
                 <Link

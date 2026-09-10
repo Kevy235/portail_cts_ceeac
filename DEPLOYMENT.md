@@ -128,7 +128,7 @@ Les documents téléversés doivent survivre aux redéploiements :
 2. Vérifiez la santé de l'application : `https://documents.votre-domaine.org/api/health` doit répondre `{"status":"ok"}`.
 3. Connectez-vous avec le compte admin, puis :
    - complétez les **Contenus du portail** (onglet Paramètres),
-   - créez les sessions CTS et les comptes participants.
+   - créez les réunions statutaires et les comptes participants.
 
 ## Étape 8 — Déploiements automatiques (optionnel)
 

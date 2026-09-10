@@ -36,18 +36,18 @@ const ADMIN_NAV: NavItem[] = [
   { to: "/admin", icon: <LayoutDashboard size={16} />, labelKey: "nav.dashboard" },
   { to: "/admin/participants", icon: <Users size={16} />, labelKey: "nav.participants" },
   { to: "/admin/documents", icon: <FileText size={16} />, labelKey: "nav.documents" },
-  { to: "/admin/sessions", icon: <Calendar size={16} />, labelKey: "nav.sessions" },
+  { to: "/admin/reunions", icon: <Calendar size={16} />, labelKey: "nav.sessions" },
   { to: "/admin/parametres", icon: <Settings size={16} />, labelKey: "nav.settings" },
 ];
 
 const PARTICIPANT_NAV: NavItem[] = [
   { to: "/espace", icon: <BookOpen size={16} />, labelKey: "nav.library", settingsKey: "nav_library" },
-  { to: "/espace/sessions", icon: <MessagesSquare size={16} />, labelKey: "nav.psessions", settingsKey: "nav_psessions" },
+  { to: "/espace/reunions", icon: <MessagesSquare size={16} />, labelKey: "nav.psessions", settingsKey: "nav_psessions" },
   { to: "/espace/profil", icon: <UserCircle size={16} />, labelKey: "nav.profile", settingsKey: "nav_profile" },
   { to: "/espace/guide", icon: <CircleHelp size={16} />, labelKey: "nav.guide" },
 ];
 
-/** Pages accessibles aux invités (accès par codes de session). */
+/** Pages accessibles aux invités (accès par codes de réunion). */
 const GUEST_PATHS = new Set(["/espace", "/espace/guide"]);
 
 export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
@@ -57,7 +57,7 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Invité (accès par codes de session) : bibliothèque uniquement.
+  // Invité (accès par codes de réunion) : bibliothèque uniquement.
   const isGuest = user?.role === "guest";
   const nav =
     variant === "admin"

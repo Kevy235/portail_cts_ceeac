@@ -76,7 +76,8 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="participants" element={<AdminParticipants />} />
           <Route path="documents" element={<AdminDocuments />} />
-          <Route path="sessions" element={<AdminSessions />} />
+          <Route path="reunions" element={<AdminSessions />} />
+          <Route path="sessions" element={<Navigate to="/admin/reunions" replace />} />
           <Route path="parametres" element={<AdminSettings />} />
         </Route>
 
@@ -91,13 +92,14 @@ function App() {
           <Route index element={<ParticipantLibrary />} />
           <Route path="guide" element={<GuideContent />} />
           <Route
-            path="sessions"
+            path="reunions"
             element={
               <AccountOnly>
                 <ParticipantSessions />
               </AccountOnly>
             }
           />
+          <Route path="sessions" element={<Navigate to="/espace/reunions" replace />} />
           <Route
             path="profil"
             element={
