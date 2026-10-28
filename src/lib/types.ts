@@ -23,6 +23,18 @@ export interface User {
   /** Réunion via laquelle le participant s'est auto-inscrit (le cas échéant). */
   originSessionId?: string | null;
   originSessionTitle?: string | null;
+  /**
+   * Réunions ouvertes au participant : il ne voit que leurs documents.
+   * Fourni par l'API d'administration (/participants) uniquement.
+   */
+  sessionAccess?: SessionAccessEntry[];
+}
+
+/** Réunion à laquelle un participant a accès (vue administrateur). */
+export interface SessionAccessEntry {
+  id: string;
+  title: string;
+  reference: string;
 }
 
 export interface CtsSession {

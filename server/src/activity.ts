@@ -16,6 +16,7 @@ export type ActivityType =
   | "session_created"
   | "session_updated"
   | "session_deleted"
+  | "session_access_granted"
   | "settings_updated"
   | "guide_updated"
   | "guide_deleted"

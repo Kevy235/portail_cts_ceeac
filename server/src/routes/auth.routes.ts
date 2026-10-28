@@ -1,8 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import crypto from "node:crypto";
 import { z } from "zod";
-import { query } from "../db.js";
+import { query, withTransaction } from "../db.js";
 import {
   clearAuthCookie,
   invalidateAuthCache,
@@ -12,6 +11,7 @@ import {
   signGuestToken,
   signToken,
 } from "../auth.js";
+import { findSessionByAccessCodes } from "../access.js";
 import { ah } from "../http.js";
 import { logActivity } from "../activity.js";
 
@@ -145,23 +145,9 @@ authRouter.post(
     }
     const d = parsed.data;
 
-    const sessions = await query<{
-      id: string;
-      title: string;
-      status: string;
-      access_password: string;
-    }>(
-      "SELECT id, title, status, access_password FROM cts_sessions WHERE access_code = $1",
-      [d.accessCode.toUpperCase()]
-    );
-    const session = sessions.rows[0];
-    // Comparaison à temps constant si la session existe ; message identique
-    // que le code ou le mot de passe soit en cause.
-    const accessOk =
-      session &&
-      session.access_password.length > 0 &&
-      timingSafeEqualStr(d.accessPassword.trim().toUpperCase(), session.access_password);
-    if (!accessOk) {
+    // Message identique que l'identifiant ou le mot de passe soit en cause.
+    const session = await findSessionByAccessCodes(d.accessCode, d.accessPassword);
+    if (!session) {
       return res.status(401).json({
         error: "Identifiant ou mot de passe de réunion incorrect",
         code: "invalid_session_access",
@@ -184,14 +170,23 @@ authRouter.post(
     }
 
     const hash = await bcrypt.hash(d.password, 12);
-    const { rows } = await query<DbUser>(
-      `INSERT INTO users (name, email, password_hash, role, country, function_title,
-                          institution, status, must_change_password, origin_session_id)
-       VALUES ($1, $2, $3, 'participant', $4, $5, $6, 'actif', FALSE, $7)
-       RETURNING *`,
-      [d.name, email, hash, d.country, d.functionTitle, d.institution, session.id]
-    );
-    const user = rows[0];
+    // Transaction : le compte et son droit d'accès à la réunion naissent
+    // ensemble — jamais de compte orphelin sans accès documentaire.
+    const user = await withTransaction(async (client) => {
+      const { rows } = await client.query<DbUser>(
+        `INSERT INTO users (name, email, password_hash, role, country, function_title,
+                            institution, status, must_change_password, origin_session_id)
+         VALUES ($1, $2, $3, 'participant', $4, $5, $6, 'actif', FALSE, $7)
+         RETURNING *`,
+        [d.name, email, hash, d.country, d.functionTitle, d.institution, session.id]
+      );
+      // Les codes saisis n'ouvrent que cette réunion.
+      await client.query(
+        "INSERT INTO session_access (user_id, session_id) VALUES ($1, $2)",
+        [rows[0].id, session.id]
+      );
+      return rows[0];
+    });
     user.origin_session_title = session.title;
 
     await logActivity(
@@ -246,41 +241,21 @@ authRouter.post(
     }
     const d = parsed.data;
 
-    const sessions = await query<{
-      id: string;
-      title: string;
-      status: string;
-      access_code: string;
-      access_password: string;
-    }>(
-      "SELECT id, title, status, access_code, access_password FROM cts_sessions WHERE access_code = $1",
-      [d.accessCode.toUpperCase()]
-    );
-    const session = sessions.rows[0];
-    const accessOk =
-      session &&
-      session.access_password.length > 0 &&
-      timingSafeEqualStr(d.accessPassword.trim().toUpperCase(), session.access_password);
-    if (!accessOk) {
+    const session = await findSessionByAccessCodes(d.accessCode, d.accessPassword);
+    if (!session) {
       return res.status(401).json({
         error: "Identifiant ou mot de passe de réunion incorrect",
         code: "invalid_session_access",
       });
     }
-    // Consultation autorisée avant, pendant et après la réunion.
+    // Consultation autorisée avant, pendant et après la réunion, mais limitée
+    // aux documents de cette réunion (jeton invité portant son identifiant).
     // L'inscription (création de compte) reste close une fois la réunion terminée.
 
-    setAuthCookie(res, signGuestToken(session.id, session.access_code));
+    setAuthCookie(res, signGuestToken(session.id, session.accessCode));
     res.json({ user: guestUser(session.id, session.title) });
   })
 );
-
-function timingSafeEqualStr(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return crypto.timingSafeEqual(bufA, bufB);
-}
 
 authRouter.post("/logout", (_req, res) => {
   clearAuthCookie(res);

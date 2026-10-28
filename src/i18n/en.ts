@@ -584,4 +584,22 @@ export const en: Dict = {
   "lib.groupUpcoming": "Upcoming meetings",
   "lib.groupPast": "Past meetings",
   "lib.groupUnlinked": "Other documents",
+  // ─── Per-meeting access ───────────────────────────────────────────────
+  "unlock.title": "Add a meeting",
+  "unlock.subtitle":
+    "Enter the meeting ID and access password you received for another meeting. These codes only unlock that meeting.",
+  "unlock.code": "Meeting ID",
+  "unlock.password": "Access password",
+  "unlock.submit": "Unlock access",
+  "unlock.done": "Access granted: {title}",
+  "unlock.failed": "Unlock failed",
+  "part.accessBtn": "Manage meeting access",
+  "part.accessTitle": "Meeting access",
+  "part.accessSubtitle":
+    "This participant only sees documents from the selected meetings.",
+  "part.accessNone": "No meeting",
+  "part.accessCount": "{n} meeting(s)",
+  "part.accessEmptyList": "No meeting scheduled",
+  "part.accessSaved": "Meeting access updated",
+  "activity.session_access_granted": "Meeting access granted",
 };

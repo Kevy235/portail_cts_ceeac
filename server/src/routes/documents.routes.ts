@@ -7,6 +7,7 @@ import { z } from "zod";
 import { query, withTransaction } from "../db.js";
 import { config } from "../config.js";
 import { requireAdmin } from "../auth.js";
+import { accessibleSessionIds, canAccessSession } from "../access.js";
 import { ah, uuidParams } from "../http.js";
 import { logActivity } from "../activity.js";
 import { LANGS, type Lang } from "../migrations.js";
@@ -98,12 +99,23 @@ function cleanupFiles(files: Express.Multer.File[]) {
 documentsRouter.get(
   "/",
   ah(async (req, res) => {
-    // Les participants ne voient que les documents publiés.
-    const isAdmin = req.user!.role === "admin";
+    // L'administrateur voit tout ; les autres uniquement les documents publiés
+    // des réunions qui leur sont ouvertes. Les documents non rattachés à une
+    // réunion (documentation générale du portail) restent visibles par tous.
+    if (req.user!.role === "admin") {
+      const { rows } = await query(
+        `SELECT ${ROW} FROM documents d ${JOINS} ORDER BY d.created_at DESC`
+      );
+      return res.json({ documents: rows });
+    }
+
+    const sessionIds = await accessibleSessionIds(req.user!);
     const { rows } = await query(
       `SELECT ${ROW} FROM documents d ${JOINS}
-       ${isAdmin ? "" : "WHERE d.status = 'publié'"}
-       ORDER BY d.created_at DESC`
+       WHERE d.status = 'publié'
+         AND (d.session_id IS NULL OR d.session_id = ANY($1::uuid[]))
+       ORDER BY d.created_at DESC`,
+      [sessionIds ?? []]
     );
     res.json({ documents: rows });
   })
@@ -431,8 +443,9 @@ documentsRouter.get(
       stored_name: string;
       mime_type: string;
       status: string;
+      session_id: string | null;
     }>(
-      `SELECT f.file_name, f.stored_name, f.mime_type, d.status
+      `SELECT f.file_name, f.stored_name, f.mime_type, d.status, d.session_id
        FROM document_files f
        JOIN documents d ON d.id = f.document_id
        WHERE f.document_id = $1 AND f.lang = $2`,
@@ -441,6 +454,17 @@ documentsRouter.get(
     const doc = rows[0];
     if (!doc || (!isAdmin && doc.status !== "publié")) {
       return res.status(404).json({ error: "Document introuvable" });
+    }
+    // Cloisonnement : un lien direct ne suffit pas, la réunion du document
+    // doit faire partie de celles ouvertes à l'utilisateur.
+    if (
+      doc.session_id &&
+      !(await canAccessSession(req.user!, doc.session_id))
+    ) {
+      return res.status(403).json({
+        error: "Ce document relève d'une réunion à laquelle vous n'avez pas accès",
+        code: "session_not_allowed",
+      });
     }
 
     const filePath = path.join(config.uploadDir, doc.stored_name);

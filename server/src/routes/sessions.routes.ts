@@ -1,10 +1,16 @@
-import { Router } from "express";
+import { Router, type RequestHandler } from "express";
 import multer from "multer";
 import path from "node:path";
 import { z } from "zod";
 import { query } from "../db.js";
 import { config, isMailConfigured } from "../config.js";
 import { requireAccount, requireAdmin } from "../auth.js";
+import {
+  accessibleSessionIds,
+  canAccessSession,
+  findSessionByAccessCodes,
+  grantSessionAccess,
+} from "../access.js";
 import { ah, uuidParams } from "../http.js";
 import { generateAccessCode, generateAccessPassword } from "../codes.js";
 import { buildReportMail, sendBroadcast, type MailAttachment } from "../mailer.js";
@@ -45,9 +51,21 @@ const ADMIN_ROW = `${ROW}, s.access_code AS "accessCode", s.access_password AS "
 sessionsRouter.get(
   "/",
   ah(async (req, res) => {
-    const isAdmin = req.user!.role === "admin";
+    // L'administrateur voit toutes les réunions (avec leurs codes d'accès) ;
+    // les autres uniquement celles qui leur sont ouvertes.
+    if (req.user!.role === "admin") {
+      const { rows } = await query(
+        `SELECT ${ADMIN_ROW} FROM cts_sessions s ORDER BY s.start_date DESC`
+      );
+      return res.json({ sessions: rows });
+    }
+
+    const sessionIds = await accessibleSessionIds(req.user!);
     const { rows } = await query(
-      `SELECT ${isAdmin ? ADMIN_ROW : ROW} FROM cts_sessions s ORDER BY s.start_date DESC`
+      `SELECT ${ROW} FROM cts_sessions s
+       WHERE s.id = ANY($1::uuid[])
+       ORDER BY s.start_date DESC`,
+      [sessionIds ?? []]
     );
     res.json({ sessions: rows });
   })
@@ -326,6 +344,60 @@ sessionsRouter.post(
   })
 );
 
+// ─── Déverrouillage d'une réunion avec ses codes ───────────────────────────────
+// Un participant déjà connecté saisit l'identifiant + le mot de passe reçus
+// pour une autre réunion : l'accès ne s'ouvre que sur cette réunion.
+const unlockSchema = z.object({
+  accessCode: z.string().trim().min(4, "Identifiant de réunion requis"),
+  accessPassword: z.string().min(1, "Mot de passe de réunion requis"),
+});
+
+sessionsRouter.post(
+  "/unlock",
+  requireAccount,
+  ah(async (req, res) => {
+    const parsed = unlockSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res
+        .status(400)
+        .json({ error: parsed.error.issues[0]?.message ?? "Données invalides" });
+    }
+    const d = parsed.data;
+
+    const session = await findSessionByAccessCodes(d.accessCode, d.accessPassword);
+    if (!session) {
+      return res.status(401).json({
+        error: "Identifiant ou mot de passe de réunion incorrect",
+        code: "invalid_session_access",
+      });
+    }
+
+    if (await grantSessionAccess(req.user!.id, session.id)) {
+      await logActivity(
+        "session_access_granted",
+        "Accès à une réunion déverrouillé",
+        session.title,
+        req.user!.id
+      );
+    }
+    res.json({ sessionId: session.id, sessionTitle: session.title });
+  })
+);
+
+/**
+ * Garde des sous-ressources d'une réunion (discussion) : l'utilisateur doit
+ * avoir accès à la réunion visée. 404 plutôt que 403 : l'existence même des
+ * réunions non autorisées n'est pas divulguée.
+ */
+const requireSessionAccess: RequestHandler = (req, res, next) => {
+  canAccessSession(req.user!, req.params.id)
+    .then((ok) => {
+      if (!ok) return res.status(404).json({ error: "Réunion introuvable" });
+      next();
+    })
+    .catch(next);
+};
+
 // ─── Fil de discussion par session ─────────────────────────────────────────────
 const MESSAGE_ROW = `m.id, m.body, m.created_at AS "createdAt",
   m.user_id AS "authorId", COALESCE(u.name, 'Compte supprimé') AS "authorName",
@@ -334,6 +406,7 @@ const MESSAGE_ROW = `m.id, m.body, m.created_at AS "createdAt",
 sessionsRouter.get(
   "/:id/messages",
   uuidParams("id"),
+  requireSessionAccess,
   ah(async (req, res) => {
     const after = Number(req.query.after) || 0;
     // Les 200 plus récents (et non les 200 plus anciens), rendus en ordre croissant.
@@ -360,6 +433,7 @@ sessionsRouter.post(
   "/:id/messages",
   requireAccount,
   uuidParams("id"),
+  requireSessionAccess,
   ah(async (req, res) => {
     const parsed = messageSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -388,6 +462,7 @@ sessionsRouter.delete(
   "/:id/messages/:messageId",
   requireAccount,
   uuidParams("id"),
+  requireSessionAccess,
   ah(async (req, res) => {
     const messageId = Number(req.params.messageId);
     if (!Number.isInteger(messageId) || messageId <= 0) {

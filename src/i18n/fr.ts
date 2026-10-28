@@ -609,6 +609,24 @@ export const fr = {
   "lib.groupUpcoming": "Réunions à venir",
   "lib.groupPast": "Réunions terminées",
   "lib.groupUnlinked": "Autres documents",
+  // ─── Accès cloisonné par réunion ──────────────────────────────────────
+  "unlock.title": "Ajouter une réunion",
+  "unlock.subtitle":
+    "Saisissez l'identifiant et le mot de passe d'accès reçus pour une autre réunion. Ces codes n'ouvrent que la réunion concernée.",
+  "unlock.code": "Identifiant de réunion",
+  "unlock.password": "Mot de passe d'accès",
+  "unlock.submit": "Déverrouiller l'accès",
+  "unlock.done": "Accès ouvert : {title}",
+  "unlock.failed": "Déverrouillage impossible",
+  "part.accessBtn": "Gérer les accès aux réunions",
+  "part.accessTitle": "Accès aux réunions",
+  "part.accessSubtitle":
+    "Ce participant ne voit que les documents des réunions cochées.",
+  "part.accessNone": "Aucune réunion",
+  "part.accessCount": "{n} réunion(s)",
+  "part.accessEmptyList": "Aucune réunion programmée",
+  "part.accessSaved": "Accès aux réunions mis à jour",
+  "activity.session_access_granted": "Accès à une réunion ouvert",
 } as const;
 
 export type Dict = Record<keyof typeof fr, string>;

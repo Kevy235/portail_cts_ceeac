@@ -388,9 +388,41 @@ async function main() {
     });
     check("changement de mot de passe (première connexion)", r.status === 200);
 
+    // Cloisonnement : un compte sans réunion ouverte ne voit aucun document
+    // rattaché à une réunion, même publié.
     r = await participant("GET", "/documents");
     check(
-      "le participant voit uniquement les documents publiés",
+      "aucun document de réunion sans accès ouvert",
+      r.status === 200 && r.data.documents.length === 0
+    );
+
+    r = await participant("GET", `/documents/${docId}/download/fr`);
+    check(
+      "téléchargement refusé hors de ses réunions (403)",
+      r.status === 403 && r.data.code === "session_not_allowed"
+    );
+
+    r = await participant("GET", "/sessions");
+    check(
+      "aucune réunion listée sans accès ouvert",
+      r.status === 200 && r.data.sessions.length === 0
+    );
+
+    r = await participant("GET", `/sessions/${sessionId}/messages`);
+    check("discussion inaccessible hors de ses réunions (404)", r.status === 404);
+
+    // L'administrateur ouvre l'accès du compte à la réunion.
+    r = await admin("PUT", `/participants/${participantId}/access`, {
+      json: { sessionIds: [sessionId] },
+    });
+    check(
+      "l'admin ouvre l'accès du participant à la réunion",
+      r.status === 200 && r.data.participant.sessionAccess.length === 1
+    );
+
+    r = await participant("GET", "/documents");
+    check(
+      "le participant voit uniquement les documents publiés de ses réunions",
       r.status === 200 && r.data.documents.length === 2
     );
 
@@ -647,6 +679,106 @@ async function main() {
 
     r = await guest("GET", "/participants");
     check("l'invité n'accède pas à l'administration (403)", r.status === 403);
+
+    // ─── Cloisonnement entre réunions ───────────────────────────────
+    // Une seconde réunion, avec ses propres codes et son propre document :
+    // ni l'invité ni le participant de la première ne doivent la voir.
+    r = await admin("POST", "/sessions", {
+      json: {
+        title: "Réunion confidentielle du Conseil des Ministres",
+        location: "Libreville, Gabon",
+        startDate: "2026-10-05",
+        organ: "Conseil des Ministres",
+        expectedParticipants: 11,
+      },
+    });
+    check("création d'une seconde réunion", r.status === 201);
+    const otherSessionId = r.data.session.id;
+    const otherAccessCode = r.data.session.accessCode;
+    const otherAccessPassword = r.data.session.accessPassword;
+
+    const otherDoc = new FormData();
+    otherDoc.append("file_fr", new Blob([pdfBytes], { type: "application/pdf" }), "confidentiel-fr.pdf");
+    otherDoc.append("title", "Note confidentielle du Conseil");
+    otherDoc.append("sessionId", otherSessionId);
+    otherDoc.append("status", "publié");
+    otherDoc.append("isCoded", "false");
+    r = await admin("POST", "/documents", { form: otherDoc });
+    check("document publié sur la seconde réunion", r.status === 201);
+    const otherDocId = r.data.document.id;
+
+    r = await guest("GET", "/documents");
+    check(
+      "l'invité ne voit pas les documents des autres réunions",
+      r.status === 200 && r.data.documents.every((d) => d.id !== otherDocId)
+    );
+    r = await guest("GET", `/documents/${otherDocId}/download/fr`);
+    check(
+      "l'invité ne peut pas télécharger le document d'une autre réunion (403)",
+      r.status === 403 && r.data.code === "session_not_allowed"
+    );
+    r = await guest("GET", "/sessions");
+    check(
+      "l'invité ne voit que sa réunion",
+      r.status === 200 &&
+        r.data.sessions.length === 1 &&
+        r.data.sessions[0].id === sessionId
+    );
+    r = await guest("GET", `/sessions/${otherSessionId}/messages`);
+    check(
+      "l'invité n'accède pas à la discussion d'une autre réunion (404)",
+      r.status === 404
+    );
+
+    r = await participant("GET", `/documents/${otherDocId}/download/fr`);
+    check(
+      "le participant ne télécharge pas le document d'une autre réunion (403)",
+      r.status === 403 && r.data.code === "session_not_allowed"
+    );
+
+    // Déverrouillage par les codes : ouvre cette réunion, et elle seule.
+    r = await participant("POST", "/sessions/unlock", {
+      json: { accessCode: otherAccessCode, accessPassword: "MAUVAIS-MDP" },
+    });
+    check("déverrouillage avec un mauvais mot de passe refusé (401)", r.status === 401);
+
+    r = await participant("POST", "/sessions/unlock", {
+      json: { accessCode: otherAccessCode, accessPassword: otherAccessPassword },
+    });
+    check(
+      "déverrouillage de la seconde réunion avec ses codes",
+      r.status === 200 && r.data.sessionId === otherSessionId
+    );
+    r = await participant("GET", `/documents/${otherDocId}/download/fr`);
+    check("le document devient accessible après déverrouillage", r.status === 200);
+    r = await participant("GET", "/sessions");
+    check(
+      "les deux réunions sont désormais listées",
+      r.status === 200 && r.data.sessions.length === 2
+    );
+
+    // Retrait de l'accès par l'administrateur.
+    r = await admin("PUT", `/participants/${participantId}/access`, {
+      json: { sessionIds: [sessionId] },
+    });
+    check(
+      "l'admin retire l'accès à la seconde réunion",
+      r.status === 200 && r.data.participant.sessionAccess.length === 1
+    );
+    r = await participant("GET", `/documents/${otherDocId}/download/fr`);
+    check("l'accès retiré bloque le téléchargement (403)", r.status === 403);
+
+    r = await participant("POST", "/sessions/unlock", {
+      json: { accessCode: otherAccessCode, accessPassword: otherAccessPassword },
+    });
+    check("le participant peut déverrouiller à nouveau", r.status === 200);
+    r = await admin("PUT", `/participants/${participantId}/access`, {
+      json: { sessionIds: [sessionId] },
+    });
+    check("remise à l'état initial des accès", r.status === 200);
+
+    await admin("DELETE", `/documents/${otherDocId}`);
+    await admin("DELETE", `/sessions/${otherSessionId}`);
 
     r = await admin("PUT", `/sessions/${sessionId}`, {
       json: {

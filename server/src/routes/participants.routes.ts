@@ -1,7 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { query } from "../db.js";
+import { query, withTransaction } from "../db.js";
 import { invalidateAuthCache } from "../auth.js";
 import { ah, uuidParams } from "../http.js";
 import { generateTempPassword } from "../codes.js";
@@ -22,7 +22,13 @@ const participantSchema = z.object({
 const ROW = `u.id, u.name, u.email, u.role, u.country, u.function_title AS "functionTitle",
   u.institution, u.status, u.must_change_password AS "mustChangePassword",
   u.last_login_at AS "lastLoginAt", u.created_at AS "createdAt",
-  u.origin_session_id AS "originSessionId", s.title AS "originSessionTitle"`;
+  u.origin_session_id AS "originSessionId", s.title AS "originSessionTitle",
+  COALESCE((
+    SELECT json_agg(json_build_object('id', cs.id, 'title', cs.title, 'reference', cs.reference)
+             ORDER BY cs.start_date DESC)
+    FROM session_access sa JOIN cts_sessions cs ON cs.id = sa.session_id
+    WHERE sa.user_id = u.id
+  ), '[]'::json) AS "sessionAccess"`;
 
 const JOINS = `LEFT JOIN cts_sessions s ON s.id = u.origin_session_id`;
 
@@ -118,6 +124,60 @@ participantsRouter.put(
       "participant_updated",
       "Participant mis à jour",
       `${data.name} — ${data.country}`,
+      req.user!.id
+    );
+    res.json({ participant: updated.rows[0] });
+  })
+);
+
+// ─── Réunions ouvertes à un participant ───────────────────────────────────────
+// Les codes d'une réunion n'ouvrent que cette réunion ; cette route permet à
+// l'administrateur d'ajuster les droits d'un compte (notamment les comptes
+// créés à la main, qui n'ont aucune réunion d'origine).
+const accessSchema = z.object({
+  sessionIds: z.array(z.string().uuid()).max(200),
+});
+
+participantsRouter.put(
+  "/:id/access",
+  uuidParams("id"),
+  ah(async (req, res) => {
+    const parsed = accessSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Liste de réunions invalide" });
+    }
+    const sessionIds = Array.from(new Set(parsed.data.sessionIds));
+
+    const target = await query<{ name: string }>(
+      "SELECT name FROM users WHERE id = $1 AND role = 'participant'",
+      [req.params.id]
+    );
+    if (!target.rows[0]) return res.status(404).json({ error: "Participant introuvable" });
+
+    // Remplacement atomique de l'ensemble des droits du participant.
+    await withTransaction(async (client) => {
+      await client.query(
+        "DELETE FROM session_access WHERE user_id = $1 AND session_id <> ALL($2::uuid[])",
+        [req.params.id, sessionIds]
+      );
+      if (sessionIds.length > 0) {
+        await client.query(
+          `INSERT INTO session_access (user_id, session_id)
+           SELECT $1, id FROM cts_sessions WHERE id = ANY($2::uuid[])
+           ON CONFLICT (user_id, session_id) DO NOTHING`,
+          [req.params.id, sessionIds]
+        );
+      }
+    });
+
+    const updated = await query(
+      `SELECT ${ROW} FROM users u ${JOINS} WHERE u.id = $1`,
+      [req.params.id]
+    );
+    await logActivity(
+      "session_access_granted",
+      "Accès aux réunions modifiés",
+      `${target.rows[0].name} — ${sessionIds.length} réunion(s)`,
       req.user!.id
     );
     res.json({ participant: updated.rows[0] });

@@ -69,6 +69,18 @@ async function main() {
     },
   });
 
+  // Déverrouillage d'une réunion par ses codes : limite dédiée (devinette de
+  // codes), distincte de celle des connexions pour ne pas bloquer le login.
+  const unlockLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+      error: "Trop de tentatives de déverrouillage. Réessayez dans 15 minutes.",
+    },
+  });
+
   // ─── API ─────────────────────────────────────────────────────────────────
   const api = express.Router();
   api.use("/auth/login", loginLimiter);
@@ -77,6 +89,7 @@ async function main() {
   api.use("/auth", authRouter);
   api.use("/participants", requireAuth, requireAdmin, participantsRouter);
   api.use("/admins", requireAuth, requireAdmin, adminsRouter);
+  api.use("/sessions/unlock", unlockLimiter);
   api.use("/sessions", requireAuth, sessionsRouter);
   api.use("/documents", requireAuth, documentsRouter);
   api.use("/categories", requireAuth, categoriesRouter);

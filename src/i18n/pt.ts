@@ -585,4 +585,22 @@ export const pt: Dict = {
   "lib.groupUpcoming": "Reuniões futuras",
   "lib.groupPast": "Reuniões concluídas",
   "lib.groupUnlinked": "Outros documentos",
+  // ─── Acesso por reunião ───────────────────────────────────────────────
+  "unlock.title": "Adicionar uma reunião",
+  "unlock.subtitle":
+    "Introduza o identificador e a palavra-passe de acesso recebidos para outra reunião. Estes códigos abrem apenas essa reunião.",
+  "unlock.code": "Identificador da reunião",
+  "unlock.password": "Palavra-passe de acesso",
+  "unlock.submit": "Desbloquear o acesso",
+  "unlock.done": "Acesso aberto: {title}",
+  "unlock.failed": "Desbloqueio impossível",
+  "part.accessBtn": "Gerir os acessos às reuniões",
+  "part.accessTitle": "Acessos às reuniões",
+  "part.accessSubtitle":
+    "Este participante só vê os documentos das reuniões selecionadas.",
+  "part.accessNone": "Nenhuma reunião",
+  "part.accessCount": "{n} reunião(ões)",
+  "part.accessEmptyList": "Nenhuma reunião agendada",
+  "part.accessSaved": "Acessos às reuniões atualizados",
+  "activity.session_access_granted": "Acesso a uma reunião aberto",
 };

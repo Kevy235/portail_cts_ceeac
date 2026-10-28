@@ -411,6 +411,30 @@ export const MIGRATIONS: Migration[] = [
       WHERE lang = 'es' AND key IN ('platform_name','platform_subtitle','org_description','footer_text');
     `,
   },
+  {
+    id: 11,
+    name: "cloisonnement des documents par reunion (session_access)",
+    sql: `
+      -- Droits d'accès documentaire, réunion par réunion. Les codes d'accès
+      -- d'une réunion n'ouvrent que cette réunion : chaque ligne ici = un
+      -- participant autorisé sur une réunion (inscription, déverrouillage
+      -- avec les codes, ou ouverture par l'administrateur).
+      CREATE TABLE session_access (
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        session_id UUID NOT NULL REFERENCES cts_sessions(id) ON DELETE CASCADE,
+        granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        PRIMARY KEY (user_id, session_id)
+      );
+      CREATE INDEX idx_session_access_session ON session_access(session_id);
+
+      -- Reprise des comptes existants : chaque participant auto-inscrit
+      -- conserve l'accès à la réunion via laquelle il s'est inscrit.
+      INSERT INTO session_access (user_id, session_id)
+        SELECT id, origin_session_id FROM users
+        WHERE role = 'participant' AND origin_session_id IS NOT NULL
+      ON CONFLICT DO NOTHING;
+    `,
+  },
 ];
 
 export const LANGS = ["fr", "en", "pt", "es"] as const;

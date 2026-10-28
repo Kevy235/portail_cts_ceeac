@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { clsx } from "clsx";
 import {
+  CalendarCheck,
   Copy,
   Edit3,
   KeyRound,
@@ -12,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { COUNTRIES, type User, type UserStatus } from "@/lib/types";
+import { COUNTRIES, type CtsSession, type User, type UserStatus } from "@/lib/types";
 import { CountryFlag } from "@/components/CountryFlag";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDate, initials } from "@/lib/format";
@@ -55,6 +56,8 @@ export function AdminParticipants() {
   const { t } = useI18n();
   const { settings } = useSettings();
   const resource = useApiResource<{ participants: User[] }>("/participants");
+  const sessionsResource = useApiResource<{ sessions: CtsSession[] }>("/sessions");
+  const allSessions = sessionsResource.data?.sessions ?? [];
   const participants = resource.data?.participants ?? null;
   const load = resource.reload;
 
@@ -66,6 +69,10 @@ export function AdminParticipants() {
   const [editing, setEditing] = useState<User | null>(null);
   const [deleting, setDeleting] = useState<User | null>(null);
   const [resetting, setResetting] = useState<User | null>(null);
+  // Gestion des accès par réunion : le participant ne voit que les documents
+  // des réunions cochées.
+  const [access, setAccess] = useState<User | null>(null);
+  const [accessIds, setAccessIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [tempPassword, setTempPassword] = useState<{ email: string; password: string } | null>(null);
 
@@ -107,6 +114,26 @@ export function AdminParticipants() {
     });
     setEditing(p);
     setModal("edit");
+  };
+
+  const openAccess = (p: User) => {
+    setAccessIds((p.sessionAccess ?? []).map((a) => a.id));
+    setAccess(p);
+  };
+
+  const handleSaveAccess = async () => {
+    if (!access || busy) return;
+    setBusy(true);
+    try {
+      await api.put(`/participants/${access.id}/access`, { sessionIds: accessIds });
+      toast.success(t("part.accessSaved"));
+      setAccess(null);
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("part.opFailed"));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -283,6 +310,12 @@ export function AdminParticipants() {
                             {t("part.viaSession", { title: p.originSessionTitle })}
                           </p>
                         )}
+                        <p className="text-[11px] text-slate2/80 mt-0.5 flex items-center gap-1">
+                          <CalendarCheck size={10} className="text-brand" aria-hidden />
+                          {p.sessionAccess && p.sessionAccess.length > 0
+                            ? t("part.accessCount", { n: p.sessionAccess.length })
+                            : t("part.accessNone")}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -306,6 +339,14 @@ export function AdminParticipants() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => openAccess(p)}
+                        className="p-1.5 rounded-lg text-brand hover:bg-brand-soft transition-colors"
+                        title={t("part.accessBtn")}
+                        aria-label={t("part.accessBtn")}
+                      >
+                        <CalendarCheck size={14} />
+                      </button>
                       <button
                         onClick={() => setResetting(p)}
                         className="p-1.5 rounded-lg text-gold hover:bg-gold-soft hover:brightness-90 transition-all"
@@ -483,6 +524,59 @@ export function AdminParticipants() {
               <Copy size={14} />
               {t("part.copyBtn")}
             </PrimaryButton>
+          </div>
+        </Modal>
+      )}
+
+      {/* ─── Accès aux réunions ────────────────────────────────────── */}
+      {access && (
+        <Modal
+          title={t("part.accessTitle")}
+          subtitle={`${access.name} — ${access.email}`}
+          onClose={() => setAccess(null)}
+        >
+          <div className="p-6 space-y-4">
+            <p className="text-xs text-slate2">{t("part.accessSubtitle")}</p>
+            {allSessions.length === 0 ? (
+              <p className="text-sm text-slate2/80">{t("part.accessEmptyList")}</p>
+            ) : (
+              <div className="max-h-72 overflow-y-auto divide-y divide-line-soft border border-line-soft rounded-lg">
+                {allSessions.map((session) => (
+                  <label
+                    key={session.id}
+                    className="flex items-start gap-3 px-3 py-2.5 hover:bg-mist/60 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 accent-brand"
+                      checked={accessIds.includes(session.id)}
+                      onChange={(e) =>
+                        setAccessIds((ids) =>
+                          e.target.checked
+                            ? [...ids, session.id]
+                            : ids.filter((id) => id !== session.id)
+                        )
+                      }
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-sm text-ink">{session.title}</span>
+                      <span className="block text-[11px] text-slate2/70 font-mono">
+                        {session.reference}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-3 pt-1">
+              <SecondaryButton type="button" className="flex-1" onClick={() => setAccess(null)}>
+                {t("common.cancel")}
+              </SecondaryButton>
+              <PrimaryButton type="button" className="flex-1" disabled={busy} onClick={handleSaveAccess}>
+                <CalendarCheck size={14} />
+                {busy ? t("common.saving") : t("common.save")}
+              </PrimaryButton>
+            </div>
           </div>
         </Modal>
       )}
