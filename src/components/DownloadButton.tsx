@@ -5,31 +5,30 @@ import { toast } from "sonner";
 import type { DocFile } from "@/lib/types";
 import { downloadWithProgress } from "@/lib/download";
 import { formatSize } from "@/lib/format";
+import { canPreview } from "@/lib/viewer";
 import { LANG_LABELS, useI18n } from "@/i18n";
 import { FlagIcon } from "@/components/ui";
 
 /**
- * Bouton « Consulter » : ouvre le document dans un nouvel onglet du navigateur
- * (affichage direct, sans téléchargement). Proposé pour les PDF uniquement —
- * les autres formats seraient téléchargés de toute façon.
+ * Bouton « Lire » : ouvre le document dans le lecteur intégré de la plateforme
+ * (sans téléchargement). Proposé pour les formats affichables (PDF, Word .docx)
+ * — les autres formats restent disponibles au téléchargement.
  */
 export function ViewButton({
-  docId,
   file,
+  onOpen,
   compact,
 }: {
-  docId: string;
-  file: DocFile;
+  file: Pick<DocFile, "lang" | "fileName" | "mimeType">;
+  onOpen: () => void;
   compact?: boolean;
 }) {
   const { t } = useI18n();
-  if (file.mimeType !== "application/pdf") return null;
+  if (!canPreview(file)) return null;
   return (
     <button
       type="button"
-      onClick={() =>
-        window.open(`/api/documents/${docId}/download/${file.lang}?inline=1`, "_blank", "noopener")
-      }
+      onClick={onOpen}
       title={`${t("docs.view")} — ${LANG_LABELS[file.lang]}`}
       aria-label={`${t("docs.view")} — ${LANG_LABELS[file.lang]}`}
       className={clsx(
@@ -47,16 +46,19 @@ export function ViewButton({
  * Bouton de téléchargement d'une version linguistique avec progression :
  * le fond se remplit de gauche à droite et le pourcentage remplace le libellé.
  * `url` : endpoint de téléchargement (document ou guide utilisateur).
+ * `label` : libellé facultatif affiché devant le drapeau (lecteur).
  */
 export function DownloadButton({
   url,
   file,
   compact,
+  label,
   onDone,
 }: {
   url: string;
   file: Pick<DocFile, "lang" | "fileName" | "fileSize">;
   compact?: boolean;
+  label?: string;
   onDone?: () => void;
 }) {
   const { t } = useI18n();
@@ -113,6 +115,7 @@ export function DownloadButton({
         ) : (
           <Download size={compact ? 11 : 12} aria-hidden className={busy ? "animate-bounce" : undefined} />
         )}
+        {label && <span className="hidden sm:inline">{label}</span>}
         <FlagIcon lang={file.lang} className="w-[14px] h-[9px] ring-white/40" />
         <span className="uppercase font-bold">{file.lang}</span>
         {busy && (

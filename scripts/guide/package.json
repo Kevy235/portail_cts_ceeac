@@ -1,8 +1,8 @@
 {
   "name": "cts-guide-generator",
   "private": true,
-  "version": "2.0.0",
-  "description": "Génération du guide participant : captures Playwright + document Word (docs/Guide-Participant-Plateforme-CTS-DSS.docx)",
+  "version": "3.0.0",
+  "description": "Génération du guide utilisateur PDRS-CEEAC en 4 langues : captures Playwright + documents Word (docs/Guide-Utilisateur-PDRS-CEEAC-<LANGUE>.docx)",
   "type": "module",
   "dependencies": {
     "docx": "^9.7.1",

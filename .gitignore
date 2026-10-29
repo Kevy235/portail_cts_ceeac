@@ -8,3 +8,6 @@ uploads/
 .pgdata-*/
 uploads-test/
 *.log
+
+# Captures de travail du générateur de guide (copie de référence : docs/captures/)
+scripts/guide/captures/

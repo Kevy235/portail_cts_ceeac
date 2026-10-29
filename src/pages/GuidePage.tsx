@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import {
   ArrowLeft,
   BookOpen,
+  BookOpenText,
   KeyRound,
   LifeBuoy,
   MessagesSquare,
@@ -116,6 +117,21 @@ export function GuideContent() {
       >
         <ul className="space-y-2.5 list-disc pl-5">
           {(["guide.s3.1", "guide.s3.2", "guide.s3.3"] as const).map((k) => (
+            <li key={k} className="text-sm text-ink leading-relaxed">
+              {t(k)}
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section
+        icon={<BookOpenText size={17} className="text-white" />}
+        tile="bg-gradient-to-br from-accent to-brand"
+        title={t("guide.s7.title")}
+      >
+        <p className="text-sm text-slate2">{t("guide.s7.p")}</p>
+        <ul className="space-y-2.5 list-disc pl-5">
+          {(["guide.s7.1", "guide.s7.2", "guide.s7.3", "guide.s7.4"] as const).map((k) => (
             <li key={k} className="text-sm text-ink leading-relaxed">
               {t(k)}
             </li>

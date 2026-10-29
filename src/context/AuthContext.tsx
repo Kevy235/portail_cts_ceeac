@@ -27,13 +27,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { setLang } = useI18n();
+  const { lang, setLang } = useI18n();
 
   const refresh = useCallback(async () => {
     try {
       const { user } = await api.get<{ user: User }>("/auth/me");
       setUser(user);
-      if (isLang(user.uiLang)) setLang(user.uiLang);
+      // Invités : pas de préférence enregistrée, la langue choisie est conservée.
+      if (user.role !== "guest" && isLang(user.uiLang)) setLang(user.uiLang);
     } catch {
       setUser(null);
     }
@@ -42,6 +43,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refresh().finally(() => setLoading(false));
   }, [refresh]);
+
+  // Langue choisie avec les drapeaux : mémorisée sur le compte, sinon la
+  // préférence enregistrée la remplaçait à la connexion suivante.
+  useEffect(() => {
+    if (!user || user.role === "guest" || user.uiLang === lang) return;
+    setUser((u) => (u ? { ...u, uiLang: lang } : u));
+    api.put("/auth/preferences", { uiLang: lang }).catch(() => {});
+  }, [lang, user]);
 
   const login = useCallback(
     async (email: string, password: string) => {

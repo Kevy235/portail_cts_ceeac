@@ -19,6 +19,8 @@ import {
   StatusBadge,
 } from "@/components/ui";
 import { DownloadButton, ViewButton } from "@/components/DownloadButton";
+import { DocumentViewer } from "@/components/DocumentViewer";
+import { documentSource } from "@/lib/viewer";
 import { DocumentFormModal } from "@/components/DocumentFormModal";
 
 export function AdminDocuments() {
@@ -36,6 +38,7 @@ export function AdminDocuments() {
   const [editing, setEditing] = useState<Doc | null>(null);
   const [deleting, setDeleting] = useState<Doc | null>(null);
   const [busy, setBusy] = useState(false);
+  const [reading, setReading] = useState<{ doc: Doc; lang: Lang } | null>(null);
 
   const load = () => {
     setLoadError(null);
@@ -322,7 +325,11 @@ export function AdminDocuments() {
                     <div className="flex items-center gap-1.5">
                       {doc.files.map((f) => (
                         <span key={f.lang} className="flex items-center gap-0.5">
-                          <ViewButton docId={doc.id} file={f} compact />
+                          <ViewButton
+                            file={f}
+                            compact
+                            onOpen={() => setReading({ doc, lang: f.lang })}
+                          />
                           <DownloadButton
                             url={`/api/documents/${doc.id}/download/${f.lang}`}
                             file={f}
@@ -396,6 +403,15 @@ export function AdminDocuments() {
           onConfirm={handleDelete}
           onCancel={() => setDeleting(null)}
           busy={busy}
+        />
+      )}
+
+      {reading && (
+        <DocumentViewer
+          source={documentSource(reading.doc)}
+          initialLang={reading.lang}
+          onClose={() => setReading(null)}
+          onDownloaded={load}
         />
       )}
     </div>

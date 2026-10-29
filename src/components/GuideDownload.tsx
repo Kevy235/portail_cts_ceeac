@@ -1,18 +1,22 @@
+import { useState } from "react";
 import { FileDown } from "lucide-react";
 import type { GuideFile } from "@/lib/types";
 import { useApiResource } from "@/lib/useApiResource";
-import { useI18n } from "@/i18n";
-import { DownloadButton } from "@/components/DownloadButton";
+import { useI18n, type Lang } from "@/i18n";
+import { DownloadButton, ViewButton } from "@/components/DownloadButton";
+import { DocumentViewer } from "@/components/DocumentViewer";
 
 /**
  * Encart de téléchargement du guide utilisateur officiel (un fichier par
  * langue, publié par l'administrateur). Affiché sur la page publique du guide
  * et dans l'espace participant ; masqué tant qu'aucun fichier n'est publié.
+ * Les versions PDF/Word peuvent aussi être lues dans le lecteur intégré.
  */
 export function GuideDownload() {
   const { t } = useI18n();
   const resource = useApiResource<{ guides: GuideFile[] }>("/guide");
   const guides = resource.data?.guides ?? [];
+  const [reading, setReading] = useState<Lang | null>(null);
 
   if (guides.length === 0) return null;
 
@@ -31,14 +35,26 @@ export function GuideDownload() {
         </div>
         <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           {guides.map((g) => (
-            <DownloadButton
-              key={g.lang}
-              url={`/api/guide/download/${g.lang}`}
-              file={g}
-            />
+            <span key={g.lang} className="flex items-center gap-1">
+              <ViewButton file={g} onOpen={() => setReading(g.lang)} />
+              <DownloadButton url={`/api/guide/download/${g.lang}`} file={g} />
+            </span>
           ))}
         </div>
       </div>
+
+      {reading && (
+        <DocumentViewer
+          source={{
+            title: t("guide.title"),
+            files: guides,
+            viewUrl: (lang) => `/api/guide/download/${lang}`,
+            downloadUrl: (lang) => `/api/guide/download/${lang}`,
+          }}
+          initialLang={reading}
+          onClose={() => setReading(null)}
+        />
+      )}
     </section>
   );
 }

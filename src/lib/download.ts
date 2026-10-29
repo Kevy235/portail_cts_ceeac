@@ -1,34 +1,34 @@
 import { ApiError } from "@/lib/api";
 
 /**
- * Télécharge un fichier en flux continu et rapporte la progression (0-100).
+ * Récupère un fichier en flux continu et rapporte la progression (0-100).
  * `onProgress` reçoit -1 lorsque la taille totale est inconnue.
- * Le fichier est ensuite enregistré via la boîte de dialogue du navigateur.
+ * Utilisé par le téléchargement et par le lecteur intégré.
  */
-export async function downloadWithProgress(
+export async function fetchWithProgress(
   url: string,
-  fallbackName: string,
-  onProgress: (percent: number) => void
-): Promise<void> {
-  const res = await fetch(url, { credentials: "include" });
+  onProgress: (percent: number) => void,
+  signal?: AbortSignal
+): Promise<{ blob: Blob; fileName: string | null }> {
+  const res = await fetch(url, { credentials: "include", signal });
   if (!res.ok) {
     let message = `Erreur ${res.status}`;
+    let code: string | undefined;
     try {
       const data = await res.json();
       if (data?.error) message = data.error;
+      if (data?.code) code = data.code;
     } catch {
       /* réponse non JSON */
     }
-    throw new ApiError(res.status, message);
+    throw new ApiError(res.status, message, code);
   }
 
-  // Nom de fichier annoncé par le serveur (Content-Disposition), sinon repli.
+  // Nom de fichier annoncé par le serveur (Content-Disposition).
   const disposition = res.headers.get("content-disposition") ?? "";
   const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(disposition);
   const plainMatch = /filename="([^"]+)"/i.exec(disposition);
-  const fileName = utf8Match
-    ? decodeURIComponent(utf8Match[1])
-    : (plainMatch?.[1] ?? fallbackName);
+  const fileName = utf8Match ? decodeURIComponent(utf8Match[1]) : (plainMatch?.[1] ?? null);
 
   const total = Number(res.headers.get("content-length")) || 0;
   const reader = res.body?.getReader();
@@ -53,11 +53,24 @@ export async function downloadWithProgress(
     });
   }
   onProgress(100);
+  return { blob, fileName };
+}
+
+/**
+ * Télécharge un fichier avec progression, puis l'enregistre via la boîte de
+ * dialogue du navigateur.
+ */
+export async function downloadWithProgress(
+  url: string,
+  fallbackName: string,
+  onProgress: (percent: number) => void
+): Promise<void> {
+  const { blob, fileName } = await fetchWithProgress(url, onProgress);
 
   const objectUrl = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = objectUrl;
-  anchor.download = fileName;
+  anchor.download = fileName ?? fallbackName;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();

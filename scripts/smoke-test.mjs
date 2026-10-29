@@ -664,6 +664,14 @@ async function main() {
     r = await guest("GET", `/documents/${docId}/download/fr`);
     check("l'invité télécharge un document publié", r.status === 200);
 
+    // Lecteur intégré : lecture inline autorisée pour l'invité
+    r = await guest("GET", `/documents/${docId}/download/fr?inline=1`);
+    check(
+      "l'invité lit un document dans le lecteur intégré (inline)",
+      r.status === 200 &&
+        (r.headers.get("content-disposition") ?? "").startsWith("inline")
+    );
+
     r = await guest("POST", `/sessions/${sessionId}/messages`, {
       json: { body: "Message d'invité" },
     });

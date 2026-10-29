@@ -7,6 +7,8 @@ import { formatDate } from "@/lib/format";
 import { useSettings } from "@/context/SettingsContext";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import { DownloadButton, ViewButton } from "@/components/DownloadButton";
+import { DocumentViewer } from "@/components/DocumentViewer";
+import { documentSource, preferredLang } from "@/lib/viewer";
 import {
   CodedBadge,
   EmptyState,
@@ -18,13 +20,15 @@ import {
 
 export function ParticipantLibrary() {
   const { settings } = useSettings();
-  const { t } = useI18n();
+  const { t, lang: uiLang } = useI18n();
   const resource = useApiResource<{ documents: Doc[] }>("/documents");
   const documents = resource.data?.documents ?? null;
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("tous");
   const [sessionFilter, setSessionFilter] = useState("tous");
   const [langFilter, setLangFilter] = useState<"tous" | Lang>("tous");
+  // Document ouvert dans le lecteur intégré
+  const [reading, setReading] = useState<{ doc: Doc; lang: Lang } | null>(null);
 
   const visible = documents ?? [];
 
@@ -231,7 +235,21 @@ export function ParticipantLibrary() {
                 </div>
                 <div className="flex-1 min-w-0 basis-full sm:basis-auto">
                   <h3 className="text-base font-semibold text-ink leading-snug mb-1.5">
-                    {doc.title}
+                    {(() => {
+                      const openLang = preferredLang(doc.files, uiLang);
+                      return openLang ? (
+                        <button
+                          type="button"
+                          onClick={() => setReading({ doc, lang: openLang })}
+                          title={t("docs.view")}
+                          className="text-left hover:text-brand hover:underline underline-offset-2 decoration-brand/40 transition-colors"
+                        >
+                          {doc.title}
+                        </button>
+                      ) : (
+                        doc.title
+                      );
+                    })()}
                     {doc.version > 1 && (
                       <span className="ml-2 text-xs font-semibold text-accent align-middle">
                         {t("docs.version", { n: doc.version })}
@@ -267,7 +285,7 @@ export function ParticipantLibrary() {
                   </div>
                   {doc.files.map((f) => (
                     <span key={f.lang} className="flex items-center gap-1">
-                      <ViewButton docId={doc.id} file={f} />
+                      <ViewButton file={f} onOpen={() => setReading({ doc, lang: f.lang })} />
                       <DownloadButton
                         url={`/api/documents/${doc.id}/download/${f.lang}`}
                         file={f}
@@ -289,6 +307,15 @@ export function ParticipantLibrary() {
           />
         )}
       </div>
+
+      {reading && (
+        <DocumentViewer
+          source={documentSource(reading.doc)}
+          initialLang={reading.lang}
+          onClose={() => setReading(null)}
+          onDownloaded={resource.reload}
+        />
+      )}
     </div>
   );
 }
