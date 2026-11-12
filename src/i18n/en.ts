@@ -55,9 +55,9 @@ export const en: Dict = {
   "login.submitting": "Signing in…",
   "login.failed": "Unable to sign in",
   "login.invalidCredentials": "Invalid credentials. Please try again.",
-  "login.accountDisabled": "Your account is disabled. Contact the ECCAS Secretariat.",
+  "login.accountDisabled": "Your account is disabled. Contact the ECCAS Commission.",
   "login.noAccount":
-    "Don't have an account? Contact the ECCAS Secretariat ({email}) for accreditation.",
+    "Don't have an account? Contact the ECCAS Commission ({email}) for accreditation.",
 
   "pwd.firstTitle": "First sign-in",
   "pwd.firstSubtitle": "Set your personal password to activate your account.",
@@ -71,7 +71,7 @@ export const en: Dict = {
   "pwd.updated": "Password updated",
   "pwd.updateFailed": "Update failed",
   "pwd.submit": "Set my password",
-  "pwd.secureNote": "Your password is encrypted and never shared with the Secretariat.",
+  "pwd.secureNote": "Your password is encrypted and never shared with the Commission.",
 
   "dash.title": "Dashboard",
   "dash.subtitle": "Overview — real-time platform data",
@@ -191,9 +191,9 @@ export const en: Dict = {
   "adm.email": "E-mail address",
   "adm.emailPh": "firstname.lastname@ceeac-eccas.org",
   "adm.function": "Function",
-  "adm.functionPh": "Secretariat",
+  "adm.functionPh": "Commission",
   "adm.institution": "Unit / institution",
-  "adm.institutionPh": "ECCAS General Secretariat",
+  "adm.institutionPh": "ECCAS Commission",
   "adm.status": "Status",
   "adm.statusSelfHint": "You cannot disable your own account.",
   "adm.createBtn": "Create the account",
@@ -311,7 +311,7 @@ export const en: Dict = {
   "set.org_full_name": "Full organization name",
   "set.org_description": "Description (sign-in page)",
   "set.login_notice": "Sign-in page message",
-  "set.contact_email": "Secretariat contact e-mail",
+  "set.contact_email": "Commission contact e-mail",
   "set.footer_text": "Footer text",
   "set.saveBtn": "Save contents",
   "set.saved": "Portal contents updated",
@@ -364,7 +364,7 @@ export const en: Dict = {
   "prof.update": "Update",
   "prof.accredTitle": "ECCAS Accreditation",
   "prof.accredText":
-    "Your access to this platform was granted by the ECCAS Secretariat. To modify your information, please contact {email}.",
+    "Your access to this platform was granted by the ECCAS Commission. To modify your information, please contact {email}.",
   "prof.originSession": "Registration meeting",
 
   // ─── Common (additions) ───────────────────────────────────────────────
@@ -390,7 +390,7 @@ export const en: Dict = {
   "register.subtitle": "Create your account with the access codes sent to your Member State",
   "register.accessSection": "Meeting access",
   "register.accessHint":
-    "The meeting ID and password were sent to you by your Member State or the ECCAS Secretariat.",
+    "The meeting ID and password were sent to you by your Member State or the ECCAS Commission.",
   "register.accessCode": "Meeting ID",
   "register.accessPassword": "Meeting password",
   "register.personalSection": "Your information",
@@ -485,7 +485,7 @@ export const en: Dict = {
   "guide.title": "User guide",
   "guide.subtitle": "The essentials for using the statutory meetings portal",
   "guide.intro":
-    "This portal provides access to the official documents of ECCAS statutory meetings. This guide summarises the essential procedures; the full guide is available from the ECCAS Secretariat.",
+    "This portal provides access to the official documents of ECCAS statutory meetings. This guide summarises the essential procedures; the full guide is available from the ECCAS Commission.",
   "guide.backToLogin": "Back to sign-in",
   "guide.s1.title": "Access with the meeting codes (guest)",
   "guide.s1.p":
@@ -507,24 +507,24 @@ export const en: Dict = {
   "guide.s3.2":
     "Open a document in the reader with the “eye” button or by clicking its title; download the desired version with the language buttons (FR, EN, PT, ES).",
   "guide.s3.3":
-    "Documents bearing the “Coded document” badge require a reading key sent separately by the Secretariat.",
+    "Documents bearing the “Coded document” badge require a reading key sent separately by the Commission.",
   "guide.s4.title": "Statutory meetings & discussions (account required)",
   "guide.s4.1":
     "The “Statutory meetings” page presents the calendar: dates, venue, status and related documents.",
   "guide.s4.2":
-    "Open “Discussion” on a meeting to exchange with the other participants and the Secretariat (2,000 characters per message).",
+    "Open “Discussion” on a meeting to exchange with the other participants and the Commission (2,000 characters per message).",
   "guide.s5.title": "Reading comfort",
   "guide.s5.1": "The A / A+ / A++ button enlarges the text across the platform; your setting is remembered.",
   "guide.s5.2": "The flag buttons switch the interface language instantly (FR, EN, PT, ES).",
   "guide.s6.title": "Your profile",
   "guide.s6.1":
-    "“My profile” summarises your accreditation details. For any correction or password change, please contact the ECCAS Secretariat.",
+    "“My profile” summarises your accreditation details. For any correction or password change, please contact the ECCAS Commission.",
   "guide.assistTitle": "Assistance",
   "guide.assist":
-    "For any difficulty (access, password, accreditation), the ECCAS Secretariat remains at your disposal:",
+    "For any difficulty (access, password, accreditation), the ECCAS Commission remains at your disposal:",
   "guide.dl.title": "Official guide to download",
   "guide.dl.desc":
-    "Download the full user guide published by the Secretariat, in the language of your choice.",
+    "Download the full user guide published by the Commission, in the language of your choice.",
 
   "login.tabAccount": "I have an account",
   "login.tabCodes": "Meeting codes",
@@ -605,6 +605,8 @@ export const en: Dict = {
   // ─── Lecteur de documents intégré ─────────────────────────────────────
   "viewer.loading": "Loading document…",
   "viewer.close": "Close the reader",
+  "viewer.back": "Back",
+  "viewer.backToList": "Back to the document list",
   "viewer.download": "Download",
   "viewer.versions": "Language versions",
   "viewer.prev": "Previous page",
@@ -631,11 +633,11 @@ export const en: Dict = {
   "viewer.errorTitle": "Unable to display the document",
   "viewer.errorText": "The file could not be read in the reader. You can download it to open it on your computer.",
   "viewer.passwordTitle": "Document protected by a reading key",
-  "viewer.passwordText": "Enter the reading key sent separately by the Secretariat to display this document.",
+  "viewer.passwordText": "Enter the reading key sent separately by the Commission to display this document.",
   "viewer.passwordLabel": "Reading key",
   "viewer.passwordWrong": "Incorrect key — please check and try again.",
   "viewer.passwordSubmit": "Open the document",
-  "viewer.codedNote": "Coded document: if a reading key is requested, use the one sent by the Secretariat through a secure channel.",
+  "viewer.codedNote": "Coded document: if a reading key is requested, use the one sent by the Commission through a secure channel.",
   "viewer.shortcuts": "← → pages · + − zoom · Ctrl+F search · Esc close",
   "viewer.pages": "{n} page(s)",
   "guide.s7.title": "Reading a document on the platform",

@@ -95,7 +95,7 @@ authRouter.post(
     }
     if (user.status === "inactif") {
       return res.status(403).json({
-        error: "Votre compte est désactivé. Contactez le Secrétariat de la CEEAC.",
+        error: "Votre compte est désactivé. Contactez la Commission de la CEEAC.",
         code: "account_disabled",
       });
     }

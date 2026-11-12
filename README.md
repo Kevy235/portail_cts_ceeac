@@ -1,6 +1,6 @@
 # Portail documentaire — Réunions statutaires de la CEEAC
 
-Portail sécurisé permettant au Secrétariat de la CEEAC de gérer les réunions statutaires, les participants et les documents officiels, et aux experts accrédités d'accéder à la bibliothèque — avant, pendant et après chaque réunion.
+Portail sécurisé permettant à la Commission de la CEEAC de gérer les réunions statutaires, les participants et les documents officiels, et aux experts accrédités d'accéder à la bibliothèque — avant, pendant et après chaque réunion.
 
 ## Pile technique
 

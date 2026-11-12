@@ -132,11 +132,11 @@ async function main() {
 
     // ─── Mise à jour du compte (nom d'utilisateur + e-mail) ─────────
     r = await admin("PUT", "/auth/me", {
-      json: { name: "Secrétariat CTS-DSS", email: "admin@test.org" },
+      json: { name: "Commission de la CEEAC", email: "admin@test.org" },
     });
     check(
       "l'admin modifie son nom d'utilisateur",
-      r.status === 200 && r.data.user.name === "Secrétariat CTS-DSS"
+      r.status === 200 && r.data.user.name === "Commission de la CEEAC"
     );
     r = await admin("PUT", "/auth/me", { json: { name: "X", email: "admin@test.org" } });
     check("nom trop court refusé (400)", r.status === 400);
@@ -181,7 +181,7 @@ async function main() {
       json: {
         name: "Admin Secondaire",
         email: "admin2@test.org",
-        functionTitle: "Secrétariat",
+        functionTitle: "Commission",
         institution: "CEEAC",
       },
     });

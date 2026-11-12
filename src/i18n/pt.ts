@@ -55,9 +55,9 @@ export const pt: Dict = {
   "login.submitting": "A iniciar sessão…",
   "login.failed": "Não foi possível iniciar sessão",
   "login.invalidCredentials": "Credenciais incorretas. Tente novamente.",
-  "login.accountDisabled": "A sua conta está desativada. Contacte o Secretariado da CEEAC.",
+  "login.accountDisabled": "A sua conta está desativada. Contacte a Comissão da CEEAC.",
   "login.noAccount":
-    "Não tem conta? Contacte o Secretariado da CEEAC ({email}) para obter acreditação.",
+    "Não tem conta? Contacte a Comissão da CEEAC ({email}) para obter acreditação.",
 
   "pwd.firstTitle": "Primeiro acesso",
   "pwd.firstSubtitle": "Defina a sua palavra-passe pessoal para ativar a conta.",
@@ -71,7 +71,7 @@ export const pt: Dict = {
   "pwd.updated": "Palavra-passe atualizada",
   "pwd.updateFailed": "Falha na atualização",
   "pwd.submit": "Definir a minha palavra-passe",
-  "pwd.secureNote": "A sua palavra-passe é cifrada e nunca é comunicada ao Secretariado.",
+  "pwd.secureNote": "A sua palavra-passe é cifrada e nunca é comunicada à Comissão.",
 
   "dash.title": "Painel de controlo",
   "dash.subtitle": "Visão geral — dados da plataforma em tempo real",
@@ -191,9 +191,9 @@ export const pt: Dict = {
   "adm.email": "Endereço de e-mail",
   "adm.emailPh": "nome.apelido@ceeac-eccas.org",
   "adm.function": "Função",
-  "adm.functionPh": "Secretariado",
+  "adm.functionPh": "Comissão",
   "adm.institution": "Serviço / instituição",
-  "adm.institutionPh": "Secretariado-Geral da CEEAC",
+  "adm.institutionPh": "Comissão da CEEAC",
   "adm.status": "Estado",
   "adm.statusSelfHint": "Não pode desativar a sua própria conta.",
   "adm.createBtn": "Criar a conta",
@@ -312,7 +312,7 @@ export const pt: Dict = {
   "set.org_full_name": "Nome completo da organização",
   "set.org_description": "Descrição (página de início de sessão)",
   "set.login_notice": "Mensagem da página de início de sessão",
-  "set.contact_email": "E-mail de contacto do Secretariado",
+  "set.contact_email": "E-mail de contacto da Comissão",
   "set.footer_text": "Texto do rodapé",
   "set.saveBtn": "Guardar os conteúdos",
   "set.saved": "Conteúdos do portal atualizados",
@@ -365,7 +365,7 @@ export const pt: Dict = {
   "prof.update": "Atualizar",
   "prof.accredTitle": "Acreditação CEEAC",
   "prof.accredText":
-    "O seu acesso a esta plataforma foi concedido pelo Secretariado da CEEAC. Para qualquer alteração das suas informações, contacte {email}.",
+    "O seu acesso a esta plataforma foi concedido pela Comissão da CEEAC. Para qualquer alteração das suas informações, contacte {email}.",
   "prof.originSession": "Sessão de inscrição",
 
   // ─── Comum (complementos) ─────────────────────────────────────────────
@@ -391,7 +391,7 @@ export const pt: Dict = {
   "register.subtitle": "Crie a sua conta com os acessos transmitidos ao seu Estado-Membro",
   "register.accessSection": "Acessos da reunião",
   "register.accessHint":
-    "O identificador e a palavra-passe da reunião foram-lhe transmitidos pelo seu Estado-Membro ou pelo Secretariado da CEEAC.",
+    "O identificador e a palavra-passe da reunião foram-lhe transmitidos pelo seu Estado-Membro ou pela Comissão da CEEAC.",
   "register.accessCode": "Identificador da reunião",
   "register.accessPassword": "Palavra-passe da reunião",
   "register.personalSection": "As suas informações",
@@ -486,7 +486,7 @@ export const pt: Dict = {
   "guide.title": "Guia do utilizador",
   "guide.subtitle": "O essencial para utilizar o portal das reuniões estatutárias",
   "guide.intro":
-    "Este portal dá acesso aos documentos oficiais das reuniões estatutárias da CEEAC. Este guia resume os procedimentos essenciais; o guia completo pode ser obtido junto do Secretariado da CEEAC.",
+    "Este portal dá acesso aos documentos oficiais das reuniões estatutárias da CEEAC. Este guia resume os procedimentos essenciais; o guia completo pode ser obtido junto da Comissão da CEEAC.",
   "guide.backToLogin": "Voltar ao início de sessão",
   "guide.s1.title": "Aceder com os códigos de reunião (convidado)",
   "guide.s1.p":
@@ -508,24 +508,24 @@ export const pt: Dict = {
   "guide.s3.2":
     "Abra um documento no leitor com o botão « olho » ou clicando no respetivo título; descarregue a versão pretendida com os botões de língua (FR, EN, PT, ES).",
   "guide.s3.3":
-    "Os documentos com o distintivo « Documento codificado » requerem uma chave de leitura transmitida separadamente pelo Secretariado.",
+    "Os documentos com o distintivo « Documento codificado » requerem uma chave de leitura transmitida separadamente pela Comissão.",
   "guide.s4.title": "Reuniões estatutárias e discussões (conta necessária)",
   "guide.s4.1":
     "A página « Reuniões estatutárias » apresenta o calendário: datas, local, estado e documentos associados.",
   "guide.s4.2":
-    "Abra « Discussão » numa reunião para trocar impressões com os outros participantes e o Secretariado (2 000 caracteres por mensagem).",
+    "Abra « Discussão » numa reunião para trocar impressões com os outros participantes e a Comissão (2 000 caracteres por mensagem).",
   "guide.s5.title": "Conforto de leitura",
   "guide.s5.1": "O botão A / A+ / A++ amplia o texto de toda a plataforma; a sua preferência é guardada.",
   "guide.s5.2": "Os botões com bandeiras mudam imediatamente a língua da interface (FR, EN, PT, ES).",
   "guide.s6.title": "O seu perfil",
   "guide.s6.1":
-    "« O meu perfil » resume os dados da sua acreditação. Para qualquer correção ou mudança de palavra-passe, contacte o Secretariado da CEEAC.",
+    "« O meu perfil » resume os dados da sua acreditação. Para qualquer correção ou mudança de palavra-passe, contacte a Comissão da CEEAC.",
   "guide.assistTitle": "Assistência",
   "guide.assist":
-    "Para qualquer dificuldade (acesso, palavra-passe, acreditação), o Secretariado da CEEAC permanece à sua disposição:",
+    "Para qualquer dificuldade (acesso, palavra-passe, acreditação), a Comissão da CEEAC permanece à sua disposição:",
   "guide.dl.title": "Guia oficial para descarregar",
   "guide.dl.desc":
-    "Descarregue o guia do utilizador completo publicado pelo Secretariado, na língua da sua escolha.",
+    "Descarregue o guia do utilizador completo publicado pela Comissão, na língua da sua escolha.",
 
   "login.tabAccount": "Tenho uma conta",
   "login.tabCodes": "Códigos de reunião",
@@ -606,6 +606,8 @@ export const pt: Dict = {
   // ─── Lecteur de documents intégré ─────────────────────────────────────
   "viewer.loading": "A carregar o documento…",
   "viewer.close": "Fechar o leitor",
+  "viewer.back": "Voltar",
+  "viewer.backToList": "Voltar à lista de documentos",
   "viewer.download": "Descarregar",
   "viewer.versions": "Versões linguísticas",
   "viewer.prev": "Página anterior",
@@ -632,11 +634,11 @@ export const pt: Dict = {
   "viewer.errorTitle": "Não é possível apresentar o documento",
   "viewer.errorText": "Não foi possível ler o ficheiro no leitor. Pode descarregá-lo para o abrir no seu computador.",
   "viewer.passwordTitle": "Documento protegido por uma chave de leitura",
-  "viewer.passwordText": "Introduza a chave de leitura comunicada separadamente pelo Secretariado para apresentar este documento.",
+  "viewer.passwordText": "Introduza a chave de leitura comunicada separadamente pela Comissão para apresentar este documento.",
   "viewer.passwordLabel": "Chave de leitura",
   "viewer.passwordWrong": "Chave incorreta — verifique e tente novamente.",
   "viewer.passwordSubmit": "Abrir o documento",
-  "viewer.codedNote": "Documento codificado: se for pedida uma chave de leitura, utilize a que foi transmitida pelo Secretariado por um canal seguro.",
+  "viewer.codedNote": "Documento codificado: se for pedida uma chave de leitura, utilize a que foi transmitida pela Comissão por um canal seguro.",
   "viewer.shortcuts": "← → páginas · + − zoom · Ctrl+F pesquisar · Esc fechar",
   "viewer.pages": "{n} página(s)",
   "guide.s7.title": "Ler um documento na plataforma",

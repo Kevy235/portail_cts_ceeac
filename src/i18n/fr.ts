@@ -58,9 +58,9 @@ export const fr = {
   "login.submitting": "Connexion…",
   "login.failed": "Connexion impossible",
   "login.invalidCredentials": "Identifiants incorrects. Veuillez réessayer.",
-  "login.accountDisabled": "Votre compte est désactivé. Contactez le Secrétariat de la CEEAC.",
+  "login.accountDisabled": "Votre compte est désactivé. Contactez la Commission de la CEEAC.",
   "login.noAccount":
-    "Vous n'avez pas de compte ? Contactez le Secrétariat de la CEEAC ({email}) pour une accréditation.",
+    "Vous n'avez pas de compte ? Contactez la Commission de la CEEAC ({email}) pour une accréditation.",
 
   // ─── Mot de passe ─────────────────────────────────────────────────────
   "pwd.firstTitle": "Première connexion",
@@ -75,7 +75,7 @@ export const fr = {
   "pwd.updated": "Mot de passe mis à jour",
   "pwd.updateFailed": "Échec de la mise à jour",
   "pwd.submit": "Définir mon mot de passe",
-  "pwd.secureNote": "Votre mot de passe est chiffré et n'est jamais communiqué au Secrétariat.",
+  "pwd.secureNote": "Votre mot de passe est chiffré et n'est jamais communiqué à la Commission.",
 
   // ─── Tableau de bord ──────────────────────────────────────────────────
   "dash.title": "Tableau de bord",
@@ -200,9 +200,9 @@ export const fr = {
   "adm.email": "Adresse e-mail",
   "adm.emailPh": "prenom.nom@ceeac-eccas.org",
   "adm.function": "Fonction",
-  "adm.functionPh": "Secrétariat",
+  "adm.functionPh": "Commission",
   "adm.institution": "Service / institution",
-  "adm.institutionPh": "Secrétariat général de la CEEAC",
+  "adm.institutionPh": "Commission de la CEEAC",
   "adm.status": "Statut",
   "adm.statusSelfHint": "Vous ne pouvez pas désactiver votre propre compte.",
   "adm.createBtn": "Créer le compte",
@@ -325,7 +325,7 @@ export const fr = {
   "set.org_full_name": "Nom complet de l'organisation",
   "set.org_description": "Description (page de connexion)",
   "set.login_notice": "Message de la page de connexion",
-  "set.contact_email": "E-mail de contact du Secrétariat",
+  "set.contact_email": "E-mail de contact de la Commission",
   "set.footer_text": "Texte de pied de page",
   "set.saveBtn": "Enregistrer les contenus",
   "set.saved": "Contenus du portail mis à jour",
@@ -380,7 +380,7 @@ export const fr = {
   "prof.update": "Mettre à jour",
   "prof.accredTitle": "Accréditation CEEAC",
   "prof.accredText":
-    "Votre accès à cette plateforme a été accordé par le Secrétariat de la CEEAC. Pour toute modification de vos informations, veuillez contacter {email}.",
+    "Votre accès à cette plateforme a été accordé par la Commission de la CEEAC. Pour toute modification de vos informations, veuillez contacter {email}.",
   "prof.originSession": "Réunion d'inscription",
 
   // ─── Commun (compléments) ─────────────────────────────────────────────
@@ -406,7 +406,7 @@ export const fr = {
   "register.subtitle": "Créez votre compte avec les accès transmis à votre État membre",
   "register.accessSection": "Accès de la réunion",
   "register.accessHint":
-    "L'identifiant et le mot de passe de réunion vous ont été transmis par votre État membre ou le Secrétariat de la CEEAC.",
+    "L'identifiant et le mot de passe de réunion vous ont été transmis par votre État membre ou la Commission de la CEEAC.",
   "register.accessCode": "Identifiant de réunion",
   "register.accessPassword": "Mot de passe de réunion",
   "register.personalSection": "Vos informations",
@@ -504,7 +504,7 @@ export const fr = {
   "guide.title": "Guide utilisateur",
   "guide.subtitle": "L'essentiel pour bien utiliser le portail des réunions statutaires",
   "guide.intro":
-    "Ce portail donne accès aux documents officiels des réunions statutaires de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès du Secrétariat de la CEEAC.",
+    "Ce portail donne accès aux documents officiels des réunions statutaires de la CEEAC. Ce guide résume les procédures essentielles ; le guide complet peut être obtenu auprès de la Commission de la CEEAC.",
   "guide.backToLogin": "Retour à la connexion",
   "guide.s1.title": "Accéder avec les codes de réunion (invité)",
   "guide.s1.p":
@@ -527,24 +527,24 @@ export const fr = {
   "guide.s3.2":
     "Ouvrez un document dans le lecteur avec le bouton « œil » ou en cliquant sur son titre ; téléchargez la version souhaitée avec les boutons de langue (FR, EN, PT, ES).",
   "guide.s3.3":
-    "Les documents portant le badge « Document codé » nécessitent une clé de lecture transmise séparément par le Secrétariat.",
+    "Les documents portant le badge « Document codé » nécessitent une clé de lecture transmise séparément par la Commission.",
   "guide.s4.title": "Réunions & discussions (compte requis)",
   "guide.s4.1":
     "La page « Réunions statutaires » présente le calendrier : dates, lieu, statut et documents rattachés.",
   "guide.s4.2":
-    "Ouvrez « Discussion » sur une réunion pour échanger avec les autres participants et le Secrétariat (2 000 caractères par message).",
+    "Ouvrez « Discussion » sur une réunion pour échanger avec les autres participants et la Commission (2 000 caractères par message).",
   "guide.s5.title": "Confort de lecture",
   "guide.s5.1": "Le bouton A / A+ / A++ agrandit le texte de toute la plateforme ; votre réglage est conservé.",
   "guide.s5.2": "Les boutons drapeaux changent immédiatement la langue de l'interface (FR, EN, PT, ES).",
   "guide.s6.title": "Votre profil",
   "guide.s6.1":
-    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous au Secrétariat de la CEEAC.",
+    "« Mon profil » récapitule vos informations d'accréditation. Pour toute correction ou changement de mot de passe, adressez-vous à la Commission de la CEEAC.",
   "guide.assistTitle": "Assistance",
   "guide.assist":
-    "Pour toute difficulté (accès, mot de passe, accréditation), le Secrétariat de la CEEAC demeure à votre disposition :",
+    "Pour toute difficulté (accès, mot de passe, accréditation), la Commission de la CEEAC demeure à votre disposition :",
   "guide.dl.title": "Guide officiel à télécharger",
   "guide.dl.desc":
-    "Téléchargez le guide utilisateur complet publié par le Secrétariat, dans la langue de votre choix.",
+    "Téléchargez le guide utilisateur complet publié par la Commission, dans la langue de votre choix.",
 
   // ─── Accès invité par codes de session ────────────────────────────────
   "login.tabAccount": "J'ai un compte",
@@ -630,6 +630,8 @@ export const fr = {
   // ─── Lecteur de documents intégré ─────────────────────────────────────
   "viewer.loading": "Chargement du document…",
   "viewer.close": "Fermer le lecteur",
+  "viewer.back": "Retour",
+  "viewer.backToList": "Retour à la liste des documents",
   "viewer.download": "Télécharger",
   "viewer.versions": "Versions linguistiques",
   "viewer.prev": "Page précédente",
@@ -656,11 +658,11 @@ export const fr = {
   "viewer.errorTitle": "Impossible d'afficher le document",
   "viewer.errorText": "Le fichier n'a pas pu être lu dans le lecteur. Vous pouvez le télécharger pour l'ouvrir sur votre poste.",
   "viewer.passwordTitle": "Document protégé par une clé de lecture",
-  "viewer.passwordText": "Saisissez la clé de lecture communiquée séparément par le Secrétariat pour afficher ce document.",
+  "viewer.passwordText": "Saisissez la clé de lecture communiquée séparément par la Commission pour afficher ce document.",
   "viewer.passwordLabel": "Clé de lecture",
   "viewer.passwordWrong": "Clé incorrecte — veuillez vérifier et réessayer.",
   "viewer.passwordSubmit": "Ouvrir le document",
-  "viewer.codedNote": "Document codé : si une clé de lecture est demandée, utilisez celle transmise par le Secrétariat par un canal sécurisé.",
+  "viewer.codedNote": "Document codé : si une clé de lecture est demandée, utilisez celle transmise par la Commission par un canal sécurisé.",
   "viewer.shortcuts": "← → pages · + − zoom · Ctrl+F rechercher · Échap fermer",
   "viewer.pages": "{n} page(s)",
   "guide.s7.title": "Lire un document dans la plateforme",

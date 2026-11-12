@@ -24,7 +24,7 @@ export default {
   },
   cover: {
     community: "Communauté Économique des États de l'Afrique Centrale",
-    secretariat: "Commission de la CEEAC · Secrétariat des réunions statutaires",
+    secretariat: "Commission de la CEEAC · Réunions statutaires",
     platform: "Portail Documentaire des Réunions Statutaires de la CEEAC",
     title: "Guide d'utilisation",
     subtitle: "Espace participant et accès invité",
@@ -39,7 +39,7 @@ export default {
       ["Public visé", "Délégués, experts et points focaux des États membres ; invités disposant des codes d'une réunion"],
       ["Langues", "Français · English · Português · Español"],
       ["Nouveautés de la version 3.0", "Lecteur de documents intégré (PDF et Word) ; accès cloisonné par réunion ; ajout d'une réunion par ses codes ; captures d'écran actualisées"],
-      ["Contact", "Secrétariat de la CEEAC — adresse indiquée sur la page de connexion de la plateforme"],
+      ["Contact", "Commission de la CEEAC — adresse indiquée sur la page de connexion de la plateforme"],
     ],
   },
   chapters: [
@@ -53,22 +53,22 @@ export default {
             "la **lecture en ligne** des documents officiels directement dans la plateforme, grâce au lecteur intégré, sans téléchargement ni logiciel supplémentaire ;",
             "le **téléchargement** de chaque document dans les langues de la Communauté disponibles — français, anglais, portugais et espagnol ;",
             "le suivi du **calendrier des réunions statutaires** et les **fils de discussion** propres à chaque réunion ;",
-            "la réception, par courrier électronique, des rapports et documents diffusés par le Secrétariat.",
+            "la réception, par courrier électronique, des rapports et documents diffusés par la Commission.",
           ],
         },
         { p: "Les documents sont accessibles **avant, pendant et après** chaque réunion. Chaque accès est **cloisonné** : les codes d'une réunion ne donnent accès qu'aux documents de cette réunion." },
-        { box: { kind: "info", title: "Bon à savoir", text: "La plateforme fonctionne sur tout navigateur récent (Chrome, Edge, Firefox, Safari), depuis un ordinateur, une tablette ou un téléphone. Aucune installation n'est requise. L'adresse de la plateforme vous est communiquée par le Secrétariat de la CEEAC ou par votre point focal national." } },
+        { box: { kind: "info", title: "Bon à savoir", text: "La plateforme fonctionne sur tout navigateur récent (Chrome, Edge, Firefox, Safari), depuis un ordinateur, une tablette ou un téléphone. Aucune installation n'est requise. L'adresse de la plateforme vous est communiquée par la Commission de la CEEAC ou par votre point focal national." } },
       ],
     },
     {
       title: "2. Les modes d'accès",
       blocks: [
-        { p: "En amont de chaque réunion statutaire, le Secrétariat transmet aux États membres deux codes d'accès : un **identifiant de réunion** (au format CEEAC-XXXXXX) et un **mot de passe d'accès** (au format XXXX-XXXX). Ces codes ouvrent deux niveaux d'accès :" },
+        { p: "En amont de chaque réunion statutaire, la Commission transmet aux États membres deux codes d'accès : un **identifiant de réunion** (au format CEEAC-XXXXXX) et un **mot de passe d'accès** (au format XXXX-XXXX). Ces codes ouvrent deux niveaux d'accès :" },
         {
           bullets: [
             ["Accès invité", "vous saisissez les codes de réunion sur la page de connexion et consultez immédiatement les documents de la réunion, sans créer de compte (chapitre 3) ;"],
             ["Compte participant", "vous créez, si vous le souhaitez, votre compte personnel avec les mêmes codes. Il est nécessaire pour participer aux discussions, recevoir les diffusions par e-mail et regrouper plusieurs réunions dans un même espace (chapitre 4) ;"],
-            ["Compte créé par le Secrétariat", "dans certains cas, le Secrétariat crée directement votre compte et vous remet un mot de passe provisoire, à personnaliser lors de votre première connexion (section 5.1)."],
+            ["Compte créé par la Commission", "dans certains cas, la Commission crée directement votre compte et vous remet un mot de passe provisoire, à personnaliser lors de votre première connexion (section 5.1)."],
           ],
         },
         {
@@ -106,7 +106,7 @@ export default {
         { figure: ["01b-connexion-codes.png", "L'onglet « Codes de réunion » de la page de connexion"] },
         { p: "En qualité d'invité, vous lisez et téléchargez librement l'ensemble des documents publiés pour la réunion. Un bandeau vous rappelle votre statut et vous propose, à tout moment, de créer votre compte participant." },
         { figure: ["03b-espace-invite.png", "L'espace documentaire en accès invité, avec le bandeau d'information"] },
-        { box: { kind: "warning", title: "Durée et renouvellement de l'accès invité", text: "L'accès invité est valable 24 heures ; il suffit de saisir à nouveau les codes de réunion pour le renouveler. Si le Secrétariat renouvelle les accès d'une réunion, les anciens codes cessent immédiatement de fonctionner. Ne communiquez les codes qu'aux membres autorisés de votre délégation." } },
+        { box: { kind: "warning", title: "Durée et renouvellement de l'accès invité", text: "L'accès invité est valable 24 heures ; il suffit de saisir à nouveau les codes de réunion pour le renouveler. Si la Commission renouvelle les accès d'une réunion, les anciens codes cessent immédiatement de fonctionner. Ne communiquez les codes qu'aux membres autorisés de votre délégation." } },
       ],
     },
     {
@@ -139,7 +139,7 @@ export default {
         { figure: ["01-connexion.png", "La page de connexion — onglet « J'ai un compte »"] },
         { p: "Votre session de travail demeure active pendant 7 jours sur l'appareil utilisé. Pour vous déconnecter, cliquez sur l'icône de déconnexion située en haut à droite de l'écran, notamment sur un poste partagé." },
         { h2: "5.1. Première connexion avec un mot de passe provisoire" },
-        { p: "Si votre compte a été créé par le Secrétariat, un mot de passe provisoire vous a été remis. Lors de votre première connexion, la plateforme vous invite à définir votre mot de passe personnel :" },
+        { p: "Si votre compte a été créé par la Commission, un mot de passe provisoire vous a été remis. Lors de votre première connexion, la plateforme vous invite à définir votre mot de passe personnel :" },
         {
           steps: [
             ["Connectez-vous avec votre adresse e-mail et le mot de passe provisoire reçu."],
@@ -148,7 +148,7 @@ export default {
           ],
         },
         { figure: ["03-premiere-connexion.png", "L'écran de première connexion : définition du mot de passe personnel"] },
-        { box: { kind: "security", title: "Sécurité de votre mot de passe", text: "Choisissez un mot de passe robuste et personnel (lettres, chiffres et caractères spéciaux). Il est conservé sous forme chiffrée : ni le Secrétariat ni l'administrateur ne peuvent le consulter. En cas d'oubli, sollicitez une réinitialisation auprès du Secrétariat de la CEEAC." } },
+        { box: { kind: "security", title: "Sécurité de votre mot de passe", text: "Choisissez un mot de passe robuste et personnel (lettres, chiffres et caractères spéciaux). Il est conservé sous forme chiffrée : ni la Commission ni l'administrateur ne peuvent le consulter. En cas d'oubli, sollicitez une réinitialisation auprès de la Commission de la CEEAC." } },
       ],
     },
     {
@@ -174,9 +174,9 @@ export default {
             ["Télécharger", "cliquez sur le bouton de la langue souhaitée (drapeau et code FR, EN, PT, ES) : la progression s'affiche dans le bouton, puis le fichier est enregistré sur votre appareil."],
           ],
         },
-        { p: "Seules les langues effectivement disponibles pour un document sont proposées. La mention « Version n » signale qu'un document a été mis à jour par le Secrétariat : la bibliothèque affiche toujours la version la plus récente." },
+        { p: "Seules les langues effectivement disponibles pour un document sont proposées. La mention « Version n » signale qu'un document a été mis à jour par la Commission : la bibliothèque affiche toujours la version la plus récente." },
         { h2: "6.3. Les documents codés" },
-        { p: "Certains documents sensibles portent le badge rouge **« Document codé »** : le fichier a été chiffré par le Secrétariat avant sa mise en ligne. Son ouverture nécessite la **clé de lecture** communiquée séparément, par un canal sécurisé. Si vous n'avez pas reçu cette clé, rapprochez-vous de votre point focal ou du Secrétariat de la CEEAC." },
+        { p: "Certains documents sensibles portent le badge rouge **« Document codé »** : le fichier a été chiffré par la Commission avant sa mise en ligne. Son ouverture nécessite la **clé de lecture** communiquée séparément, par un canal sécurisé. Si vous n'avez pas reçu cette clé, rapprochez-vous de votre point focal ou de la Commission de la CEEAC." },
       ],
     },
     {
@@ -208,7 +208,7 @@ export default {
               ["Flèche circulaire", "Pivoter les pages d'un quart de tour (documents PDF)."],
               ["Loupe (à droite)", "Ouvrir la recherche dans le document."],
               ["Cadre (à droite)", "Passer en plein écran / quitter le plein écran."],
-              ["Croix (en-tête)", "Fermer le lecteur et revenir à la bibliothèque."],
+              ["« Retour » ou croix (en-tête)", "Fermer le lecteur et revenir à la liste des documents. Le bouton « Précédent » du navigateur ou du téléphone produit le même effet."],
             ],
           },
         },
@@ -226,7 +226,7 @@ export default {
         { p: "Les documents Word récents (format .docx) sont affichés avec leur mise en forme : titres, paragraphes, tableaux et images. La recherche, le zoom et le téléchargement fonctionnent comme pour un PDF." },
         { figure: ["04d-lecteur-word.png", "Un document Word affiché dans le lecteur intégré"] },
         { h2: "7.5. Documents protégés par une clé de lecture" },
-        { p: "Lorsqu'un document codé est un PDF protégé par mot de passe, le lecteur affiche l'écran **« Document protégé par une clé de lecture »**. Saisissez la clé transmise par le Secrétariat puis cliquez sur **« Ouvrir le document »**. La clé n'est ni enregistrée ni transmise : elle n'est utilisée que dans votre navigateur, le temps de la lecture. Si un document codé utilise un autre procédé de chiffrement, téléchargez-le et ouvrez-le avec l'outil indiqué par le Secrétariat." },
+        { p: "Lorsqu'un document codé est un PDF protégé par mot de passe, le lecteur affiche l'écran **« Document protégé par une clé de lecture »**. Saisissez la clé transmise par la Commission puis cliquez sur **« Ouvrir le document »**. La clé n'est ni enregistrée ni transmise : elle n'est utilisée que dans votre navigateur, le temps de la lecture. Si un document codé utilise un autre procédé de chiffrement, téléchargez-le et ouvrez-le avec l'outil indiqué par la Commission." },
         { h2: "7.6. Formats non affichables" },
         { p: "Les fichiers Excel, PowerPoint et Word 97-2003 (.doc) ne sont pas affichés dans le lecteur : un message vous invite à les télécharger pour les ouvrir avec votre logiciel habituel." },
         {
@@ -251,13 +251,13 @@ export default {
       title: "8. Réunions statutaires et fils de discussion",
       blocks: [
         { p: "La page **« Réunions statutaires »** présente le calendrier des réunions qui vous sont ouvertes : organe statutaire, dates, lieu, statut (à venir, en cours, terminée), description et nombre de documents rattachés. Elle est réservée aux titulaires d'un compte participant." },
-        { p: "Chaque réunion dispose d'un fil de discussion ouvert aux participants et au Secrétariat. Cliquez sur le bouton **« Discussion »** d'une réunion pour l'ouvrir :" },
+        { p: "Chaque réunion dispose d'un fil de discussion ouvert aux participants et à la Commission. Cliquez sur le bouton **« Discussion »** d'une réunion pour l'ouvrir :" },
         { figure: ["05-reunions-discussion.png", "Une réunion statutaire avec son fil de discussion ouvert"] },
         {
           bullets: [
             ["Écrire", "saisissez votre message dans le champ inférieur, puis appuyez sur Entrée ou cliquez sur le bouton d'envoi (2 000 caractères au maximum) ;"],
             ["Suivre", "les nouveaux messages apparaissent automatiquement, sans recharger la page ;"],
-            ["Supprimer", "vous pouvez supprimer vos propres messages ; le Secrétariat assure la modération du fil."],
+            ["Supprimer", "vous pouvez supprimer vos propres messages ; la Commission assure la modération du fil."],
           ],
         },
         { h2: "8.1. Ajouter une réunion à votre compte" },
@@ -278,7 +278,7 @@ export default {
       blocks: [
         { p: "La page **« Mon profil »** récapitule les informations de votre accréditation : adresse e-mail, institution, pays représenté, fonction, date d'accréditation, statut et, le cas échéant, la réunion au titre de laquelle vous vous êtes inscrit(e)." },
         { figure: ["06-profil.png", "La page « Mon profil » : informations de votre accréditation"] },
-        { box: { kind: "info", title: "Mise à jour de vos informations", text: "Par souci d'intégrité des données officielles, les informations d'accréditation ne sont pas modifiables directement. Pour toute correction (fonction, institution, adresse e-mail) ou pour un changement de mot de passe, adressez votre demande au Secrétariat de la CEEAC." } },
+        { box: { kind: "info", title: "Mise à jour de vos informations", text: "Par souci d'intégrité des données officielles, les informations d'accréditation ne sont pas modifiables directement. Pour toute correction (fonction, institution, adresse e-mail) ou pour un changement de mot de passe, adressez votre demande à la Commission de la CEEAC." } },
       ],
     },
     {
@@ -297,21 +297,21 @@ export default {
     {
       title: "11. Le guide intégré",
       blocks: [
-        { p: "Un guide abrégé est disponible à tout moment dans la plateforme : lien **« Guide utilisateur »** de la page de connexion, ou menu **« Guide »** de votre espace. Il résume les procédures essentielles et propose, lorsqu'il a été publié par le Secrétariat, le présent guide complet en lecture ou en téléchargement dans les quatre langues." },
+        { p: "Un guide abrégé est disponible à tout moment dans la plateforme : lien **« Guide utilisateur »** de la page de connexion, ou menu **« Guide »** de votre espace. Il résume les procédures essentielles et propose, lorsqu'il a été publié par la Commission, le présent guide complet en lecture ou en téléchargement dans les quatre langues." },
         { figure: ["08-guide-integre.png", "Le guide intégré à la plateforme"] },
       ],
     },
     {
       title: "12. Les courriers électroniques de la plateforme",
       blocks: [
-        { p: "À l'issue des réunions, le Secrétariat peut adresser aux participants les rapports et documents officiels par courrier électronique. Ces messages peuvent contenir :" },
+        { p: "À l'issue des réunions, la Commission peut adresser aux participants les rapports et documents officiels par courrier électronique. Ces messages peuvent contenir :" },
         {
           bullets: [
             "des **liens directs**, par langue, vers les documents publiés sur la plateforme — une connexion à votre compte est nécessaire pour les ouvrir ;",
             "des **documents joints** directement au message.",
           ],
         },
-        { box: { kind: "security", title: "Vigilance", text: "Les courriers officiels proviennent exclusivement de l'adresse du Secrétariat et renvoient uniquement vers l'adresse officielle de la plateforme. En cas de doute sur l'authenticité d'un message, abstenez-vous de cliquer et signalez-le au Secrétariat." } },
+        { box: { kind: "security", title: "Vigilance", text: "Les courriers officiels proviennent exclusivement de l'adresse de la Commission et renvoient uniquement vers l'adresse officielle de la plateforme. En cas de doute sur l'authenticité d'un message, abstenez-vous de cliquer et signalez-le à la Commission." } },
       ],
     },
     {
@@ -319,11 +319,11 @@ export default {
       blocks: [
         {
           bullets: [
-            "Ne communiquez jamais votre mot de passe personnel ; le Secrétariat ne vous le demandera jamais.",
+            "Ne communiquez jamais votre mot de passe personnel ; la Commission ne vous le demandera jamais.",
             "Ne transmettez les codes de réunion qu'aux membres autorisés de votre délégation.",
             "Sur un poste partagé, préférez la lecture dans la plateforme au téléchargement et déconnectez-vous à la fin de votre consultation.",
             "Conservez les clés de lecture des documents codés séparément des documents eux-mêmes.",
-            "Signalez sans délai au Secrétariat toute perte de codes, tout accès suspect ou tout message douteux.",
+            "Signalez sans délai à la Commission toute perte de codes, tout accès suspect ou tout message douteux.",
           ],
         },
       ],
@@ -337,18 +337,18 @@ export default {
             head: ["Situation rencontrée", "Marche à suivre"],
             widths: [38, 62],
             rows: [
-              ["« Identifiant ou mot de passe de réunion incorrect »", "Vérifiez l'identifiant (format CEEAC-XXXXXX) et le mot de passe (format XXXX-XXXX), tirets compris. Si le message persiste, les accès ont pu être renouvelés : rapprochez-vous de votre point focal national ou du Secrétariat."],
+              ["« Identifiant ou mot de passe de réunion incorrect »", "Vérifiez l'identifiant (format CEEAC-XXXXXX) et le mot de passe (format XXXX-XXXX), tirets compris. Si le message persiste, les accès ont pu être renouvelés : rapprochez-vous de votre point focal national ou de la Commission."],
               ["« Accès invité expiré, saisissez à nouveau les codes de réunion »", "L'accès invité est valable 24 heures : saisissez de nouveau les codes de réunion pour le renouveler."],
               ["« Les inscriptions pour cette réunion sont closes »", "La réunion est terminée : la création de compte n'est plus possible, mais ses documents restent consultables avec les codes de réunion (onglet « Codes de réunion »)."],
               ["« Un compte existe déjà avec cet e-mail »", "Utilisez l'onglet « J'ai un compte » de la page de connexion. Pour accéder à une nouvelle réunion, utilisez « Ajouter une réunion » (section 8.1)."],
               ["« Identifiants incorrects » à la connexion", "Vérifiez l'adresse e-mail et le mot de passe (attention aux majuscules). Après plusieurs tentatives infructueuses, un délai d'attente de 15 minutes s'applique par mesure de sécurité."],
-              ["« Votre compte est désactivé »", "Votre accréditation a été suspendue. Prenez l'attache du Secrétariat de la CEEAC pour en connaître les motifs et, le cas échéant, solliciter sa réactivation."],
+              ["« Votre compte est désactivé »", "Votre accréditation a été suspendue. Prenez l'attache de la Commission de la CEEAC pour en connaître les motifs et, le cas échéant, solliciter sa réactivation."],
               ["« Session expirée, veuillez vous reconnecter »", "Votre session a expiré (7 jours) ou votre mot de passe a été réinitialisé entre-temps : reconnectez-vous."],
               ["Un document attendu n'apparaît pas", "Il n'est peut-être pas encore publié, ou il relève d'une réunion qui ne vous est pas ouverte : ajoutez cette réunion avec ses codes (section 8.1). Pensez aussi à réinitialiser les filtres."],
               ["Le lecteur affiche « Aperçu non disponible pour ce format »", "Le fichier est au format Excel, PowerPoint ou Word 97-2003 : téléchargez-le pour l'ouvrir avec votre logiciel habituel."],
-              ["Le lecteur demande une clé de lecture", "Le document est codé : saisissez la clé transmise par le Secrétariat. Si vous ne l'avez pas reçue, rapprochez-vous de votre point focal."],
+              ["Le lecteur demande une clé de lecture", "Le document est codé : saisissez la clé transmise par la Commission. Si vous ne l'avez pas reçue, rapprochez-vous de votre point focal."],
               ["Le texte est trop petit à l'écran", "Utilisez le bouton A / A+ / A++ de l'en-tête, ou le zoom du lecteur pour les documents."],
-              ["Mot de passe oublié", "Adressez une demande de réinitialisation au Secrétariat. Un mot de passe provisoire vous sera remis ; vous en définirez un nouveau à la connexion suivante."],
+              ["Mot de passe oublié", "Adressez une demande de réinitialisation à la Commission. Un mot de passe provisoire vous sera remis ; vous en définirez un nouveau à la connexion suivante."],
             ],
           },
         },
@@ -357,7 +357,7 @@ export default {
     {
       title: "15. Assistance",
       blocks: [
-        { p: "Pour toute difficulté d'accès, demande de réinitialisation de mot de passe, correction de vos informations d'accréditation ou question relative à la plateforme, le Secrétariat de la CEEAC demeure à votre disposition :" },
+        { p: "Pour toute difficulté d'accès, demande de réinitialisation de mot de passe, correction de vos informations d'accréditation ou question relative à la plateforme, la Commission de la CEEAC demeure à votre disposition :" },
         {
           bullets: [
             "par courrier électronique, à l'adresse de contact indiquée sur la page de connexion et dans le guide intégré ;",
@@ -365,7 +365,7 @@ export default {
           ],
         },
         { p: "Afin de faciliter le traitement de votre demande, merci d'indiquer votre nom complet, votre pays, votre institution, la réunion concernée et une description précise de la difficulté rencontrée, accompagnée si possible du message d'erreur affiché." },
-        { p: "Le Secrétariat vous remercie de votre collaboration et vous souhaite une excellente utilisation de la plateforme.", run: {} },
+        { p: "La Commission vous remercie de votre collaboration et vous souhaite une excellente utilisation de la plateforme.", run: {} },
       ],
     },
   ],

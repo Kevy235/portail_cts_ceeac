@@ -12,6 +12,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import {
+  ArrowLeft,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -77,6 +78,14 @@ interface EngineProps {
 const ScrollRootContext = createContext<HTMLElement | null>(null);
 
 const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
+
+/** Marque l'entrée d'historique ajoutée à l'ouverture du lecteur. */
+const HISTORY_MARKER = "documentViewer";
+/**
+ * Retour arrière programmé à la fermeture. Différé pour qu'un remontage
+ * immédiat (StrictMode en développement) réutilise l'entrée existante.
+ */
+let pendingHistoryBack: number | undefined;
 
 /** Recherche insensible à la casse et aux accents. */
 const normalize = (s: string) =>
@@ -496,13 +505,17 @@ export function DocumentViewer({
   initialLang,
   onClose,
   onDownloaded,
+  backLabel,
 }: {
   source: ViewerSource;
   initialLang: Lang;
   onClose: () => void;
   onDownloaded?: () => void;
+  /** Libellé du bouton de retour (par défaut : retour à la liste des documents). */
+  backLabel?: string;
 }) {
   const { t } = useI18n();
+  const backText = backLabel ?? t("viewer.backToList");
   const [lang, setLang] = useState<Lang>(initialLang);
   const file = source.files.find((f) => f.lang === lang) ?? source.files[0];
   const kind = viewerKind(file);
@@ -549,6 +562,32 @@ export function DocumentViewer({
       document.body.style.overflow = prevOverflow;
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
       previouslyFocused?.focus?.();
+    };
+  }, []);
+
+  // ─── Historique : « Précédent » (navigateur, téléphone) ferme le lecteur ─
+  useEffect(() => {
+    if (pendingHistoryBack !== undefined) {
+      window.clearTimeout(pendingHistoryBack);
+      pendingHistoryBack = undefined;
+    } else {
+      window.history.pushState({ ...window.history.state, [HISTORY_MARKER]: true }, "");
+    }
+    let closedByHistory = false;
+    const onPopState = () => {
+      closedByHistory = true;
+      onCloseRef.current();
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      if (closedByHistory) return;
+      // Fermeture par le bouton ou Échap : on retire l'entrée ajoutée, sauf si
+      // une navigation l'a déjà remplacée (redirection, déconnexion…).
+      pendingHistoryBack = window.setTimeout(() => {
+        pendingHistoryBack = undefined;
+        if (window.history.state?.[HISTORY_MARKER]) window.history.back();
+      }, 0);
     };
   }, []);
 
@@ -921,8 +960,19 @@ export function DocumentViewer({
       {/* ─── En-tête : document, versions linguistiques, téléchargement ─── */}
       <header className="bg-gradient-to-b from-brand-deep to-brand-night text-white flex-shrink-0">
         <div className="flex items-center gap-3 px-3 sm:px-4 py-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={onClose}
+            title={backText}
+            aria-label={backText}
+            className="flex items-center gap-1.5 h-9 pl-2 pr-3 rounded-lg bg-white/10 border border-white/15 text-xs sm:text-sm font-semibold text-white hover:bg-white/20 transition-colors flex-shrink-0"
+          >
+            <ArrowLeft size={16} aria-hidden />
+            <span className="lg:hidden">{t("viewer.back")}</span>
+            <span className="hidden lg:inline">{backText}</span>
+          </button>
           <span
-            className="hidden sm:flex w-9 h-9 rounded-xl bg-white/10 border border-white/15 items-center justify-center flex-shrink-0"
+            className="hidden md:flex w-9 h-9 rounded-xl bg-white/10 border border-white/15 items-center justify-center flex-shrink-0"
             aria-hidden
           >
             <FileText size={17} className="text-accent" />

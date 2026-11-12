@@ -53,6 +53,7 @@ export function GuideDownload() {
           }}
           initialLang={reading}
           onClose={() => setReading(null)}
+          backLabel={t("viewer.back")}
         />
       )}
     </section>

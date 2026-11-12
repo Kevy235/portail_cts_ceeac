@@ -24,7 +24,7 @@ export default {
   },
   cover: {
     community: "Comunidade Económica dos Estados da África Central",
-    secretariat: "Comissão da CEEAC · Secretariado das reuniões estatutárias",
+    secretariat: "Comissão da CEEAC · Reuniões estatutárias",
     platform: "Portal Documental das Reuniões Estatutárias da CEEAC",
     title: "Guia do utilizador",
     subtitle: "Espaço do participante e acesso de convidado",
@@ -39,7 +39,7 @@ export default {
       ["Destinatários", "Delegados, peritos e pontos focais dos Estados-Membros; convidados que disponham dos códigos de uma reunião"],
       ["Línguas", "Français · English · Português · Español"],
       ["Novidades da versão 3.0", "Leitor de documentos integrado (PDF e Word); acesso compartimentado por reunião; adição de uma reunião através dos respetivos códigos; capturas de ecrã atualizadas"],
-      ["Contacto", "Secretariado da CEEAC — endereço indicado na página de início de sessão da plataforma"],
+      ["Contacto", "Comissão da CEEAC — endereço indicado na página de início de sessão da plataforma"],
     ],
   },
   chapters: [
@@ -53,22 +53,22 @@ export default {
             "a **leitura em linha** dos documentos oficiais diretamente na plataforma, graças ao leitor integrado, sem necessidade de descarregamento nem de software adicional;",
             "o **descarregamento** de cada documento nas línguas da Comunidade disponíveis — francês, inglês, português e espanhol;",
             "o acompanhamento do **calendário das reuniões estatutárias** e os **fios de discussão** próprios de cada reunião;",
-            "a receção, por correio eletrónico, dos relatórios e documentos difundidos pelo Secretariado.",
+            "a receção, por correio eletrónico, dos relatórios e documentos difundidos pela Comissão.",
           ],
         },
         { p: "Os documentos estão acessíveis **antes, durante e após** cada reunião. Cada acesso é **compartimentado**: os códigos de uma reunião apenas dão acesso aos documentos dessa reunião." },
-        { box: { kind: "info", title: "A ter em conta", text: "A plataforma funciona em qualquer navegador recente (Chrome, Edge, Firefox, Safari), a partir de um computador, de um tablet ou de um telemóvel. Não é necessária qualquer instalação. O endereço da plataforma é-lhe comunicado pelo Secretariado da CEEAC ou pelo seu ponto focal nacional." } },
+        { box: { kind: "info", title: "A ter em conta", text: "A plataforma funciona em qualquer navegador recente (Chrome, Edge, Firefox, Safari), a partir de um computador, de um tablet ou de um telemóvel. Não é necessária qualquer instalação. O endereço da plataforma é-lhe comunicado pela Comissão da CEEAC ou pelo seu ponto focal nacional." } },
       ],
     },
     {
       title: "2. Modos de acesso",
       blocks: [
-        { p: "Antes de cada reunião estatutária, o Secretariado transmite aos Estados-Membros dois códigos de acesso: um **identificador de reunião** (no formato CEEAC-XXXXXX) e uma **palavra-passe de acesso** (no formato XXXX-XXXX). Estes códigos dão acesso a dois níveis:" },
+        { p: "Antes de cada reunião estatutária, a Comissão transmite aos Estados-Membros dois códigos de acesso: um **identificador de reunião** (no formato CEEAC-XXXXXX) e uma **palavra-passe de acesso** (no formato XXXX-XXXX). Estes códigos dão acesso a dois níveis:" },
         {
           bullets: [
             ["Acesso de convidado", "introduz os códigos da reunião na página de início de sessão e consulta de imediato os documentos da reunião, sem criar conta (capítulo 3);"],
             ["Conta de participante", "pode, se o desejar, criar a sua conta pessoal com os mesmos códigos. Esta conta é necessária para participar nas discussões, receber as difusões por e-mail e reunir várias reuniões num mesmo espaço (capítulo 4);"],
-            ["Conta criada pelo Secretariado", "em determinados casos, o Secretariado cria diretamente a sua conta e entrega-lhe uma palavra-passe provisória, a personalizar no primeiro início de sessão (secção 5.1)."],
+            ["Conta criada pela Comissão", "em determinados casos, a Comissão cria diretamente a sua conta e entrega-lhe uma palavra-passe provisória, a personalizar no primeiro início de sessão (secção 5.1)."],
           ],
         },
         {
@@ -106,7 +106,7 @@ export default {
         { figure: ["01b-connexion-codes.png", "O separador « Códigos de reunião » da página de início de sessão"] },
         { p: "Na qualidade de convidado, pode ler e descarregar livremente todos os documentos publicados para a reunião. Uma faixa informativa recorda-lhe o seu estatuto e propõe-lhe, a qualquer momento, a criação da sua conta de participante." },
         { figure: ["03b-espace-invite.png", "O espaço documental com acesso de convidado e a faixa informativa"] },
-        { box: { kind: "warning", title: "Duração e renovação do acesso de convidado", text: "O acesso de convidado é válido durante 24 horas; para o renovar, basta introduzir novamente os códigos da reunião. Se o Secretariado renovar os acessos de uma reunião, os códigos anteriores deixam imediatamente de funcionar. Comunique os códigos apenas aos membros autorizados da sua delegação." } },
+        { box: { kind: "warning", title: "Duração e renovação do acesso de convidado", text: "O acesso de convidado é válido durante 24 horas; para o renovar, basta introduzir novamente os códigos da reunião. Se a Comissão renovar os acessos de uma reunião, os códigos anteriores deixam imediatamente de funcionar. Comunique os códigos apenas aos membros autorizados da sua delegação." } },
       ],
     },
     {
@@ -139,7 +139,7 @@ export default {
         { figure: ["01-connexion.png", "A página de início de sessão — separador « Tenho uma conta »"] },
         { p: "A sua sessão de trabalho permanece ativa durante 7 dias no dispositivo utilizado. Para terminar a sessão, clique no ícone de fim de sessão situado no canto superior direito do ecrã, em especial num posto partilhado." },
         { h2: "5.1. Primeiro início de sessão com uma palavra-passe provisória" },
-        { p: "Se a sua conta foi criada pelo Secretariado, ser-lhe-á entregue uma palavra-passe provisória. No primeiro início de sessão, a plataforma convida-o(a) a definir a sua palavra-passe pessoal:" },
+        { p: "Se a sua conta foi criada pela Comissão, ser-lhe-á entregue uma palavra-passe provisória. No primeiro início de sessão, a plataforma convida-o(a) a definir a sua palavra-passe pessoal:" },
         {
           steps: [
             ["Inicie sessão com o seu endereço de e-mail e a palavra-passe provisória recebida."],
@@ -148,7 +148,7 @@ export default {
           ],
         },
         { figure: ["03-premiere-connexion.png", "O ecrã do primeiro início de sessão: definição da palavra-passe pessoal"] },
-        { box: { kind: "security", title: "Segurança da sua palavra-passe", text: "Escolha uma palavra-passe robusta e pessoal (letras, algarismos e caracteres especiais). A palavra-passe é conservada de forma cifrada: nem o Secretariado nem o administrador a podem consultar. Em caso de esquecimento, solicite a sua reposição ao Secretariado da CEEAC." } },
+        { box: { kind: "security", title: "Segurança da sua palavra-passe", text: "Escolha uma palavra-passe robusta e pessoal (letras, algarismos e caracteres especiais). A palavra-passe é conservada de forma cifrada: nem a Comissão nem o administrador a podem consultar. Em caso de esquecimento, solicite a sua reposição à Comissão da CEEAC." } },
       ],
     },
     {
@@ -161,7 +161,7 @@ export default {
           bullets: [
             ["Pesquisa", "introduza uma ou mais palavras do título ou do nome do ficheiro no campo « Pesquisar um documento… »;"],
             ["Reunião", "o seletor « Todas as reuniões » restringe a apresentação aos documentos de uma determinada reunião;"],
-            ["Categoria", "clique numa categoria (por exemplo Rapport, Résolution, Ordre du Jour, Note Conceptuelle — designações definidas pelo Secretariado);"],
+            ["Categoria", "clique numa categoria (por exemplo Rapport, Résolution, Ordre du Jour, Note Conceptuelle — designações definidas pela Comissão);"],
             ["Língua", "os botões com bandeiras apresentam apenas os documentos disponíveis na língua escolhida;"],
             ["Reposição", "o botão « Repor os filtros » restabelece a apresentação completa; o número de documentos correspondentes é indicado à direita."],
           ],
@@ -174,9 +174,9 @@ export default {
             ["Descarregar", "clique no botão da língua pretendida (bandeira e código FR, EN, PT, ES): o progresso é apresentado no botão e, em seguida, o ficheiro é guardado no seu dispositivo."],
           ],
         },
-        { p: "São propostas apenas as línguas efetivamente disponíveis para cada documento. A menção « Versão n » assinala que um documento foi atualizado pelo Secretariado: a biblioteca apresenta sempre a versão mais recente." },
+        { p: "São propostas apenas as línguas efetivamente disponíveis para cada documento. A menção « Versão n » assinala que um documento foi atualizado pela Comissão: a biblioteca apresenta sempre a versão mais recente." },
         { h2: "6.3. Documentos codificados" },
-        { p: "Alguns documentos sensíveis ostentam o distintivo vermelho **« Documento codificado »**: o ficheiro foi cifrado pelo Secretariado antes da sua publicação. A sua abertura requer a **chave de leitura** comunicada separadamente, por um canal seguro. Se não tiver recebido esta chave, contacte o seu ponto focal ou o Secretariado da CEEAC." },
+        { p: "Alguns documentos sensíveis ostentam o distintivo vermelho **« Documento codificado »**: o ficheiro foi cifrado pela Comissão antes da sua publicação. A sua abertura requer a **chave de leitura** comunicada separadamente, por um canal seguro. Se não tiver recebido esta chave, contacte o seu ponto focal ou a Comissão da CEEAC." },
       ],
     },
     {
@@ -208,7 +208,7 @@ export default {
               ["Seta circular", "Rodar as páginas um quarto de volta (documentos PDF)."],
               ["Lupa (à direita)", "Abrir a pesquisa no documento."],
               ["Moldura (à direita)", "Passar para ecrã inteiro / sair do ecrã inteiro."],
-              ["Cruz (cabeçalho)", "Fechar o leitor e regressar à biblioteca."],
+              ["« Voltar » ou cruz (cabeçalho)", "Fechar o leitor e regressar à lista de documentos. O botão « Retroceder » do navegador ou do telemóvel produz o mesmo efeito."],
             ],
           },
         },
@@ -226,7 +226,7 @@ export default {
         { p: "Os documentos Word recentes (formato .docx) são apresentados com a respetiva formatação: títulos, parágrafos, tabelas e imagens. A pesquisa, o zoom e o descarregamento funcionam tal como para um PDF." },
         { figure: ["04d-lecteur-word.png", "Um documento Word apresentado no leitor integrado"] },
         { h2: "7.5. Documentos protegidos por uma chave de leitura" },
-        { p: "Quando um documento codificado é um PDF protegido por palavra-passe, o leitor apresenta o ecrã **« Documento protegido por uma chave de leitura »**. Introduza a chave transmitida pelo Secretariado e clique em **« Abrir o documento »**. A chave não é guardada nem transmitida: é utilizada apenas no seu navegador, durante a leitura. Se um documento codificado utilizar outro processo de cifragem, descarregue-o e abra-o com a ferramenta indicada pelo Secretariado." },
+        { p: "Quando um documento codificado é um PDF protegido por palavra-passe, o leitor apresenta o ecrã **« Documento protegido por uma chave de leitura »**. Introduza a chave transmitida pela Comissão e clique em **« Abrir o documento »**. A chave não é guardada nem transmitida: é utilizada apenas no seu navegador, durante a leitura. Se um documento codificado utilizar outro processo de cifragem, descarregue-o e abra-o com a ferramenta indicada pela Comissão." },
         { h2: "7.6. Formatos não apresentáveis" },
         { p: "Os ficheiros Excel, PowerPoint e Word 97-2003 (.doc) não são apresentados no leitor: uma mensagem convida-o(a) a descarregá-los para os abrir com o seu software habitual." },
         {
@@ -251,13 +251,13 @@ export default {
       title: "8. Reuniões estatutárias e fios de discussão",
       blocks: [
         { p: "A página **« Reuniões estatutárias »** apresenta o calendário das reuniões que lhe estão abertas: órgão estatutário, datas, local, estado (futura, em curso, concluída), descrição e número de documentos associados. Está reservada aos titulares de uma conta de participante." },
-        { p: "Cada reunião dispõe de um fio de discussão aberto aos participantes e ao Secretariado. Clique no botão **« Discussão »** de uma reunião para o abrir:" },
+        { p: "Cada reunião dispõe de um fio de discussão aberto aos participantes e à Comissão. Clique no botão **« Discussão »** de uma reunião para o abrir:" },
         { figure: ["05-reunions-discussion.png", "Uma reunião estatutária com o respetivo fio de discussão aberto"] },
         {
           bullets: [
             ["Escrever", "introduza a sua mensagem no campo inferior e prima Enter ou clique no botão de envio (máximo de 2000 caracteres);"],
             ["Acompanhar", "as novas mensagens aparecem automaticamente, sem necessidade de recarregar a página;"],
-            ["Eliminar", "pode eliminar as suas próprias mensagens; o Secretariado assegura a moderação do fio."],
+            ["Eliminar", "pode eliminar as suas próprias mensagens; a Comissão assegura a moderação do fio."],
           ],
         },
         { h2: "8.1. Adicionar uma reunião à sua conta" },
@@ -278,7 +278,7 @@ export default {
       blocks: [
         { p: "A página **« O meu perfil »** resume as informações da sua acreditação: endereço de e-mail, instituição, país representado, função, data de acreditação, estado e, se aplicável, a reunião a título da qual se inscreveu." },
         { figure: ["06-profil.png", "A página « O meu perfil »: informações da sua acreditação"] },
-        { box: { kind: "info", title: "Atualização das suas informações", text: "Por razões de integridade dos dados oficiais, as informações de acreditação não podem ser alteradas diretamente. Para qualquer correção (função, instituição, endereço de e-mail) ou para a alteração da palavra-passe, dirija o seu pedido ao Secretariado da CEEAC." } },
+        { box: { kind: "info", title: "Atualização das suas informações", text: "Por razões de integridade dos dados oficiais, as informações de acreditação não podem ser alteradas diretamente. Para qualquer correção (função, instituição, endereço de e-mail) ou para a alteração da palavra-passe, dirija o seu pedido à Comissão da CEEAC." } },
       ],
     },
     {
@@ -297,21 +297,21 @@ export default {
     {
       title: "11. O guia integrado",
       blocks: [
-        { p: "Está disponível a qualquer momento na plataforma um guia resumido: ligação **« Guia do utilizador »** da página de início de sessão ou menu **« Guia »** do seu espaço. O guia resume os procedimentos essenciais e propõe, quando publicado pelo Secretariado, o presente guia completo para leitura ou descarregamento nas quatro línguas." },
+        { p: "Está disponível a qualquer momento na plataforma um guia resumido: ligação **« Guia do utilizador »** da página de início de sessão ou menu **« Guia »** do seu espaço. O guia resume os procedimentos essenciais e propõe, quando publicado pela Comissão, o presente guia completo para leitura ou descarregamento nas quatro línguas." },
         { figure: ["08-guide-integre.png", "O guia integrado na plataforma"] },
       ],
     },
     {
       title: "12. Mensagens de correio eletrónico da plataforma",
       blocks: [
-        { p: "No final das reuniões, o Secretariado pode enviar aos participantes os relatórios e documentos oficiais por correio eletrónico. Estas mensagens podem conter:" },
+        { p: "No final das reuniões, a Comissão pode enviar aos participantes os relatórios e documentos oficiais por correio eletrónico. Estas mensagens podem conter:" },
         {
           bullets: [
             "**ligações diretas**, por língua, para os documentos publicados na plataforma — é necessário iniciar sessão na sua conta para os abrir;",
             "**documentos anexados** diretamente à mensagem.",
           ],
         },
-        { box: { kind: "security", title: "Vigilância", text: "As mensagens oficiais provêm exclusivamente do endereço do Secretariado e remetem unicamente para o endereço oficial da plataforma. Em caso de dúvida quanto à autenticidade de uma mensagem, não clique em nenhuma ligação e comunique a situação ao Secretariado." } },
+        { box: { kind: "security", title: "Vigilância", text: "As mensagens oficiais provêm exclusivamente do endereço da Comissão e remetem unicamente para o endereço oficial da plataforma. Em caso de dúvida quanto à autenticidade de uma mensagem, não clique em nenhuma ligação e comunique a situação à Comissão." } },
       ],
     },
     {
@@ -319,11 +319,11 @@ export default {
       blocks: [
         {
           bullets: [
-            "Nunca comunique a sua palavra-passe pessoal; o Secretariado nunca lha solicitará.",
+            "Nunca comunique a sua palavra-passe pessoal; a Comissão nunca lha solicitará.",
             "Transmita os códigos de reunião apenas aos membros autorizados da sua delegação.",
             "Num posto partilhado, privilegie a leitura na plataforma em vez do descarregamento e termine a sessão no final da consulta.",
             "Conserve as chaves de leitura dos documentos codificados separadamente dos próprios documentos.",
-            "Comunique sem demora ao Secretariado qualquer perda de códigos, acesso suspeito ou mensagem duvidosa.",
+            "Comunique sem demora à Comissão qualquer perda de códigos, acesso suspeito ou mensagem duvidosa.",
           ],
         },
       ],
@@ -337,18 +337,18 @@ export default {
             head: ["Situação encontrada", "Procedimento a seguir"],
             widths: [38, 62],
             rows: [
-              ["« Identificador ou palavra-passe de reunião incorretos »", "Verifique o identificador (formato CEEAC-XXXXXX) e a palavra-passe (formato XXXX-XXXX), incluindo os hífenes. Se a mensagem persistir, os acessos podem ter sido renovados: contacte o seu ponto focal nacional ou o Secretariado."],
+              ["« Identificador ou palavra-passe de reunião incorretos »", "Verifique o identificador (formato CEEAC-XXXXXX) e a palavra-passe (formato XXXX-XXXX), incluindo os hífenes. Se a mensagem persistir, os acessos podem ter sido renovados: contacte o seu ponto focal nacional ou a Comissão."],
               ["Mensagem a indicar que o acesso de convidado expirou", "O acesso de convidado é válido durante 24 horas: introduza novamente os códigos de reunião para o renovar."],
               ["« As inscrições para esta reunião estão encerradas »", "A reunião terminou: já não é possível criar uma conta, mas os respetivos documentos continuam consultáveis com os códigos de reunião (separador « Códigos de reunião »)."],
               ["« Já existe uma conta com este e-mail »", "Utilize o separador « Tenho uma conta » da página de início de sessão. Para aceder a uma nova reunião, utilize « Adicionar uma reunião » (secção 8.1)."],
               ["« Credenciais incorretas » ao iniciar sessão", "Verifique o endereço de e-mail e a palavra-passe (atenção às maiúsculas). Após várias tentativas sem êxito, aplica-se, por razões de segurança, um tempo de espera de 15 minutos."],
-              ["« A sua conta está desativada »", "A sua acreditação foi suspensa. Contacte o Secretariado da CEEAC para conhecer os motivos e, se for caso disso, solicitar a sua reativação."],
+              ["« A sua conta está desativada »", "A sua acreditação foi suspensa. Contacte a Comissão da CEEAC para conhecer os motivos e, se for caso disso, solicitar a sua reativação."],
               ["Mensagem a indicar que a sessão expirou", "A sua sessão expirou (7 dias) ou a sua palavra-passe foi entretanto reposta: inicie sessão novamente."],
               ["Um documento esperado não aparece", "O documento pode ainda não ter sido publicado ou pertencer a uma reunião que não lhe está aberta: adicione essa reunião com os respetivos códigos (secção 8.1). Lembre-se também de repor os filtros."],
               ["O leitor apresenta « Pré-visualização indisponível para este formato »", "O ficheiro está em formato Excel, PowerPoint ou Word 97-2003: descarregue-o para o abrir com o seu software habitual."],
-              ["O leitor pede uma chave de leitura", "O documento está codificado: introduza a chave transmitida pelo Secretariado. Se não a tiver recebido, contacte o seu ponto focal."],
+              ["O leitor pede uma chave de leitura", "O documento está codificado: introduza a chave transmitida pela Comissão. Se não a tiver recebido, contacte o seu ponto focal."],
               ["O texto é demasiado pequeno no ecrã", "Utilize o botão A / A+ / A++ do cabeçalho ou, para os documentos, o zoom do leitor."],
-              ["Palavra-passe esquecida", "Dirija um pedido de reposição ao Secretariado. Ser-lhe-á entregue uma palavra-passe provisória; definirá uma nova no início de sessão seguinte."],
+              ["Palavra-passe esquecida", "Dirija um pedido de reposição à Comissão. Ser-lhe-á entregue uma palavra-passe provisória; definirá uma nova no início de sessão seguinte."],
             ],
           },
         },
@@ -357,7 +357,7 @@ export default {
     {
       title: "15. Assistência",
       blocks: [
-        { p: "Para qualquer dificuldade de acesso, pedido de reposição da palavra-passe, correção das suas informações de acreditação ou questão relativa à plataforma, o Secretariado da CEEAC permanece à sua disposição:" },
+        { p: "Para qualquer dificuldade de acesso, pedido de reposição da palavra-passe, correção das suas informações de acreditação ou questão relativa à plataforma, a Comissão da CEEAC permanece à sua disposição:" },
         {
           bullets: [
             "por correio eletrónico, para o endereço de contacto indicado na página de início de sessão e no guia integrado;",
@@ -365,7 +365,7 @@ export default {
           ],
         },
         { p: "A fim de facilitar o tratamento do seu pedido, queira indicar o seu nome completo, o seu país, a sua instituição, a reunião em causa e uma descrição precisa da dificuldade encontrada, acompanhada, se possível, da mensagem de erro apresentada." },
-        { p: "O Secretariado agradece a sua colaboração e deseja-lhe uma excelente utilização da plataforma.", run: {} },
+        { p: "A Comissão agradece a sua colaboração e deseja-lhe uma excelente utilização da plataforma.", run: {} },
       ],
     },
   ],

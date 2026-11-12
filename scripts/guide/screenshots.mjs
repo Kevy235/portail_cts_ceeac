@@ -402,7 +402,7 @@ async function main() {
       await page.getByPlaceholder(t["part.institutionPh"]).fill("Ministère de l'Intérieur");
       await shot("02-inscription");
 
-      // 3. Première connexion (compte créé par le Secrétariat)
+      // 3. Première connexion (compte créé par la Commission)
       await login(INVITED_EMAIL, invited.temporaryPassword);
       await page.waitForURL("**/premiere-connexion");
       // La langue enregistrée du compte (fr) s'applique à la connexion : on
