@@ -77,6 +77,16 @@ export function formatTime(iso: string): string {
   return `${formatDate(iso)} ${timeFormatter.format(d)}`;
 }
 
+/** Intitulé de réunion pour les listes et filtres (référence seulement si le titre est vide). */
+export function sessionLabel(
+  title: string | null | undefined,
+  reference: string | null | undefined
+): string {
+  const name = title?.trim();
+  if (name) return name;
+  return reference?.trim() || "";
+}
+
 export function initials(name: string): string {
   const fromCapitals = name
     .split(" ")

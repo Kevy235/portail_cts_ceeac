@@ -4,7 +4,7 @@ import { clsx } from "clsx";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { Category, CtsSession, Doc, DocStatus } from "@/lib/types";
-import { formatDate } from "@/lib/format";
+import { formatDate, sessionLabel } from "@/lib/format";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import {
   CodedBadge,
@@ -199,12 +199,12 @@ export function AdminDocuments() {
             value={sessionFilter}
             onChange={(e) => setSessionFilter(e.target.value)}
             aria-label={t("docs.allSessions")}
-            className={`${inputClass} py-2 w-auto max-w-56`}
+            className={`${inputClass} py-2 w-auto max-w-xs`}
           >
             <option value="tous">{t("docs.allSessions")}</option>
             {sessions.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.reference || (s.title.length > 32 ? `${s.title.slice(0, 32)}…` : s.title)}
+              <option key={s.id} value={s.id} title={sessionLabel(s.title, s.reference)}>
+                {sessionLabel(s.title, s.reference)}
               </option>
             ))}
           </select>

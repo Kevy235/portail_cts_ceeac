@@ -3,7 +3,7 @@ import { Clock, FileText, RotateCcw, Search } from "lucide-react";
 import { clsx } from "clsx";
 import type { Doc } from "@/lib/types";
 import { useApiResource } from "@/lib/useApiResource";
-import { formatDate } from "@/lib/format";
+import { formatDate, sessionLabel } from "@/lib/format";
 import { useSettings } from "@/context/SettingsContext";
 import { LANGS, LANG_LABELS, useI18n, type Lang } from "@/i18n";
 import { DownloadButton, ViewButton } from "@/components/DownloadButton";
@@ -43,7 +43,7 @@ export function ParticipantLibrary() {
   const docSessions = useMemo(() => {
     const map = new Map<string, string>();
     for (const d of visible) {
-      if (d.sessionId) map.set(d.sessionId, d.sessionReference || d.sessionTitle || "");
+      if (d.sessionId) map.set(d.sessionId, sessionLabel(d.sessionTitle, d.sessionReference));
     }
     return Array.from(map.entries());
   }, [visible]);
@@ -125,12 +125,12 @@ export function ParticipantLibrary() {
               value={sessionFilter}
               onChange={(e) => setSessionFilter(e.target.value)}
               aria-label={t("docs.allSessions")}
-              className={`${inputClass} py-1.5 w-auto max-w-52 text-xs`}
+              className={`${inputClass} py-1.5 w-auto max-w-xs text-xs`}
             >
               <option value="tous">{t("docs.allSessions")}</option>
               {docSessions.map(([id, label]) => (
-                <option key={id} value={id}>
-                  {label.length > 32 ? `${label.slice(0, 32)}…` : label}
+                <option key={id} value={id} title={label}>
+                  {label}
                 </option>
               ))}
             </select>
