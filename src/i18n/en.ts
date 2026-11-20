@@ -139,7 +139,8 @@ export const en: Dict = {
   "part.empty": "No participants — create the first account",
   "part.resetPwd": "Reset password",
   "part.createTitle": "Create a participant account",
-  "part.createSubtitle": "A temporary password will be generated and shown only once",
+  "part.createSubtitle":
+    "A temporary password will be generated. You can send it by e-mail with the sign-in instructions.",
   "part.kind.label": "Profile",
   "part.kind.member": "Member State participant",
   "part.kind.memberShort": "Member State",
@@ -168,7 +169,15 @@ export const en: Dict = {
   "part.institutionPh": "Ministry of Foreign Affairs",
   "part.status": "Status",
   "part.createBtn": "Create account",
+  "part.sendAccessEmail": "Send access by e-mail",
+  "part.sendAccessEmailHint":
+    "The participant receives their credentials and sign-in instructions at the address above.",
   "part.created": "Participant account created",
+  "part.createdMailSent": "Account created — access e-mail sent",
+  "part.mailSentNote":
+    "An e-mail was sent to {email} with the credentials and sign-in instructions.",
+  "part.mailFailedNote":
+    "The account was created, but the e-mail could not be sent. Copy the credentials below and share them through a secure channel.",
   "part.updated": "Participant updated",
   "part.deleted": "{name} deleted",
   "part.deleteTitle": "Delete participant",
@@ -184,7 +193,7 @@ export const en: Dict = {
   "part.copied": "Credentials copied",
   "part.pwdReset": "Password reset",
   "part.copyText":
-    "{platform} — temporary credentials\nE-mail: {email}\nPassword: {password}",
+    "{platform} — access to a new account\nSign-in page: {url}\nE-mail: {email}\nTemporary password: {password}\n\nOn first sign-in, set your own password.",
 
   "adm.title": "Portal administrators",
   "adm.subtitle": "Accounts authorised to manage meetings, documents and participants",

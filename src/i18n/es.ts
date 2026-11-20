@@ -139,7 +139,8 @@ export const es: Dict = {
   "part.empty": "Ningún participante — cree la primera cuenta",
   "part.resetPwd": "Restablecer la contraseña",
   "part.createTitle": "Crear una cuenta de participante",
-  "part.createSubtitle": "Se generará una contraseña provisional, mostrada una sola vez",
+  "part.createSubtitle":
+    "Se generará una contraseña provisional. Puede enviarla por correo con las instrucciones de acceso.",
   "part.kind.label": "Perfil",
   "part.kind.member": "Participante Estado miembro",
   "part.kind.memberShort": "Estado miembro",
@@ -168,7 +169,15 @@ export const es: Dict = {
   "part.institutionPh": "Ministerio de Asuntos Exteriores",
   "part.status": "Estado",
   "part.createBtn": "Crear la cuenta",
+  "part.sendAccessEmail": "Enviar los accesos por correo",
+  "part.sendAccessEmailHint":
+    "El participante recibe sus credenciales y las instrucciones de acceso en la dirección indicada.",
   "part.created": "Cuenta de participante creada",
+  "part.createdMailSent": "Cuenta creada — correo de acceso enviado",
+  "part.mailSentNote":
+    "Se ha enviado un correo a {email} con las credenciales y las instrucciones de acceso.",
+  "part.mailFailedNote":
+    "La cuenta se ha creado, pero no se pudo enviar el correo. Copie las credenciales siguientes y transmítalas por un canal seguro.",
   "part.updated": "Participante actualizado",
   "part.deleted": "{name} eliminado",
   "part.deleteTitle": "Eliminar el participante",
@@ -184,7 +193,7 @@ export const es: Dict = {
   "part.copied": "Credenciales copiadas",
   "part.pwdReset": "Contraseña restablecida",
   "part.copyText":
-    "{platform} — credenciales provisionales\nCorreo: {email}\nContraseña: {password}",
+    "{platform} — acceso a una nueva cuenta\nPágina de acceso: {url}\nCorreo: {email}\nContraseña provisional: {password}\n\nEn el primer acceso, defina su contraseña personal.",
 
   "adm.title": "Administradores del portal",
   "adm.subtitle": "Cuentas habilitadas para gestionar las reuniones, documentos y participantes",

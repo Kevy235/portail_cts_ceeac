@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { clsx } from "clsx";
 import {
+  AlertTriangle,
   CalendarCheck,
+  CheckCircle2,
   Copy,
   Edit3,
   KeyRound,
@@ -153,8 +155,14 @@ export function AdminParticipants() {
   const [accessAll, setAccessAll] = useState(false);
   const [formIds, setFormIds] = useState<string[]>([]);
   const [formAll, setFormAll] = useState(false);
+  const [sendAccessEmail, setSendAccessEmail] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [tempPassword, setTempPassword] = useState<{ email: string; password: string } | null>(null);
+  const [tempPassword, setTempPassword] = useState<{
+    email: string;
+    password: string;
+    mailSent?: boolean;
+    mailRequested?: boolean;
+  } | null>(null);
 
   const filtered = useMemo(() => {
     if (!participants) return [];
@@ -182,6 +190,7 @@ export function AdminParticipants() {
     setForm(EMPTY_FORM);
     setFormIds([]);
     setFormAll(false);
+    setSendAccessEmail(true);
     setEditing(null);
     setModal("create");
   };
@@ -251,15 +260,22 @@ export function AdminParticipants() {
       ...(form.kind === "commission"
         ? { allSessions: formAll, sessionIds: formAll ? [] : formIds }
         : {}),
+      ...(modal === "create" ? { sendAccessEmail } : {}),
     };
     try {
       if (modal === "create") {
-        const { temporaryPassword } = await api.post<{
+        const created = await api.post<{
           participant: User;
           temporaryPassword: string;
+          mailSent?: boolean;
         }>("/participants", payload);
-        setTempPassword({ email: form.email, password: temporaryPassword });
-        toast.success(t("part.created"));
+        setTempPassword({
+          email: form.email,
+          password: created.temporaryPassword,
+          mailSent: Boolean(created.mailSent),
+          mailRequested: sendAccessEmail,
+        });
+        toast.success(created.mailSent ? t("part.createdMailSent") : t("part.created"));
       } else if (editing) {
         await api.put(`/participants/${editing.id}`, payload);
         toast.success(t("part.updated"));
@@ -673,12 +689,32 @@ export function AdminParticipants() {
               />
             )}
 
+            {modal === "create" && (
+              <label className="flex items-start gap-2.5 text-sm text-ink cursor-pointer rounded-lg border border-line-soft bg-mist/50 px-3 py-2.5">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 accent-brand"
+                  checked={sendAccessEmail}
+                  onChange={(e) => setSendAccessEmail(e.target.checked)}
+                />
+                <span>
+                  <span className="font-medium flex items-center gap-1.5">
+                    <Mail size={14} className="text-brand shrink-0" aria-hidden />
+                    {t("part.sendAccessEmail")}
+                  </span>
+                  <span className="block text-[11px] text-slate2/80 mt-0.5">
+                    {t("part.sendAccessEmailHint")}
+                  </span>
+                </span>
+              </label>
+            )}
+
             <div className="flex gap-3 pt-1">
               <SecondaryButton type="button" className="flex-1" onClick={() => setModal(null)}>
                 {t("common.cancel")}
               </SecondaryButton>
               <PrimaryButton type="submit" className="flex-1" disabled={busy}>
-                <Mail size={14} />
+                {modal === "create" ? <UserPlus size={14} /> : <Mail size={14} />}
                 {busy
                   ? t("common.saving")
                   : modal === "create"
@@ -708,7 +744,19 @@ export function AdminParticipants() {
                 <span className="font-mono text-ink font-bold">{tempPassword.password}</span>
               </p>
             </div>
-            <p className="text-xs text-slate2">{t("part.tempNote")}</p>
+            {tempPassword.mailRequested && tempPassword.mailSent ? (
+              <p className="flex items-start gap-2 text-xs text-brand-dark bg-brand-soft/70 border border-brand/20 rounded-lg px-3 py-2">
+                <CheckCircle2 size={14} className="mt-0.5 shrink-0" aria-hidden />
+                {t("part.mailSentNote", { email: tempPassword.email })}
+              </p>
+            ) : tempPassword.mailRequested && !tempPassword.mailSent ? (
+              <p className="flex items-start gap-2 text-xs text-gold bg-gold-soft/70 border border-gold/25 rounded-lg px-3 py-2">
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden />
+                {t("part.mailFailedNote")}
+              </p>
+            ) : (
+              <p className="text-xs text-slate2">{t("part.tempNote")}</p>
+            )}
             <PrimaryButton
               className="w-full"
               onClick={async () => {
@@ -717,6 +765,7 @@ export function AdminParticipants() {
                     platform: settings.platform_name,
                     email: tempPassword.email,
                     password: tempPassword.password,
+                    url: `${window.location.origin}/connexion`,
                   })
                 );
                 if (ok) toast.success(t("part.copied"));

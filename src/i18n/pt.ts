@@ -139,7 +139,8 @@ export const pt: Dict = {
   "part.empty": "Nenhum participante — crie a primeira conta",
   "part.resetPwd": "Repor a palavra-passe",
   "part.createTitle": "Criar uma conta de participante",
-  "part.createSubtitle": "Será gerada uma palavra-passe provisória, mostrada uma única vez",
+  "part.createSubtitle":
+    "Será gerada uma palavra-passe provisória. Pode enviá-la por e-mail com as instruções de acesso.",
   "part.kind.label": "Perfil",
   "part.kind.member": "Participante Estado-Membro",
   "part.kind.memberShort": "Estado-Membro",
@@ -168,7 +169,15 @@ export const pt: Dict = {
   "part.institutionPh": "Ministério dos Negócios Estrangeiros",
   "part.status": "Estado",
   "part.createBtn": "Criar a conta",
+  "part.sendAccessEmail": "Enviar os acessos por e-mail",
+  "part.sendAccessEmailHint":
+    "O participante recebe as credenciais e as instruções de acesso no endereço indicado.",
   "part.created": "Conta de participante criada",
+  "part.createdMailSent": "Conta criada — e-mail de acesso enviado",
+  "part.mailSentNote":
+    "Foi enviado um e-mail para {email} com as credenciais e as instruções de acesso.",
+  "part.mailFailedNote":
+    "A conta foi criada, mas o e-mail não pôde ser enviado. Copie as credenciais abaixo e transmita-as por um canal seguro.",
   "part.updated": "Participante atualizado",
   "part.deleted": "{name} eliminado",
   "part.deleteTitle": "Eliminar o participante",
@@ -184,7 +193,7 @@ export const pt: Dict = {
   "part.copied": "Credenciais copiadas",
   "part.pwdReset": "Palavra-passe reposta",
   "part.copyText":
-    "{platform} — credenciais provisórias\nE-mail: {email}\nPalavra-passe: {password}",
+    "{platform} — acesso a uma nova conta\nPágina de acesso: {url}\nE-mail: {email}\nPalavra-passe provisória: {password}\n\nNo primeiro acesso, defina a sua palavra-passe pessoal.",
 
   "adm.title": "Administradores do portal",
   "adm.subtitle": "Contas habilitadas a gerir as reuniões, documentos e participantes",

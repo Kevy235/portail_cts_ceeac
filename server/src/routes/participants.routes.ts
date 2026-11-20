@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
 import bcrypt from "bcryptjs";
 import type { PoolClient } from "pg";
 import { z } from "zod";
@@ -7,6 +7,8 @@ import { invalidateAuthCache } from "../auth.js";
 import { ah, uuidParams } from "../http.js";
 import { generateTempPassword } from "../codes.js";
 import { logActivity } from "../activity.js";
+import { config, isMailConfigured } from "../config.js";
+import { buildAccessMail, sendBroadcast } from "../mailer.js";
 
 export const participantsRouter = Router();
 
@@ -23,6 +25,7 @@ const participantSchema = z
     kind: z.enum(["member_state", "commission"]).default("member_state"),
     allSessions: z.boolean().optional(),
     sessionIds: z.array(z.string().uuid()).max(200).optional(),
+    sendAccessEmail: z.boolean().optional().default(false),
   })
   .superRefine((d, ctx) => {
     if (d.kind === "member_state" && !d.country) {
@@ -74,6 +77,34 @@ async function applyMeetingAccess(
 function normalizeInstitution(kind: "member_state" | "commission", institution: string) {
   if (kind === "commission" && !institution) return COMMISSION_INSTITUTION;
   return institution;
+}
+
+async function maybeSendAccessEmail(
+  req: Request,
+  opts: { send: boolean; name: string; email: string; password: string }
+): Promise<{ mailSent: boolean; mailError?: string }> {
+  if (!opts.send) return { mailSent: false };
+  if (!isMailConfigured()) return { mailSent: false, mailError: "smtp_not_configured" };
+  try {
+    const appUrl =
+      config.appUrl || `${req.protocol}://${req.get("host") ?? "localhost"}`;
+    const platform = await query<{ value: string }>(
+      "SELECT value FROM settings WHERE key = 'platform_name' AND lang = 'fr'"
+    );
+    const mail = buildAccessMail({
+      platformName: platform.rows[0]?.value?.trim() || "PDRS-CEEAC",
+      recipientName: opts.name,
+      email: opts.email,
+      password: opts.password,
+      loginUrl: `${appUrl}/connexion`,
+    });
+    const result = await sendBroadcast([opts.email], mail);
+    if (result.sent.length > 0) return { mailSent: true };
+    return { mailSent: false, mailError: "smtp_send_failed" };
+  } catch (err) {
+    console.error("[mail] envoi des accès :", err);
+    return { mailSent: false, mailError: "smtp_send_failed" };
+  }
 }
 
 const JOINS = `LEFT JOIN cts_sessions s ON s.id = u.origin_session_id`;
@@ -139,16 +170,30 @@ participantsRouter.post(
     });
     const created = await query(`SELECT ${ROW} FROM users u ${JOINS} WHERE u.id = $1`, [id]);
 
+    const mail = await maybeSendAccessEmail(req, {
+      send: Boolean(data.sendAccessEmail),
+      name: data.name,
+      email,
+      password,
+    });
+
     await logActivity(
       "participant_created",
       data.kind === "commission"
         ? "Nouveau participant Commission de la CEEAC"
         : "Nouveau participant accrédité",
-      `${data.name} — ${data.kind === "commission" ? "Commission" : data.country}`,
+      `${data.name} — ${data.kind === "commission" ? "Commission" : data.country}${
+        mail.mailSent ? " — e-mail d'accès envoyé" : ""
+      }`,
       req.user!.id
     );
 
-    res.status(201).json({ participant: created.rows[0], temporaryPassword: password });
+    res.status(201).json({
+      participant: created.rows[0],
+      temporaryPassword: password,
+      mailSent: mail.mailSent,
+      ...(mail.mailError ? { mailError: mail.mailError } : {}),
+    });
   })
 );
 

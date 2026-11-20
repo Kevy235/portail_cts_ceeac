@@ -146,7 +146,8 @@ export const fr = {
   "part.empty": "Aucun participant — créez le premier compte",
   "part.resetPwd": "Réinitialiser le mot de passe",
   "part.createTitle": "Créer un compte participant",
-  "part.createSubtitle": "Un mot de passe provisoire sera généré et affiché une seule fois",
+  "part.createSubtitle":
+    "Un mot de passe provisoire sera généré. Vous pouvez l'envoyer par e-mail avec les orientations de connexion.",
   "part.kind.label": "Profil",
   "part.kind.member": "Participant État membre",
   "part.kind.memberShort": "État membre",
@@ -175,7 +176,15 @@ export const fr = {
   "part.institutionPh": "Ministère des Affaires Étrangères",
   "part.status": "Statut",
   "part.createBtn": "Créer le compte",
+  "part.sendAccessEmail": "Envoyer les accès par e-mail",
+  "part.sendAccessEmailHint":
+    "Le participant reçoit ses identifiants et les orientations de connexion à l'adresse indiquée.",
   "part.created": "Compte participant créé",
+  "part.createdMailSent": "Compte créé — e-mail d'accès envoyé",
+  "part.mailSentNote":
+    "Un e-mail a été envoyé à {email} avec les identifiants et les orientations de connexion.",
+  "part.mailFailedNote":
+    "Le compte est créé, mais l'e-mail n'a pas pu être envoyé. Copiez les identifiants ci-dessous et transmettez-les par un canal sûr.",
   "part.updated": "Participant mis à jour",
   "part.deleted": "{name} supprimé",
   "part.deleteTitle": "Supprimer le participant",
@@ -192,7 +201,7 @@ export const fr = {
   "part.copied": "Identifiants copiés",
   "part.pwdReset": "Mot de passe réinitialisé",
   "part.copyText":
-    "{platform} — identifiants provisoires\nE-mail : {email}\nMot de passe : {password}",
+    "{platform} — accès à un nouveau compte\nPage de connexion : {url}\nE-mail : {email}\nMot de passe provisoire : {password}\n\nLors de la première connexion, définissez votre mot de passe personnel.",
 
   // ─── Administrateurs du portail ───────────────────────────────────────
   "adm.title": "Administrateurs du portail",

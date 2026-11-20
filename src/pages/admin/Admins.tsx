@@ -396,6 +396,7 @@ export function AdminAdmins() {
                     platform: settings.platform_name,
                     email: tempPassword.email,
                     password: tempPassword.password,
+                    url: `${window.location.origin}/connexion`,
                   })
                 );
                 if (ok) toast.success(t("part.copied"));

@@ -153,11 +153,14 @@ async function main() {
         country: "RDC",
         functionTitle: "Expert Senior",
         institution: "MAE",
+        sendAccessEmail: true,
       },
     });
     check(
       "création participant + mot de passe provisoire",
-      r.status === 201 && typeof r.data.temporaryPassword === "string"
+      r.status === 201 &&
+        typeof r.data.temporaryPassword === "string" &&
+        r.data.mailSent === false
     );
     const participantId = r.data.participant.id;
     const tempPwd = r.data.temporaryPassword;
