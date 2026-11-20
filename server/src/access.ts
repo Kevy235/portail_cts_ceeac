@@ -17,6 +17,11 @@ export async function accessibleSessionIds(user: AuthUser): Promise<string[] | n
   if (user.role === "admin") return null;
   // Invité : la réunion embarquée dans son jeton, et elle seule.
   if (user.role === "guest") return user.sessionId ? [user.sessionId] : [];
+  // Participant Commission rattaché à toutes les réunions (y compris les futures).
+  if (user.allSessions) {
+    const { rows } = await query<{ id: string }>("SELECT id FROM cts_sessions");
+    return rows.map((r) => r.id);
+  }
 
   const { rows } = await query<{ session_id: string }>(
     "SELECT session_id FROM session_access WHERE user_id = $1",
@@ -32,6 +37,7 @@ export async function canAccessSession(
 ): Promise<boolean> {
   if (user.role === "admin") return true;
   if (user.role === "guest") return user.sessionId === sessionId;
+  if (user.allSessions) return true;
 
   const { rows } = await query<{ ok: boolean }>(
     "SELECT TRUE AS ok FROM session_access WHERE user_id = $1 AND session_id = $2",

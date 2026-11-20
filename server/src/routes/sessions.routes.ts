@@ -401,7 +401,8 @@ const requireSessionAccess: RequestHandler = (req, res, next) => {
 // ─── Fil de discussion par session ─────────────────────────────────────────────
 const MESSAGE_ROW = `m.id, m.body, m.created_at AS "createdAt",
   m.user_id AS "authorId", COALESCE(u.name, 'Compte supprimé') AS "authorName",
-  COALESCE(u.country, '') AS "authorCountry", COALESCE(u.role, '') AS "authorRole"`;
+  COALESCE(u.country, '') AS "authorCountry", COALESCE(u.role, '') AS "authorRole",
+  COALESCE(u.participant_kind, '') AS "authorKind"`;
 
 sessionsRouter.get(
   "/:id/messages",

@@ -16,6 +16,11 @@ export function ParticipantProfile() {
   if (!user) return null;
 
   const infos: { label: string; value: React.ReactNode }[] = [
+    {
+      label: t("part.kind.label"),
+      value:
+        user.kind === "commission" ? t("part.kind.commission") : t("part.kind.member"),
+    },
     { label: t("prof.email"), value: user.email },
     { label: t("prof.institution"), value: user.institution || "—" },
     {
@@ -60,8 +65,14 @@ export function ParticipantProfile() {
               </h3>
               <p className="text-white/80 text-sm mt-1 flex items-center gap-1.5 flex-wrap">
                 {user.functionTitle && <span>{user.functionTitle}</span>}
-                {user.functionTitle && user.country && <span aria-hidden>·</span>}
-                {user.country && (
+                {user.functionTitle && user.kind === "commission" && <span aria-hidden>·</span>}
+                {user.kind === "commission" && (
+                  <span className="text-white/80">{t("part.kind.commission")}</span>
+                )}
+                {user.functionTitle && user.kind !== "commission" && user.country && (
+                  <span aria-hidden>·</span>
+                )}
+                {user.kind !== "commission" && user.country && (
                   <span className="flex items-center gap-1.5">
                     <CountryFlag country={user.country} />
                     {user.country}

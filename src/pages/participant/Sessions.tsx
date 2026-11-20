@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { CtsSession } from "@/lib/types";
 import { useApiResource } from "@/lib/useApiResource";
+import { useAuth } from "@/context/AuthContext";
 import { useI18n } from "@/i18n";
 import { SessionCard } from "@/components/SessionCard";
 import {
@@ -114,8 +115,10 @@ function UnlockSessionForm({ onUnlocked }: { onUnlocked: () => void }) {
 
 export function ParticipantSessions() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const resource = useApiResource<{ sessions: CtsSession[] }>("/sessions");
   const [openThread, setOpenThread] = useState<string | null>(null);
+  const isCommission = user?.kind === "commission";
 
   if (resource.loading && !resource.data) return <LoadingBlock />;
   if (resource.error && !resource.data)
@@ -124,9 +127,12 @@ export function ParticipantSessions() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title={t("sess.title")} subtitle={t("sess.psubtitle")} />
+      <PageHeader
+        title={t("sess.title")}
+        subtitle={isCommission ? t("sess.psubtitleCommission") : t("sess.psubtitle")}
+      />
 
-      <UnlockSessionForm onUnlocked={resource.reload} />
+      {!isCommission && <UnlockSessionForm onUnlocked={resource.reload} />}
 
       {sessions.length === 0 ? (
         <div className="bg-white rounded-xl border border-line-soft">

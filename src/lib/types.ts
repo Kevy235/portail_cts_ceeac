@@ -3,6 +3,8 @@ import type { Lang } from "@/i18n";
 /** "guest" : accès documentaire via les codes de session, sans compte. */
 export type Role = "admin" | "participant" | "guest";
 export type UserStatus = "actif" | "en-attente" | "inactif";
+/** États membres (parcours actuel) ou personnels internes de la Commission. */
+export type ParticipantKind = "member_state" | "commission";
 export type DocStatus = "publié" | "brouillon";
 export type SessionStatus = "à-venir" | "en-cours" | "terminé";
 
@@ -23,6 +25,10 @@ export interface User {
   /** Réunion via laquelle le participant s'est auto-inscrit (le cas échéant). */
   originSessionId?: string | null;
   originSessionTitle?: string | null;
+  /** Profil : État membre (défaut) ou Commission de la CEEAC. */
+  kind?: ParticipantKind;
+  /** Commission : accès à toutes les réunions, y compris les futures. */
+  allSessions?: boolean;
   /**
    * Réunions ouvertes au participant : il ne voit que leurs documents.
    * Fourni par l'API d'administration (/participants) uniquement.
@@ -109,6 +115,7 @@ export interface ChatMessage {
   authorName: string;
   authorCountry: string;
   authorRole: string;
+  authorKind?: string;
 }
 
 export interface ActivityItem {

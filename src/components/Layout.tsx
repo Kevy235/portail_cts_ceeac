@@ -114,7 +114,9 @@ export function AppLayout({ variant }: { variant: "admin" | "participant" }) {
                   ? t("header.admin")
                   : isGuest
                     ? user?.originSessionTitle
-                    : [user?.functionTitle, user?.country].filter(Boolean).join(" — ")}
+                    : user?.kind === "commission"
+                      ? t("part.kind.commission")
+                      : [user?.functionTitle, user?.country].filter(Boolean).join(" — ")}
               </p>
             </div>
           </div>

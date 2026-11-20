@@ -132,7 +132,7 @@ export const fr = {
 
   // ─── Participants (admin) ─────────────────────────────────────────────
   "part.title": "Gestion des participants",
-  "part.subtitle": "Experts accrédités au Comité Technique Spécialisé",
+  "part.subtitle": "Experts des États membres et participants de la Commission de la CEEAC",
   "part.create": "Créer un compte",
   "part.searchPh": "Rechercher par nom, pays ou e-mail…",
   "part.colExpert": "Expert",
@@ -147,6 +147,22 @@ export const fr = {
   "part.resetPwd": "Réinitialiser le mot de passe",
   "part.createTitle": "Créer un compte participant",
   "part.createSubtitle": "Un mot de passe provisoire sera généré et affiché une seule fois",
+  "part.kind.label": "Profil",
+  "part.kind.member": "Participant État membre",
+  "part.kind.memberShort": "État membre",
+  "part.kind.memberHint": "Expert accrédité par un État membre — accès limité aux réunions ouvertes.",
+  "part.kind.commission": "Participant Commission de la CEEAC",
+  "part.kind.commissionShort": "Commission",
+  "part.kind.commissionHint":
+    "Personnel interne de la Commission — l'administrateur lui affecte une, plusieurs ou toutes les réunions.",
+  "part.allKinds": "Tous les profils",
+  "part.commissionInstitution": "Commission de la CEEAC",
+  "part.meetingsLabel": "Réunions affectées",
+  "part.meetingsHelp":
+    "Le participant de la Commission interagit uniquement dans les réunions qui lui sont attribuées — comme un participant inscrit.",
+  "part.meetingsRequired": "Choisissez au moins une réunion, ou toutes les réunions.",
+  "part.accessAll": "Toutes les réunions",
+  "part.accessAllHint": "Y compris les réunions qui seront créées ultérieurement.",
   "part.editTitle": "Modifier le participant",
   "part.fullName": "Nom complet",
   "part.fullNamePh": "Dr. Prénom Nom",
@@ -621,7 +637,9 @@ export const fr = {
   "part.accessBtn": "Gérer les accès aux réunions",
   "part.accessTitle": "Accès aux réunions",
   "part.accessSubtitle":
-    "Ce participant ne voit que les documents des réunions cochées.",
+    "Ce participant ne voit que les documents des réunions cochées, et peut y interagir (discussion, bibliothèque).",
+  "sess.psubtitleCommission":
+    "Réunions de la Commission qui vous sont attribuées et fils de discussion",
   "part.accessNone": "Aucune réunion",
   "part.accessCount": "{n} réunion(s)",
   "part.accessEmptyList": "Aucune réunion programmée",

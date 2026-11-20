@@ -435,6 +435,20 @@ export const MIGRATIONS: Migration[] = [
       ON CONFLICT DO NOTHING;
     `,
   },
+  {
+    id: 12,
+    name: "participants Commission de la CEEAC",
+    sql: `
+      -- Distingue les experts des États membres (parcours actuel) des
+      -- personnels de la Commission, que l'administrateur rattache à une,
+      -- plusieurs ou toutes les réunions (y compris les futures).
+      ALTER TABLE users
+        ADD COLUMN participant_kind TEXT NOT NULL DEFAULT 'member_state'
+          CHECK (participant_kind IN ('member_state', 'commission')),
+        ADD COLUMN all_sessions BOOLEAN NOT NULL DEFAULT FALSE;
+      CREATE INDEX idx_users_participant_kind ON users(participant_kind);
+    `,
+  },
 ];
 
 export const LANGS = ["fr", "en", "pt", "es"] as const;

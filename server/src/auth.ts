@@ -8,6 +8,8 @@ export interface AuthUser {
   role: "admin" | "participant" | "guest";
   /** Réunion d'un accès invité (connexion par codes de réunion). */
   sessionId?: string;
+  /** Participant Commission : accès à toutes les réunions, y compris les futures. */
+  allSessions?: boolean;
 }
 
 declare global {
@@ -63,6 +65,7 @@ interface UserAuthState {
   role: "admin" | "participant";
   status: string;
   tokenVersion: number;
+  allSessions: boolean;
 }
 
 const CACHE_TTL_MS = 10_000;
@@ -82,9 +85,15 @@ async function getAuthState(userId: string): Promise<UserAuthState | null> {
     role: "admin" | "participant";
     status: string;
     token_version: number;
-  }>("SELECT role, status, token_version FROM users WHERE id = $1", [userId]);
+    all_sessions: boolean;
+  }>("SELECT role, status, token_version, all_sessions FROM users WHERE id = $1", [userId]);
   const state = rows[0]
-    ? { role: rows[0].role, status: rows[0].status, tokenVersion: rows[0].token_version }
+    ? {
+        role: rows[0].role,
+        status: rows[0].status,
+        tokenVersion: rows[0].token_version,
+        allSessions: rows[0].all_sessions,
+      }
     : null;
   authCache.set(userId, { state, at: Date.now() });
   return state;
@@ -133,7 +142,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
           .status(401)
           .json({ error: "Session expirée, veuillez vous reconnecter" });
       }
-      req.user = { id: userId, role: state.role };
+      req.user = { id: userId, role: state.role, allSessions: state.allSessions };
       next();
     })
     .catch(next);

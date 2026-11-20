@@ -13,7 +13,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { COUNTRIES, type CtsSession, type User, type UserStatus } from "@/lib/types";
+import {
+  COUNTRIES,
+  type CtsSession,
+  type ParticipantKind,
+  type User,
+  type UserStatus,
+} from "@/lib/types";
 import { CountryFlag } from "@/components/CountryFlag";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDate, initials } from "@/lib/format";
@@ -41,6 +47,7 @@ interface FormState {
   functionTitle: string;
   institution: string;
   status: UserStatus;
+  kind: ParticipantKind;
 }
 
 const EMPTY_FORM: FormState = {
@@ -50,7 +57,76 @@ const EMPTY_FORM: FormState = {
   functionTitle: "",
   institution: "",
   status: "en-attente",
+  kind: "member_state",
 };
+
+function MeetingAccessFields({
+  sessions,
+  selectedIds,
+  allSelected,
+  onToggleAll,
+  onChangeIds,
+}: {
+  sessions: CtsSession[];
+  selectedIds: string[];
+  allSelected: boolean;
+  onToggleAll: (value: boolean) => void;
+  onChangeIds: (ids: string[] | ((prev: string[]) => string[])) => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-semibold text-ink">{t("part.meetingsLabel")}</p>
+      <p className="text-xs text-slate2">{t("part.meetingsHelp")}</p>
+      <label className="flex items-start gap-2.5 text-sm text-ink cursor-pointer">
+        <input
+          type="checkbox"
+          className="mt-0.5 accent-brand"
+          checked={allSelected}
+          onChange={(e) => onToggleAll(e.target.checked)}
+        />
+        <span>
+          <span className="font-medium">{t("part.accessAll")}</span>
+          <span className="block text-[11px] text-slate2/80">{t("part.accessAllHint")}</span>
+        </span>
+      </label>
+      {sessions.length === 0 ? (
+        <p className="text-sm text-slate2/80">{t("part.accessEmptyList")}</p>
+      ) : (
+        <div
+          className={clsx(
+            "max-h-56 overflow-y-auto divide-y divide-line-soft border border-line-soft rounded-lg",
+            allSelected && "opacity-50 pointer-events-none"
+          )}
+        >
+          {sessions.map((session) => (
+            <label
+              key={session.id}
+              className="flex items-start gap-3 px-3 py-2.5 hover:bg-mist/60 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                className="mt-0.5 accent-brand"
+                checked={allSelected || selectedIds.includes(session.id)}
+                onChange={(e) =>
+                  onChangeIds((ids) =>
+                    e.target.checked ? [...ids, session.id] : ids.filter((id) => id !== session.id)
+                  )
+                }
+              />
+              <span className="min-w-0">
+                <span className="block text-sm text-ink">{session.title}</span>
+                <span className="block text-[11px] text-slate2/70 font-mono">
+                  {session.reference}
+                </span>
+              </span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AdminParticipants() {
   const { t } = useI18n();
@@ -63,6 +139,7 @@ export function AdminParticipants() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"tous" | UserStatus>("tous");
+  const [kindFilter, setKindFilter] = useState<"tous" | ParticipantKind>("tous");
   const [countryFilter, setCountryFilter] = useState("tous");
   const [modal, setModal] = useState<"create" | "edit" | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -73,6 +150,9 @@ export function AdminParticipants() {
   // des réunions cochées.
   const [access, setAccess] = useState<User | null>(null);
   const [accessIds, setAccessIds] = useState<string[]>([]);
+  const [accessAll, setAccessAll] = useState(false);
+  const [formIds, setFormIds] = useState<string[]>([]);
+  const [formAll, setFormAll] = useState(false);
   const [busy, setBusy] = useState(false);
   const [tempPassword, setTempPassword] = useState<{ email: string; password: string } | null>(null);
 
@@ -82,6 +162,7 @@ export function AdminParticipants() {
     return participants.filter(
       (p) =>
         (statusFilter === "tous" || p.status === statusFilter) &&
+        (kindFilter === "tous" || (p.kind ?? "member_state") === kindFilter) &&
         (countryFilter === "tous" || p.country === countryFilter) &&
         (p.name.toLowerCase().includes(q) ||
           p.country.toLowerCase().includes(q) ||
@@ -89,7 +170,7 @@ export function AdminParticipants() {
           p.functionTitle.toLowerCase().includes(q) ||
           p.institution.toLowerCase().includes(q))
     );
-  }, [participants, search, statusFilter, countryFilter]);
+  }, [participants, search, statusFilter, kindFilter, countryFilter]);
 
   // Pays réellement présents dans la liste (filtre pertinent).
   const presentCountries = useMemo(() => {
@@ -99,6 +180,8 @@ export function AdminParticipants() {
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
+    setFormIds([]);
+    setFormAll(false);
     setEditing(null);
     setModal("create");
   };
@@ -111,13 +194,29 @@ export function AdminParticipants() {
       functionTitle: p.functionTitle,
       institution: p.institution,
       status: p.status,
+      kind: p.kind ?? "member_state",
     });
+    setFormIds((p.sessionAccess ?? []).map((a) => a.id));
+    setFormAll(Boolean(p.allSessions));
     setEditing(p);
     setModal("edit");
   };
 
+  const setKind = (kind: ParticipantKind) => {
+    setForm((f) => ({
+      ...f,
+      kind,
+      institution:
+        kind === "commission" && !f.institution.trim()
+          ? t("part.commissionInstitution")
+          : f.institution,
+    }));
+    if (kind === "member_state") setFormAll(false);
+  };
+
   const openAccess = (p: User) => {
     setAccessIds((p.sessionAccess ?? []).map((a) => a.id));
+    setAccessAll(Boolean(p.allSessions));
     setAccess(p);
   };
 
@@ -125,7 +224,10 @@ export function AdminParticipants() {
     if (!access || busy) return;
     setBusy(true);
     try {
-      await api.put(`/participants/${access.id}/access`, { sessionIds: accessIds });
+      await api.put(`/participants/${access.id}/access`, {
+        sessionIds: accessAll ? [] : accessIds,
+        allSessions: accessAll,
+      });
       toast.success(t("part.accessSaved"));
       setAccess(null);
       await load();
@@ -139,17 +241,27 @@ export function AdminParticipants() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
+    if (form.kind === "commission" && !formAll && formIds.length === 0) {
+      toast.error(t("part.meetingsRequired"));
+      return;
+    }
     setBusy(true);
+    const payload = {
+      ...form,
+      ...(form.kind === "commission"
+        ? { allSessions: formAll, sessionIds: formAll ? [] : formIds }
+        : {}),
+    };
     try {
       if (modal === "create") {
         const { temporaryPassword } = await api.post<{
           participant: User;
           temporaryPassword: string;
-        }>("/participants", form);
+        }>("/participants", payload);
         setTempPassword({ email: form.email, password: temporaryPassword });
         toast.success(t("part.created"));
       } else if (editing) {
-        await api.put(`/participants/${editing.id}`, form);
+        await api.put(`/participants/${editing.id}`, payload);
         toast.success(t("part.updated"));
       }
       setModal(null);
@@ -235,6 +347,28 @@ export function AdminParticipants() {
         <div className="flex items-center gap-2 flex-wrap">
           {(
             [
+              { key: "tous", label: t("part.allKinds") },
+              { key: "member_state", label: t("part.kind.member") },
+              { key: "commission", label: t("part.kind.commission") },
+            ] as const
+          ).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setKindFilter(key)}
+              className={clsx(
+                "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                kindFilter === key
+                  ? "bg-gradient-to-b from-brand to-brand-dark text-white shadow-sm shadow-brand/30"
+                  : "bg-white border border-line text-slate2 hover:bg-mist hover:border-brand/40"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {(
+            [
               { key: "tous", label: t("part.allStatuses") },
               { key: "actif", label: t("status.actif") },
               { key: "en-attente", label: t("status.en-attente") },
@@ -303,7 +437,21 @@ export function AdminParticipants() {
                         {initials(p.name)}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-ink">{p.name}</p>
+                        <p className="text-sm font-medium text-ink flex items-center gap-2 flex-wrap">
+                          {p.name}
+                          <span
+                            className={clsx(
+                              "text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded",
+                              (p.kind ?? "member_state") === "commission"
+                                ? "text-accent-dark bg-accent-soft"
+                                : "text-brand bg-brand-soft"
+                            )}
+                          >
+                            {(p.kind ?? "member_state") === "commission"
+                              ? t("part.kind.commissionShort")
+                              : t("part.kind.memberShort")}
+                          </span>
+                        </p>
                         <p className="text-xs text-slate2/80">{p.email}</p>
                         {p.originSessionTitle && (
                           <p className="text-[11px] text-accent-dark mt-0.5">
@@ -312,18 +460,28 @@ export function AdminParticipants() {
                         )}
                         <p className="text-[11px] text-slate2/80 mt-0.5 flex items-center gap-1">
                           <CalendarCheck size={10} className="text-brand" aria-hidden />
-                          {p.sessionAccess && p.sessionAccess.length > 0
-                            ? t("part.accessCount", { n: p.sessionAccess.length })
-                            : t("part.accessNone")}
+                          {p.allSessions
+                            ? t("part.accessAll")
+                            : p.sessionAccess && p.sessionAccess.length > 0
+                              ? t("part.accessCount", { n: p.sessionAccess.length })
+                              : t("part.accessNone")}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="flex items-center gap-2 text-sm text-ink whitespace-nowrap">
-                      <CountryFlag country={p.country} />
-                      {p.country}
-                    </span>
+                    {p.country ? (
+                      <span className="flex items-center gap-2 text-sm text-ink whitespace-nowrap">
+                        <CountryFlag country={p.country} />
+                        {p.country}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-slate2/70">
+                        {(p.kind ?? "member_state") === "commission"
+                          ? t("part.kind.commissionShort")
+                          : "—"}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm text-ink">{p.functionTitle || "—"}</p>
@@ -395,8 +553,38 @@ export function AdminParticipants() {
           title={modal === "create" ? t("part.createTitle") : t("part.editTitle")}
           subtitle={modal === "create" ? t("part.createSubtitle") : editing?.email}
           onClose={() => setModal(null)}
+          wide
         >
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <fieldset>
+              <legend className="block text-sm font-semibold text-ink mb-2">
+                {t("part.kind.label")}
+              </legend>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {(
+                  [
+                    { key: "member_state" as const, title: t("part.kind.member"), hint: t("part.kind.memberHint") },
+                    { key: "commission" as const, title: t("part.kind.commission"), hint: t("part.kind.commissionHint") },
+                  ]
+                ).map(({ key, title, hint }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setKind(key)}
+                    aria-pressed={form.kind === key}
+                    className={clsx(
+                      "text-left rounded-lg border px-3 py-2.5 transition-all",
+                      form.kind === key
+                        ? "border-brand bg-brand-soft/70 shadow-sm"
+                        : "border-line-soft bg-white hover:border-brand/40"
+                    )}
+                  >
+                    <span className="block text-sm font-semibold text-ink">{title}</span>
+                    <span className="block text-[11px] text-slate2/80 mt-0.5">{hint}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
             <Field label={t("part.fullName")} required>
               <input
                 required
@@ -417,7 +605,11 @@ export function AdminParticipants() {
               />
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label={t("part.country")} required>
+              <Field
+                label={t("part.country")}
+                required={form.kind === "member_state"}
+                hint={form.kind === "commission" ? t("common.optional") : undefined}
+              >
                 <div className="relative">
                   {form.country && (
                     <CountryFlag
@@ -426,7 +618,7 @@ export function AdminParticipants() {
                     />
                   )}
                   <select
-                    required
+                    required={form.kind === "member_state"}
                     value={form.country}
                     onChange={(e) => setForm({ ...form, country: e.target.value })}
                     className={`${inputClass} ${form.country ? "pl-9" : ""}`}
@@ -470,6 +662,16 @@ export function AdminParticipants() {
                 </select>
               </Field>
             </div>
+
+            {form.kind === "commission" && (
+              <MeetingAccessFields
+                sessions={allSessions}
+                selectedIds={formIds}
+                allSelected={formAll}
+                onToggleAll={setFormAll}
+                onChangeIds={setFormIds}
+              />
+            )}
 
             <div className="flex gap-3 pt-1">
               <SecondaryButton type="button" className="flex-1" onClick={() => setModal(null)}>
@@ -537,7 +739,15 @@ export function AdminParticipants() {
         >
           <div className="p-6 space-y-4">
             <p className="text-xs text-slate2">{t("part.accessSubtitle")}</p>
-            {allSessions.length === 0 ? (
+            {(access.kind ?? "member_state") === "commission" ? (
+              <MeetingAccessFields
+                sessions={allSessions}
+                selectedIds={accessIds}
+                allSelected={accessAll}
+                onToggleAll={setAccessAll}
+                onChangeIds={setAccessIds}
+              />
+            ) : allSessions.length === 0 ? (
               <p className="text-sm text-slate2/80">{t("part.accessEmptyList")}</p>
             ) : (
               <div className="max-h-72 overflow-y-auto divide-y divide-line-soft border border-line-soft rounded-lg">

@@ -125,7 +125,7 @@ export const es: Dict = {
   "time.days": "hace {n} d",
 
   "part.title": "Gestión de participantes",
-  "part.subtitle": "Expertos acreditados ante el Comité Técnico Especializado",
+  "part.subtitle": "Expertos de los Estados miembros y participantes de la Comisión de la CEEAC",
   "part.create": "Crear una cuenta",
   "part.searchPh": "Buscar por nombre, país o correo…",
   "part.colExpert": "Experto",
@@ -140,6 +140,22 @@ export const es: Dict = {
   "part.resetPwd": "Restablecer la contraseña",
   "part.createTitle": "Crear una cuenta de participante",
   "part.createSubtitle": "Se generará una contraseña provisional, mostrada una sola vez",
+  "part.kind.label": "Perfil",
+  "part.kind.member": "Participante Estado miembro",
+  "part.kind.memberShort": "Estado miembro",
+  "part.kind.memberHint": "Experto acreditado por un Estado miembro — acceso limitado a las reuniones abiertas.",
+  "part.kind.commission": "Participante Comisión de la CEEAC",
+  "part.kind.commissionShort": "Comisión",
+  "part.kind.commissionHint":
+    "Personal interno de la Comisión — el administrador le asigna una, varias o todas las reuniones.",
+  "part.allKinds": "Todos los perfiles",
+  "part.commissionInstitution": "Comisión de la CEEAC",
+  "part.meetingsLabel": "Reuniones asignadas",
+  "part.meetingsHelp":
+    "El participante de la Comisión interactúa únicamente en las reuniones que se le asignan — como un participante inscrito.",
+  "part.meetingsRequired": "Elija al menos una reunión, o todas las reuniones.",
+  "part.accessAll": "Todas las reuniones",
+  "part.accessAllHint": "Incluidas las reuniones que se creen posteriormente.",
   "part.editTitle": "Editar el participante",
   "part.fullName": "Nombre completo",
   "part.fullNamePh": "Dr. Nombre Apellido",
@@ -597,7 +613,9 @@ export const es: Dict = {
   "part.accessBtn": "Gestionar los accesos a las reuniones",
   "part.accessTitle": "Accesos a las reuniones",
   "part.accessSubtitle":
-    "Este participante solo ve los documentos de las reuniones marcadas.",
+    "Este participante solo ve los documentos de las reuniones marcadas, y puede interactuar en ellas (discusión, biblioteca).",
+  "sess.psubtitleCommission":
+    "Reuniones de la Comisión que tiene asignadas e hilos de discusión",
   "part.accessNone": "Ninguna reunión",
   "part.accessCount": "{n} reunión(es)",
   "part.accessEmptyList": "Ninguna reunión programada",

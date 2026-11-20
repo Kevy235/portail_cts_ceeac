@@ -125,7 +125,7 @@ export const en: Dict = {
   "time.days": "{n} d ago",
 
   "part.title": "Participant management",
-  "part.subtitle": "Experts accredited to the Specialized Technical Committee",
+  "part.subtitle": "Member State experts and ECCAS Commission participants",
   "part.create": "Create an account",
   "part.searchPh": "Search by name, country or e-mail…",
   "part.colExpert": "Expert",
@@ -140,6 +140,22 @@ export const en: Dict = {
   "part.resetPwd": "Reset password",
   "part.createTitle": "Create a participant account",
   "part.createSubtitle": "A temporary password will be generated and shown only once",
+  "part.kind.label": "Profile",
+  "part.kind.member": "Member State participant",
+  "part.kind.memberShort": "Member State",
+  "part.kind.memberHint": "Expert accredited by a Member State — access limited to opened meetings.",
+  "part.kind.commission": "ECCAS Commission participant",
+  "part.kind.commissionShort": "Commission",
+  "part.kind.commissionHint":
+    "Internal Commission staff — the administrator assigns one, several or all meetings.",
+  "part.allKinds": "All profiles",
+  "part.commissionInstitution": "ECCAS Commission",
+  "part.meetingsLabel": "Assigned meetings",
+  "part.meetingsHelp":
+    "The Commission participant interacts only in the meetings assigned to them — like a registered participant.",
+  "part.meetingsRequired": "Select at least one meeting, or all meetings.",
+  "part.accessAll": "All meetings",
+  "part.accessAllHint": "Including meetings that will be created later.",
   "part.editTitle": "Edit participant",
   "part.fullName": "Full name",
   "part.fullNamePh": "Dr. First Last",
@@ -596,7 +612,9 @@ export const en: Dict = {
   "part.accessBtn": "Manage meeting access",
   "part.accessTitle": "Meeting access",
   "part.accessSubtitle":
-    "This participant only sees documents from the selected meetings.",
+    "This participant only sees documents from the selected meetings, and can interact there (discussion, library).",
+  "sess.psubtitleCommission":
+    "Commission meetings assigned to you and discussion threads",
   "part.accessNone": "No meeting",
   "part.accessCount": "{n} meeting(s)",
   "part.accessEmptyList": "No meeting scheduled",

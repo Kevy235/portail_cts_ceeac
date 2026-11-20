@@ -45,6 +45,8 @@ interface DbUser {
   token_version: number;
   origin_session_id: string | null;
   origin_session_title?: string | null;
+  participant_kind: "member_state" | "commission";
+  all_sessions: boolean;
 }
 
 function publicUser(u: DbUser) {
@@ -63,6 +65,8 @@ function publicUser(u: DbUser) {
     docLangs: u.doc_langs,
     originSessionId: u.origin_session_id ?? null,
     originSessionTitle: u.origin_session_title ?? null,
+    kind: u.participant_kind ?? "member_state",
+    allSessions: Boolean(u.all_sessions),
   };
 }
 

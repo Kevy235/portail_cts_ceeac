@@ -512,6 +512,98 @@ async function main() {
         r.data.activity.length > 0
     );
 
+    // ─── Participant Commission de la CEEAC ─────────────────────────
+    r = await admin("POST", "/participants", {
+      json: {
+        name: "Sans réunion",
+        email: "commission-vide@ceeac-eccas.org",
+        kind: "commission",
+        functionTitle: "Juriste",
+      },
+    });
+    check("Commission sans réunion refusée (400)", r.status === 400);
+
+    r = await admin("POST", "/participants", {
+      json: {
+        name: "Marie Commission",
+        email: "marie.commission@ceeac-eccas.org",
+        kind: "commission",
+        functionTitle: "Chargée de documents",
+        sessionIds: [sessionId],
+        status: "actif",
+      },
+    });
+    check(
+      "création participant Commission + mot de passe provisoire",
+      r.status === 201 &&
+        r.data.participant.kind === "commission" &&
+        r.data.participant.allSessions === false &&
+        r.data.participant.sessionAccess.length === 1 &&
+        typeof r.data.temporaryPassword === "string"
+    );
+    const commissionId = r.data.participant.id;
+    const commissionPwd = r.data.temporaryPassword;
+
+    const commission = makeClient();
+    r = await commission("POST", "/auth/login", {
+      json: { email: "marie.commission@ceeac-eccas.org", password: commissionPwd },
+    });
+    check(
+      "connexion participant Commission",
+      r.status === 200 && r.data.user.kind === "commission"
+    );
+    r = await commission("POST", "/auth/change-password", {
+      json: { currentPassword: commissionPwd, newPassword: "Commission#2026" },
+    });
+    check("changement de mot de passe Commission", r.status === 200);
+
+    r = await commission("GET", "/documents");
+    check(
+      "la Commission voit les documents de ses réunions",
+      r.status === 200 && r.data.documents.length === 2
+    );
+    r = await commission("GET", "/sessions");
+    check(
+      "la Commission voit uniquement la réunion attribuée",
+      r.status === 200 && r.data.sessions.length === 1 && r.data.sessions[0].id === sessionId
+    );
+    r = await commission("POST", `/sessions/${sessionId}/messages`, {
+      json: { body: "Note de la Commission sur le dossier." },
+    });
+    check("la Commission écrit dans le fil de discussion", r.status === 201);
+
+    r = await admin("POST", "/sessions", {
+      json: {
+        title: "Conseil des Ministres extraordinaire",
+        location: "Libreville",
+        startDate: "2026-11-10",
+        organ: "Conseil des Ministres",
+      },
+    });
+    check("création d'une seconde réunion", r.status === 201);
+    const session2Id = r.data.session.id;
+
+    r = await commission("GET", "/sessions");
+    check(
+      "nouvelle réunion invisible sans affectation Commission",
+      r.status === 200 && r.data.sessions.length === 1
+    );
+
+    r = await admin("PUT", `/participants/${commissionId}/access`, {
+      json: { sessionIds: [], allSessions: true },
+    });
+    check(
+      "affectation à toutes les réunions (Commission)",
+      r.status === 200 && r.data.participant.allSessions === true
+    );
+
+    r = await commission("GET", "/sessions");
+    check(
+      "la Commission voit toutes les réunions après affectation globale",
+      r.status === 200 && r.data.sessions.some((s) => s.id === sessionId) &&
+        r.data.sessions.some((s) => s.id === session2Id)
+    );
+
     r = await admin("PUT", "/settings/admin", {
       json: {
         settings: {
@@ -916,6 +1008,8 @@ async function main() {
     check("suppression participant", r.status === 200);
     r = await admin("DELETE", `/participants/${registrantId}`);
     check("suppression de l'auto-inscrit", r.status === 200);
+    r = await admin("DELETE", `/participants/${commissionId}`);
+    check("suppression participant Commission", r.status === 200);
 
     console.log(`\nRésultat : ${passed} vérifications réussies, 0 échec.`);
   } finally {

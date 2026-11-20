@@ -125,7 +125,7 @@ export const pt: Dict = {
   "time.days": "há {n} d",
 
   "part.title": "Gestão de participantes",
-  "part.subtitle": "Peritos acreditados junto do Comité Técnico Especializado",
+  "part.subtitle": "Peritos dos Estados-Membros e participantes da Comissão da CEEAC",
   "part.create": "Criar uma conta",
   "part.searchPh": "Pesquisar por nome, país ou e-mail…",
   "part.colExpert": "Perito",
@@ -140,6 +140,22 @@ export const pt: Dict = {
   "part.resetPwd": "Repor a palavra-passe",
   "part.createTitle": "Criar uma conta de participante",
   "part.createSubtitle": "Será gerada uma palavra-passe provisória, mostrada uma única vez",
+  "part.kind.label": "Perfil",
+  "part.kind.member": "Participante Estado-Membro",
+  "part.kind.memberShort": "Estado-Membro",
+  "part.kind.memberHint": "Perito acreditado por um Estado-Membro — acesso limitado às reuniões abertas.",
+  "part.kind.commission": "Participante Comissão da CEEAC",
+  "part.kind.commissionShort": "Comissão",
+  "part.kind.commissionHint":
+    "Pessoal interno da Comissão — o administrador atribui-lhe uma, várias ou todas as reuniões.",
+  "part.allKinds": "Todos os perfis",
+  "part.commissionInstitution": "Comissão da CEEAC",
+  "part.meetingsLabel": "Reuniões atribuídas",
+  "part.meetingsHelp":
+    "O participante da Comissão interage apenas nas reuniões que lhe são atribuídas — como um participante inscrito.",
+  "part.meetingsRequired": "Escolha pelo menos uma reunião, ou todas as reuniões.",
+  "part.accessAll": "Todas as reuniões",
+  "part.accessAllHint": "Incluindo as reuniões que forem criadas posteriormente.",
   "part.editTitle": "Editar o participante",
   "part.fullName": "Nome completo",
   "part.fullNamePh": "Dr. Nome Apelido",
@@ -597,7 +613,9 @@ export const pt: Dict = {
   "part.accessBtn": "Gerir os acessos às reuniões",
   "part.accessTitle": "Acessos às reuniões",
   "part.accessSubtitle":
-    "Este participante só vê os documentos das reuniões selecionadas.",
+    "Este participante só vê os documentos das reuniões selecionadas, e pode aí interagir (discussão, biblioteca).",
+  "sess.psubtitleCommission":
+    "Reuniões da Comissão que lhe são atribuídas e fios de discussão",
   "part.accessNone": "Nenhuma reunião",
   "part.accessCount": "{n} reunião(ões)",
   "part.accessEmptyList": "Nenhuma reunião agendada",

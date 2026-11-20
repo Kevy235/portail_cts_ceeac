@@ -151,7 +151,12 @@ export function Discussion({ sessionId }: { sessionId: string }) {
                       {!mine && m.authorRole === "admin" && (
                         <span className="ml-1 text-brand font-normal">· {t("header.admin")}</span>
                       )}
-                      {!mine && m.authorCountry && (
+                      {!mine && m.authorKind === "commission" && (
+                        <span className="ml-1 font-normal text-accent-dark">
+                          · {t("part.kind.commissionShort")}
+                        </span>
+                      )}
+                      {!mine && m.authorKind !== "commission" && m.authorCountry && (
                         <span className="ml-1 font-normal text-slate2/80 inline-flex items-center gap-1">
                           <CountryFlag country={m.authorCountry} className="w-[14px] h-[9px]" />
                           {m.authorCountry}
